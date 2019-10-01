@@ -1,4 +1,5 @@
 public class Hexagon extends Shape{
+	private Shape color = "blue"
 	
 	public Hexagon(){
 		super();
