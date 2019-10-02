@@ -6,7 +6,7 @@ public class Shape{
     public Shape(){
         this.x = 0;
         this.y = 0;
-        this.color = "red";
+        this.color = "$This_is_a_color";
     }
   
     public Shape(int x, int y, String color){
