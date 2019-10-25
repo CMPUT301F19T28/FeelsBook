@@ -7,6 +7,12 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+
+
 public class SignUp extends AppCompatActivity {
 
     private Button signupButton;
@@ -14,6 +20,7 @@ public class SignUp extends AppCompatActivity {
     private EditText nameField;
     private EditText passwordField;
     private EditText usernameField;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +33,8 @@ public class SignUp extends AppCompatActivity {
         passwordField = (EditText) findViewById(R.id.passwordField);
         usernameField = (EditText) findViewById(R.id.usernameField);
 
+        db = FirebaseFirestore.getInstance();  // Create an instance to access Cloud Firestore
+        final CollectionReference collectionReference = db.collection("users");
 
 
         signupButton.setOnClickListener(new View.OnClickListener() {
@@ -33,7 +42,17 @@ public class SignUp extends AppCompatActivity {
             public void onClick(View v) {
                 checkRequirements();  // Checks field requirements
 
+                final String username = usernameField.getText().toString();
+                final String password = passwordField.getText().toString();
+                final String name     = nameField.getText().toString();
 
+                HashMap<String, String> data = new HashMap<>();
+                data.put("password", password);
+                data.put("name", name);
+
+                collectionReference
+                        .document(username)
+                        .set(data);
             }
         });
 
@@ -51,19 +70,22 @@ public class SignUp extends AppCompatActivity {
      * Checks the requirements of the field:
      *  All the fields are not empty
      *  The length of the password is at least a length of 8
-     *  The password contains at least one uppercase and one number
      */
     private void checkRequirements(){
-        if (nameField.getText().length() == 0){
-
+        if (nameField.getText().length() == 0 ||
+                passwordField.getText().length() == 0 ||
+                usernameField.getText().length() == 0 ) {
+            return;
         }
-        else if (passwordField.getText().length() == 0){
 
-        }
-        else if (usernameField.getText().length() == 0){
-
+        if (passwordField.getText().length() < 8 ){
+            // Invalid password error
+            return;
         }
 
     }
+
+
+
 
 }
