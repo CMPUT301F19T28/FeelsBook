@@ -17,13 +17,17 @@ public class Mood extends Post {
 
     private final static DateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.CANADA);
 
+<<<<<<< HEAD
     private Date dateTime;
+=======
+>>>>>>> 600051d28804c10d8677ea7f1984eb319ea7cf40
     private MoodType moodType;
     private String reason;
     private SocialSituation situation;
     private Bitmap photo;
     private Location location;
 
+<<<<<<< HEAD
     public Mood(MoodType moodType) {
         dateTime = new Date();
         this.moodType = moodType;
@@ -32,6 +36,26 @@ public class Mood extends Post {
     public Mood(Date dateTime, MoodType moodType) {
         this.dateTime = dateTime;
         this.moodType = moodType;
+=======
+
+    /**
+     * Create a Mood object with the current Date
+     * @param moodType
+     * Holds the associated emoji and colour for the Mood
+     * @param profilePic
+     * The user who made the posts
+     */
+    public Mood(MoodType moodType, Bitmap profilePic) {
+        this.dateTime = new Date();
+        this.moodType = moodType;
+        this.profilePic = profilePic;
+    }
+
+    public Mood(Date dateTime, MoodType moodType, Bitmap profilePic) {
+        this.dateTime = dateTime;
+        this.moodType = moodType;
+        this.profilePic = profilePic;
+>>>>>>> 600051d28804c10d8677ea7f1984eb319ea7cf40
     }
 
     public Mood withReason(String reason) {
@@ -58,6 +82,7 @@ public class Mood extends Post {
      * Provides context for the fields in a mood feed item.
      * @Param viewHolder Contains the view for the mood feed item which has the other views
      */
+<<<<<<< HEAD
 
     @Override
     public void displayPost(Feed.ViewHolder viewHolder) {
@@ -87,6 +112,32 @@ public class Mood extends Post {
 
     public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
+=======
+    @Override
+    public void displayPost(Feed.ViewHolder viewHolder) {
+        TextView dateTimeText = viewHolder.itemView.findViewById(R.id.dateText);
+        TextView moodText = viewHolder.itemView.findViewById(R.id.moodText);
+        ImageView profile_pic_feed = viewHolder.itemView.findViewById(R.id.profileImage);
+
+        dateTimeText.setText(dateFormatter.format(dateTime));
+        moodText.setText(moodType.getEmoticon());
+        profile_pic_feed.setImageBitmap(this.profilePic);
+
+//        TODO: Implemented but out of scope for sprint 1
+//
+//        if(reason != null) {
+//            TextView reasonText = viewHolder.itemView.findViewById(R.id.reason_feed);
+//            reasonText.setText(reason);
+//        }
+//        if(situation != null) {
+//            TextView situationText = viewHolder.itemView.findViewById(R.id.situation_feed);
+//            situationText.setText(situation.toString());
+//        }
+//        if(photo != null) {
+//            ImageView photoFeed = viewHolder.itemView.findViewById(R.id.photo_feed);
+//            photoFeed.setImageBitmap(photo);
+//        }
+>>>>>>> 600051d28804c10d8677ea7f1984eb319ea7cf40
     }
 
     public MoodType getMoodType() {
@@ -128,4 +179,8 @@ public class Mood extends Post {
     public void setLocation(Location location) {
         this.location = location;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 600051d28804c10d8677ea7f1984eb319ea7cf40

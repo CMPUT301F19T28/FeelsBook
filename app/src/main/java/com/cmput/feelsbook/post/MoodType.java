@@ -28,4 +28,8 @@ public enum MoodType {
     public int getEmoticon() {
         return emoticon;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 600051d28804c10d8677ea7f1984eb319ea7cf40
