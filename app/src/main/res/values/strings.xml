@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">FeelsBook</string>
+    <string name="map">MAP</string>
+    <string name="feed">FEED</string>
+    <string name="confirm">CONFIRM</string>
+    <string name="app_title">FeelsBook</string>
+    <string name="sign_up_msg">Don\'t have an account? Sign up</string>
+    <string name="enter_account_details">Enter account details:</string>
+    <string name="cancel">Cancel</string>
+    <string name="happy">&#128515;</string>
+    <string name="sleepy">&#128564;</string>
+    <string name="sad">&#128557;</string>
+    <string name="angry">&#128544;</string>
+    <string name="annoyed">&#128580;</string>
+    <string name="sexy">&#127814;</string>
 </resources>
