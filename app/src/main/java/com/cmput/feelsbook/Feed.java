@@ -27,6 +27,22 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> {
         this.feed = feed;
     }
 
+    public void addPost(Post post) {
+        feed.add(post);
+    }
+
+    public void removePost(Post post) {
+        feed.remove(post);
+    }
+
+    public void removePost(int pos) {
+        feed.remove(pos);
+    }
+
+    public Post getPost(int pos) {
+        return feed.get(pos);
+    }
+
     /**
      * Create a view holder of item post layout
      *
