@@ -3,4 +3,9 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="menu_bar_color">#107000</color>
+    <color name="feed_map_bar_color">#4AA800</color>
+    <color name="add_post_color">#FAF43C</color>
+    <color name="defaultWhite">#FFFFFF</color>
+    <color name="defaultGray">#E0E0E0</color>
 </resources>
