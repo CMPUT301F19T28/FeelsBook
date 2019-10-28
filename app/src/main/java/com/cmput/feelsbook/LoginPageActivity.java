@@ -51,14 +51,13 @@ public class LoginPageActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         };
-        /*loginButton.setOnClickListener(new View.OnClickListener() {
+        loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(LoginPageActivity.this,MainActivity.class);
                 startActivity(intent);
             }
         });
-         */
 
         spanString.setSpan(clickSpan,23,30, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         signupPrompt.setText(spanString);
