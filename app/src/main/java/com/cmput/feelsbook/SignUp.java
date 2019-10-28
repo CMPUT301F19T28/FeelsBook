@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,6 +31,7 @@ public class SignUp extends AppCompatActivity {
     private EditText nameField;
     private EditText passwordField;
     private EditText usernameField;
+    private TextView errorPrompt;
     private FirebaseFirestore db;
 
     @Override
@@ -42,6 +44,7 @@ public class SignUp extends AppCompatActivity {
         nameField     = (EditText) findViewById(R.id.s_name_text);
         passwordField = (EditText) findViewById(R.id.s_password_text);
         usernameField = (EditText) findViewById(R.id.s_username_text);
+        errorPrompt   = (TextView) findViewById(R.id.error_text);
 
         db = FirebaseFirestore.getInstance();  // Create an instance to access Cloud Firestore
         final CollectionReference collectionReference = db.collection("users");
@@ -65,7 +68,10 @@ public class SignUp extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             DocumentSnapshot doc = task.getResult();
                             if (doc.exists()) {
-                                Log.d(TAG, "Username is not available");
+                                Log.d(TAG, "Doc already exists with that name is collection users");
+                                errorPrompt.setText("Username is not available");
+                                errorPrompt.setVisibility(View.VISIBLE);
+                                return;
                             }
                             else {
                                 Log.d(TAG, "Username is available");
@@ -102,6 +108,9 @@ public class SignUp extends AppCompatActivity {
                                 Log.w(TAG, "User creation failed", e);
                             }
                         });
+
+                finish();
+
                 /*
                 Structure of the database:
 
@@ -135,11 +144,15 @@ public class SignUp extends AppCompatActivity {
                 passwordField.getText().length() == 0 ||
                 usernameField.getText().length() == 0 ) {
             Log.d(TAG, "A required field is not filled");
+            errorPrompt.setText("Please fill all required fields");
+            errorPrompt.setVisibility(View.VISIBLE);
             return false;
         }
 
         if (passwordField.getText().length() < 8 ){
             Log.d(TAG, "Invalid password length");
+            errorPrompt.setText("Invalid password length");
+            errorPrompt.setVisibility(View.VISIBLE);
             return false;
         }
         return  true;
