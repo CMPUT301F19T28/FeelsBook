@@ -49,7 +49,6 @@ public class SignUp extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();  // Create an instance to access Cloud Firestore
         final CollectionReference collectionReference = db.collection("users");
 
-
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
                 public void onClick(View v) {

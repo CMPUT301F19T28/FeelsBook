@@ -63,6 +63,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String username = userField.getText().toString();
+
                 DocumentReference docRef = db.collection("users").document(username);
                 docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
