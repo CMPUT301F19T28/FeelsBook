@@ -1,19 +1,29 @@
 package com.cmput.feelsbook;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 
 
 public class SignUp extends AppCompatActivity {
+
+    private static final String TAG = "SignUpActivity";
 
     private Button signupButton;
     private Button cancelButton;
@@ -25,13 +35,13 @@ public class SignUp extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.signup_activity);
+        setContentView(R.layout.activity_signup);
 
-        signupButton  = (Button) findViewById(R.id.singupButton);
-        cancelButton  = (Button) findViewById(R.id.cancelButton);
-        nameField     = (EditText) findViewById(R.id.nameField);
-        passwordField = (EditText) findViewById(R.id.passwordField);
-        usernameField = (EditText) findViewById(R.id.usernameField);
+        signupButton  = (Button) findViewById(R.id.confirm_signup);
+        cancelButton  = (Button) findViewById(R.id.cancel_signup);
+        nameField     = (EditText) findViewById(R.id.s_name_text);
+        passwordField = (EditText) findViewById(R.id.s_password_text);
+        usernameField = (EditText) findViewById(R.id.s_username_text);
 
         db = FirebaseFirestore.getInstance();  // Create an instance to access Cloud Firestore
         final CollectionReference collectionReference = db.collection("users");
@@ -39,12 +49,39 @@ public class SignUp extends AppCompatActivity {
 
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                checkRequirements();  // Checks field requirements
+                public void onClick(View v) {
+                Boolean result = checkRequirements();  // Checks field requirements
+
+                if (result == false){
+                    return;
+                }
 
                 final String username = usernameField.getText().toString();
+
+                DocumentReference docRef = db.collection("users").document(username);
+                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot doc = task.getResult();
+                            if (doc.exists()) {
+                                Log.d(TAG, "Username is not available");
+                            }
+                            else {
+                                Log.d(TAG, "Username is available");
+                            }
+                        }
+                        else {
+                            Log.d(TAG, "Failed with:   ", task.getException());
+                        }
+                    }
+                });
+
+
+
                 final String password = passwordField.getText().toString();
-                final String name     = nameField.getText().toString();
+                final String name = nameField.getText().toString();
+
 
                 HashMap<String, String> data = new HashMap<>();
                 data.put("password", password);
@@ -52,7 +89,29 @@ public class SignUp extends AppCompatActivity {
 
                 collectionReference
                         .document(username)
-                        .set(data);
+                        .set(data)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "User creation successful");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w(TAG, "User creation failed", e);
+                            }
+                        });
+                /*
+                Structure of the database:
+
+                collectionReference.document(username).collection("data").document("Followers")
+                collectionReference.document(username).collection("data").document("Following")
+                collectionReference.document(username).collection("data").document("Follow_Requests")
+                collectionReference.document(username).collection("data").document("Mood_History")
+                collectionReference.document(username).collection("data").document("Mood_History").collection("History").document()
+                 */
+
             }
         });
 
@@ -71,21 +130,19 @@ public class SignUp extends AppCompatActivity {
      *  All the fields are not empty
      *  The length of the password is at least a length of 8
      */
-    private void checkRequirements(){
+    private Boolean checkRequirements(){
         if (nameField.getText().length() == 0 ||
                 passwordField.getText().length() == 0 ||
                 usernameField.getText().length() == 0 ) {
-            return;
+            Log.d(TAG, "A required field is not filled");
+            return false;
         }
 
         if (passwordField.getText().length() < 8 ){
-            // Invalid password error
-            return;
+            Log.d(TAG, "Invalid password length");
+            return false;
         }
-
+        return  true;
     }
-
-
-
 
 }
