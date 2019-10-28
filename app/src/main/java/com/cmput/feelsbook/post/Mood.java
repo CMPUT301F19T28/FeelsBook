@@ -37,27 +37,64 @@ public class Mood extends Post {
         this.profilePic = profilePic;
     }
 
+    /**
+     * Create a Mood object with a different Date
+     * @param dateTime
+     * The Date that the post should be associated
+     * @param moodType
+     * Holds the associated emoji and colour for the Mood
+     * @param profilePic
+     * The user who made the posts
+     */
     public Mood(Date dateTime, MoodType moodType, Bitmap profilePic) {
         this.dateTime = dateTime;
         this.moodType = moodType;
         this.profilePic = profilePic;
     }
 
+    /**
+     * Builder style to add a reason to the Mood
+     * @param reason
+     * A short description of why the user is in the given Mood
+     * @return
+     * The Mood with the reason added
+     */
     public Mood withReason(String reason) {
         this.reason = reason;
         return this;
     }
 
+    /**
+     * Builder style to add a situation to the Mood
+     * @param situation
+     * A category describing how many people they are with
+     * @return
+     * The Mood with the situation added
+     */
     public Mood withSituation(SocialSituation situation) {
         this.situation = situation;
         return this;
     }
 
+    /**
+     * Builder style to add a situation to the Mood
+     * @param photo
+     * A photo to show something about their Mood
+     * @return
+     * The mood with a Photo added
+     */
     public Mood withPhoto(Bitmap photo) {
         this.photo = photo;
         return this;
     }
 
+    /**
+     * Builder style to add a location to the Mood
+     * @param location
+     * A location where the user is posting their Mood
+     * @return
+     * The mood with a Location added
+     */
     public Mood withLocation(Location location) {
         this.location = location;
         return this;

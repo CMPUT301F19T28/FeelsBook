@@ -10,6 +10,10 @@ public enum SocialSituation {
     CROWD;
 
 
+    /**
+     * @return
+     * The type of situation with the first letter uppercase and the rest lowercase
+     */
     @NonNull
     @Override
     public String toString() {
