@@ -4,8 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-<<<<<<< HEAD
-
     <TableRow
         android:id="@+id/tableRow"
         android:layout_width="412dp"
@@ -122,11 +120,3 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-=======
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:srcCompat="@mipmap/ic_launcher" />
-</androidx.constraintlayout.widget.ConstraintLayout>
->>>>>>> 600051d28804c10d8677ea7f1984eb319ea7cf40
