@@ -48,6 +48,9 @@ public class LoginActivityTest {
         Activity activity = rule.getActivity();
     }
 
+    /**
+     * Tests if the given username actually exists
+     */
     @Test
     public void badUserTest(){
         // Asserts that the current activity is LoginActivity. Otherwise, show "Wrong Activity"
@@ -60,6 +63,9 @@ public class LoginActivityTest {
         assertTrue(solo.waitForText("Invalid", 1, 1000));
     }
 
+    /**
+     * Given the correct username, but tests the incorrect password
+     */
     @Test
     public void badPasswordTest(){
         // Asserts that the current activity is LoginActivity. Otherwise, show "Wrong Activity"
@@ -72,6 +78,10 @@ public class LoginActivityTest {
         assertTrue(solo.waitForText("Invalid", 1, 1000));
     }
 
+    /**
+     * Given a good username and password,
+     * Tests a successful login
+     */
     @Test
     public void goodPasswordTest(){
         // Asserts that the current activity is LoginActivity. Otherwise, show "Wrong Activity"

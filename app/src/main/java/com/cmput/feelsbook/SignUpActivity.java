@@ -65,12 +65,35 @@ public class SignUpActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
                             DocumentSnapshot doc = task.getResult();
-                            if (doc.exists()) {
-                                Log.d(TAG, "Doc already exists with that name is collection users");
-                                return;
+                            if (!doc.exists()) {
+                                final String password = passwordField.getText().toString();
+                                final String name = nameField.getText().toString();
+
+
+                                HashMap<String, String> data = new HashMap<>();
+                                data.put("password", password);
+                                data.put("name", name);
+
+                                collectionReference
+                                        .document(username)
+                                        .set(data)
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Log.d(TAG, "User creation successful");
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.w(TAG, "User creation failed", e);
+                                            }
+                                        });
+
+                                finish();
                             }
                             else {
-                                Log.d(TAG, "Username is available");
+                                Toast.makeText(SignUpActivity.this, "Username is not available", Toast.LENGTH_SHORT).show();
                             }
                         }
                         else {
@@ -79,33 +102,6 @@ public class SignUpActivity extends AppCompatActivity {
                     }
                 });
 
-
-
-                final String password = passwordField.getText().toString();
-                final String name = nameField.getText().toString();
-
-
-                HashMap<String, String> data = new HashMap<>();
-                data.put("password", password);
-                data.put("name", name);
-
-                collectionReference
-                        .document(username)
-                        .set(data)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d(TAG, "User creation successful");
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w(TAG, "User creation failed", e);
-                            }
-                        });
-
-                //finish();
 
                 /*
                 Structure of the database:

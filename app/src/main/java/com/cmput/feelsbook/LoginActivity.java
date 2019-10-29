@@ -74,7 +74,7 @@ public class LoginActivity extends AppCompatActivity {
                             if (document.exists()) {
                                 String saved_pass = document.getString("password");
                                 String password = passField.getText().toString();
-                                if (password == saved_pass) {
+                                if (password.equals(saved_pass)) {
                                     Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
                                     //finish();
                                     //Intent intent = new Intent(LoginActivity.this, MainActivity.class)

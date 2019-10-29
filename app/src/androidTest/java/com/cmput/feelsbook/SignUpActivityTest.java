@@ -48,18 +48,24 @@ public class SignUpActivityTest {
         Activity activity = rule.getActivity();
     }
 
+    /**
+     * Tests that a new user is added to the database
+     */
     @Test
     public void addNewUser(){
+        db = FirebaseFirestore.getInstance();
+        db.collection("users").document("MoodMan2019").delete();
         // Asserts that the current activity is SignUpActivity. Otherwise, show "Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", SignUpActivity.class);
-
-        db = FirebaseFirestore.getInstance();
-        DocumentReference docRef = db.collection("users").document("MoodMan2019");
 
         solo.enterText((EditText) solo.getView(R.id.s_name_text), "Daylen Pacheco");
         solo.enterText((EditText) solo.getView(R.id.s_user_text), "MoodMan2019");
         solo.enterText((EditText) solo.getView(R.id.s_password_text), "passwords123");
         solo.clickOnButton("CONFIRM");
+
+        solo.waitForActivity(LoginActivity.class,2000);
+
+        DocumentReference docRef = db.collection("users").document("MoodMan2019");
 
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -72,6 +78,9 @@ public class SignUpActivityTest {
         });
     }
 
+    /**
+     * Tests if there is a field that is required but is empty
+     */
     @Test
     public void missingFieldTest(){
         // Asserts that the current activity is SignUpActivity. Otherwise, show "Wrong Activity"
@@ -84,6 +93,9 @@ public class SignUpActivityTest {
         assertTrue(solo.waitForText("Required", 1, 1000));
     }
 
+    /**
+     * Tests that the password is of correct length
+     */
     @Test
     public void invalidPassTest(){
         // Asserts that the current activity is SignUpActivity. Otherwise, show "Wrong Activity"
