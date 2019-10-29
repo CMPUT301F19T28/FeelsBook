@@ -53,10 +53,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 new AddMoodFragment().show(getSupportFragmentManager(), "ADD_MOOD");
             }
         });
-        /**
-         * Need to add more functionality for feed/ posts
-         * may need to adjust classes to better represent the app
-         */
+
 
     }
 
