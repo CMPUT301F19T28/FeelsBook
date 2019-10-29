@@ -4,6 +4,7 @@ import com.cmput.feelsbook.R;
 
 public enum MoodType {
 
+
     HAPPY(R.string.happy,"yellow"),
     SAD(R.string.sad,"blue"),
     ANGRY(R.string.angry, "red"),

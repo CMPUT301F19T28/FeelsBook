@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
 
     <TableRow
         android:id="@+id/tableRow"
@@ -29,6 +27,7 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_weight="0.166"
+                android:contentDescription="Profile picture"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@mipmap/ic_launcher" />
@@ -41,6 +40,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_weight="0.833"
+                android:contentDescription="Filter button"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@android:drawable/ic_menu_sort_by_size" />
@@ -77,17 +77,19 @@
             android:layout_height="wrap_content"
             android:background="@color/feed_map_bar_color"
             app:tabIndicatorColor="@color/add_post_color"
-            app:tabIndicatorHeight="4dp">
+            app:tabIndicatorHeight="4dp"
+            app:tabTextColor="@color/defaultGray"
+            app:tabSelectedTextColor="@color/defaultWhite">
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="FEED" />
+                android:text="FEED"/>
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="MAP" />
+                android:text="MAP"/>
 
         </com.google.android.material.tabs.TabLayout>
 

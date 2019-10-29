@@ -4,13 +4,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput.feelsbook.post.Post;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +19,7 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
 
     private List<Post> feed;
 
-    public Feed(){
+    public Feed() {
         this.feed = new ArrayList<>();
     }
 
@@ -29,6 +27,13 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
         this.feed = feed;
     }
 
+    /**
+     * Create a view holder of item post layout
+     *
+     * @param parent
+     * @param viewType
+     * @return
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -36,17 +41,24 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
         return new ViewHolder(view);
     }
 
+    /**
+     * When binding a viewholder to the recycler view calls the post to fill the fields.
+     *
+     * @param holder   The viewholder which will display the item
+     * @param position The position of the item in the data source
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Log.d(TAG, "called onBindViewHolder");
         feed.get(position).displayPost(holder);
     }
+
     @Override
     public int getItemCount() {
         return feed.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements Serializable{
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
 
         public ViewHolder(final View view) {

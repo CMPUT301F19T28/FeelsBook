@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 
 public enum SocialSituation {
 
-
     ALONE,
     ONEPERSON,
     SEVERAL,
@@ -22,4 +21,3 @@ public enum SocialSituation {
         return temp.substring(0,1) + temp.substring(1).toLowerCase();
     }
 }
-
