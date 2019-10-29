@@ -29,11 +29,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         feedAdapter = new Feed();
         feedView.setAdapter(feedAdapter);
 
-        /**
-         * to-do: implement test RecyclerView
-         * - add FloatingActionButton for post added
-         * -
-         */
 
         try {
             currentUser = (User) getIntent().getSerializableExtra(LoginPageActivity.USER);
