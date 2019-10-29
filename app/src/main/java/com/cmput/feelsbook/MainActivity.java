@@ -8,9 +8,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.cmput.feelsbook.post.Mood;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener{
     User currentUser;
     RecyclerView feedView;
     Feed feedAdapter;
@@ -51,12 +52,25 @@ public class MainActivity extends AppCompatActivity {
                 //When floating action button is pressed instantiates the fragment so a Ride can be
                 // added to the list
                 //add post activity ;
+                new AddMoodFragment().show(getSupportFragmentManager(), "ADD_MOOD");
             }
         });
         /**
          * Need to add more functionality for feed/ posts
          * may need to adjust classes to better represent the app
          */
+
+    }
+
+    public void onSubmit(Mood newMood){
+
+    }
+
+    public void edited(){
+
+    }
+
+    public void deleted(Mood delete){
 
     }
 }
