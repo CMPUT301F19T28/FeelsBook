@@ -22,13 +22,15 @@ import androidx.fragment.app.DialogFragment;
 
 import com.cmput.feelsbook.post.Mood;
 
-
+/**
+ * Fragment for adding or editing a Mood
+ */
 public class AddMoodFragment extends DialogFragment {
 
     private EditText input;
     private Bitmap dp;
     private OnFragmentInteractionListener listener;
-//    public static final String INPUT = "com.cmput.feelsbook.AddMoodFragment.input";
+
 
     public interface OnFragmentInteractionListener{
         void onSubmit(Mood newMood);
@@ -36,8 +38,12 @@ public class AddMoodFragment extends DialogFragment {
         void deleted(Mood delete);
     }
 
+    /**
+     * Attaches to context and ensures it implements OnFragmentInteractionListener
+     * else it throws an exception
+     * @param context
+     */
     @Override
-    // makes sure the activity the fragment attaches to implements OnFragmentInteractionListener
     public void onAttach(Context context){
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener){
@@ -48,8 +54,14 @@ public class AddMoodFragment extends DialogFragment {
         }
     }
 
-    //when a new instance of the fragment is called passes a Mood into the fragment
-    // for when a Mood is being edited
+    /**
+     * Returns a new instance of the fragment and passes a mood to be edited
+     * Used for when a Mood needs to be edited
+     * @param mood
+     *      object that will be edited
+     * @return
+     *      a fragment object
+     */
     public static AddMoodFragment newInstance(Mood mood){
         Bundle args = new Bundle();
         args.putSerializable("mood", mood);
@@ -59,6 +71,12 @@ public class AddMoodFragment extends DialogFragment {
         return fragment;
     }
 
+    /**
+     * Builds a dialog when the fragment is called
+     * @param savedInstanceState
+     * @return
+     *      returns a dialog where a mood can be created or edited and passed back to the homepage
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){

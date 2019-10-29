@@ -8,19 +8,13 @@ import android.widget.ListView;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
-
 import com.cmput.feelsbook.post.Mood;
-import com.robotium.solo.Condition;
 import com.robotium.solo.Solo;
-
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+
 
 
 public class MainActivityTest {
@@ -68,14 +62,9 @@ public class MainActivityTest {
         solo.clickOnButton("Post"); //Select Confirm button
 
         //Get MainActivity to access its variables and methods
-        try{
-            solo.wait(5);
-        }catch(Exception e){
-            //do nothing
-        }
-
         //these fail
         try { //asserts theres something in the feedAdapter
+            solo.wait(5);
             final RecyclerView list = activity.feedView;
             assertEquals(list.getChildCount(), 1);
 

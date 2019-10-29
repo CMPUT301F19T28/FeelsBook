@@ -1,15 +1,16 @@
 package com.cmput.feelsbook;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Bundle;
 import android.view.View;
-
 import com.cmput.feelsbook.post.Mood;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+/**
+ * Homepage where feed of moods/Posts will be seen
+ * comprises of a scrollable recyclerView
+ */
 public class MainActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener{
     User currentUser;
     RecyclerView feedView;
@@ -52,15 +53,26 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
 
     }
 
+    /**
+     * Takes a mood from the implemented fragment and adds it to the feedAdapter
+     * @param newMood
+     */
     public void onSubmit(Mood newMood){
         feedAdapter.addPost(newMood);
 
     }
 
+    /**
+     * will eventually be used to edit mood
+     */
     public void edited(){
         //Code for editing mood
     }
 
+    /**
+     * will be used to delete passed in mood once implemented
+     * @param delete
+     */
     public void deleted(Mood delete){
         //For deleting mood
     }
