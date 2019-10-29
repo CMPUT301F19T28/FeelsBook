@@ -45,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_screen);
 
+        db = FirebaseFirestore.getInstance();  // Create an instance to access Cloud Firestore
         userField = findViewById(R.id.user_text);
         passField = findViewById(R.id.password_text);
         loginButton = findViewById(R.id.confirm_login);
@@ -70,21 +71,20 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
-                            if (document.exists()){
+                            if (document.exists()) {
                                 String saved_pass = document.getString("password");
                                 String password = passField.getText().toString();
-                                if (password == saved_pass){
-                                    finish();
-                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class)
+                                if (password == saved_pass) {
+                                    Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
+                                    //finish();
+                                    //Intent intent = new Intent(LoginActivity.this, MainActivity.class)
+                                } else {
+                                    Toast.makeText(LoginActivity.this, "Invalid Username or Password", Toast.LENGTH_SHORT).show();
                                 }
-                                Log.d(TAG, "Document exists");
-                            }
-                            else {
-                                Log.d(TAG, "Document does not exist");
+                            } else {
                                 Toast.makeText(LoginActivity.this, "Invalid Username or Password", Toast.LENGTH_SHORT).show();
                             }
-                        }
-                        else{
+                        } else {
                             Log.d(TAG, "Failed with:  ", task.getException());
                         }
                     }
@@ -92,8 +92,9 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        spanString.setSpan(clickSpan,23,30, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(clickSpan, 23, 30, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         signupPrompt.setText(spanString);
         signupPrompt.setMovementMethod(LinkMovementMethod.getInstance());
 
+    }
 }
