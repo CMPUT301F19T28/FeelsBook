@@ -76,8 +76,12 @@ public class LoginActivity extends AppCompatActivity {
                                 String password = passField.getText().toString();
                                 if (password.equals(saved_pass)) {
                                     Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
-                                    //finish();
-                                    //Intent intent = new Intent(LoginActivity.this, MainActivity.class)
+                                    User user = new User(document.getString("name"), new Feed(), new FollowList());
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    Bundle bundle = new Bundle();
+                                    bundle.putSerializable("User",user);
+                                    intent.putExtras(bundle);
+                                    startActivity(intent);
                                 } else {
                                     Toast.makeText(LoginActivity.this, "Invalid Username or Password", Toast.LENGTH_SHORT).show();
                                 }
