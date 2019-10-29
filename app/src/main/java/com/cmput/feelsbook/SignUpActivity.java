@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -34,16 +35,18 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText usernameField;
     private FirebaseFirestore db;
 
+    private final String SIGNUP_TAG = "Invalid field";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signup_screen);
 
-        signupButton  = (Button) findViewById(R.id.confirm_signup);
-        cancelButton  = (Button) findViewById(R.id.cancel_signup);
-        nameField     = (EditText) findViewById(R.id.s_name_text);
-        passwordField = (EditText) findViewById(R.id.s_password_text);
-        usernameField = (EditText) findViewById(R.id.s_user_text);
+        signupButton  = findViewById(R.id.confirm_signup);
+        cancelButton  = findViewById(R.id.cancel_signup);
+        nameField     = findViewById(R.id.s_name_text);
+        passwordField = findViewById(R.id.s_password_text);
+        usernameField = findViewById(R.id.s_user_text);
 
         db = FirebaseFirestore.getInstance();  // Create an instance to access Cloud Firestore
         final CollectionReference collectionReference = db.collection("users");
@@ -147,5 +150,4 @@ public class SignUpActivity extends AppCompatActivity {
         }
         return  true;
     }
-
 }
