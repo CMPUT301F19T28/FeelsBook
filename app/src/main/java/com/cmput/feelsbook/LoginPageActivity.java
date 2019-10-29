@@ -23,6 +23,7 @@ public class LoginPageActivity extends AppCompatActivity {
     private Button loginButton;
     private TextView signupPrompt;
     private String signupMessage = "Don't have an account? Sign up";
+    public static final String USER = "com.example.LoginPageActivity.User";
     private FirebaseFirestore db;
 
     @Override
@@ -54,7 +55,9 @@ public class LoginPageActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(LoginPageActivity.this,MainActivity.class);
+                Intent intent = new Intent(LoginPageActivity.this, MainActivity.class);
+                User user = new User("John", new Feed(), new FollowList());
+                intent.putExtra(USER, user);
                 startActivity(intent);
             }
         });

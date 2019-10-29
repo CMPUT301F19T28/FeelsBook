@@ -17,26 +17,13 @@ public class Mood extends Post {
 
     private final static DateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.CANADA);
 
-<<<<<<< HEAD
-    private Date dateTime;
-=======
->>>>>>> 600051d28804c10d8677ea7f1984eb319ea7cf40
+
     private MoodType moodType;
     private String reason;
     private SocialSituation situation;
     private Bitmap photo;
     private Location location;
 
-<<<<<<< HEAD
-    public Mood(MoodType moodType) {
-        dateTime = new Date();
-        this.moodType = moodType;
-    }
-
-    public Mood(Date dateTime, MoodType moodType) {
-        this.dateTime = dateTime;
-        this.moodType = moodType;
-=======
 
     /**
      * Create a Mood object with the current Date
@@ -51,28 +38,64 @@ public class Mood extends Post {
         this.profilePic = profilePic;
     }
 
+    /**
+     * Create a Mood object with a different Date
+     * @param dateTime
+     * The Date that the post should be associated
+     * @param moodType
+     * Holds the associated emoji and colour for the Mood
+     * @param profilePic
+     * The user who made the posts
+     */
     public Mood(Date dateTime, MoodType moodType, Bitmap profilePic) {
         this.dateTime = dateTime;
         this.moodType = moodType;
         this.profilePic = profilePic;
->>>>>>> 600051d28804c10d8677ea7f1984eb319ea7cf40
     }
 
+    /**
+     * Builder style to add a reason to the Mood
+     * @param reason
+     * A short description of why the user is in the given Mood
+     * @return
+     * The Mood with the reason added
+     */
     public Mood withReason(String reason) {
         this.reason = reason;
         return this;
     }
 
+    /**
+     * Builder style to add a situation to the Mood
+     * @param situation
+     * A category describing how many people they are with
+     * @return
+     * The Mood with the situation added
+     */
     public Mood withSituation(SocialSituation situation) {
         this.situation = situation;
         return this;
     }
 
+    /**
+     * Builder style to add a situation to the Mood
+     * @param photo
+     * A photo to show something about their Mood
+     * @return
+     * The mood with a Photo added
+     */
     public Mood withPhoto(Bitmap photo) {
         this.photo = photo;
         return this;
     }
 
+    /**
+     * Builder style to add a location to the Mood
+     * @param location
+     * A location where the user is posting their Mood
+     * @return
+     * The mood with a Location added
+     */
     public Mood withLocation(Location location) {
         this.location = location;
         return this;
@@ -82,37 +105,6 @@ public class Mood extends Post {
      * Provides context for the fields in a mood feed item.
      * @Param viewHolder Contains the view for the mood feed item which has the other views
      */
-<<<<<<< HEAD
-
-    @Override
-    public void displayPost(Feed.ViewHolder viewHolder) {
-        TextView dateTimeText = viewHolder.itemView.findViewById(R.id.date_time_feed);
-        TextView moodText = viewHolder.itemView.findViewById(R.id.mood_feed);
-
-        dateTimeText.setText(dateFormatter.format(dateTime));
-        moodText.setText(moodType.getEmoticon());
-
-        if(reason != null) {
-            TextView reasonText = viewHolder.itemView.findViewById(R.id.reason_feed);
-            reasonText.setText(reason);
-        }
-        if(situation != null) {
-            TextView situationText = viewHolder.itemView.findViewById(R.id.situation_feed);
-            situationText.setText(situation.toString());
-        }
-        if(photo != null) {
-            ImageView photoFeed = viewHolder.itemView.findViewById(R.id.photo_feed);
-            photoFeed.setImageBitmap(photo);
-        }
-    }
-
-    public Date getDateTime() {
-        return dateTime;
-    }
-
-    public void setDateTime(Date dateTime) {
-        this.dateTime = dateTime;
-=======
     @Override
     public void displayPost(Feed.ViewHolder viewHolder) {
         TextView dateTimeText = viewHolder.itemView.findViewById(R.id.dateText);
@@ -137,7 +129,6 @@ public class Mood extends Post {
 //            ImageView photoFeed = viewHolder.itemView.findViewById(R.id.photo_feed);
 //            photoFeed.setImageBitmap(photo);
 //        }
->>>>>>> 600051d28804c10d8677ea7f1984eb319ea7cf40
     }
 
     public MoodType getMoodType() {
@@ -179,8 +170,4 @@ public class Mood extends Post {
     public void setLocation(Location location) {
         this.location = location;
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 600051d28804c10d8677ea7f1984eb319ea7cf40

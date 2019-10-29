@@ -1,13 +1,5 @@
 package com.cmput.feelsbook.post;
 
-<<<<<<< HEAD
-import com.cmput.feelsbook.Feed;
-
-public abstract class Post {
-
-    public abstract void displayPost(Feed.ViewHolder viewHolder);
-}
-=======
 import android.graphics.Bitmap;
 
 import com.cmput.feelsbook.Feed;
@@ -37,4 +29,3 @@ public abstract class Post {
         this.dateTime = dateTime;
     }
 }
->>>>>>> 600051d28804c10d8677ea7f1984eb319ea7cf40

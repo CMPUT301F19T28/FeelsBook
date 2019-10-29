@@ -1,5 +1,6 @@
 package com.cmput.feelsbook;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +24,7 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText usernameField;
     private FirebaseFirestore db;
     private final String SIGNUP_TAG = "Invalid field";
+    public static final String USER = "com.example.signUpActivity.User";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,10 @@ public class SignUpActivity extends AppCompatActivity {
                  * data with password and name.
                  * Next step: create a user with the data and send to MainActivity
                  */
+                Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+                User user = new User(name, new Feed(), new FollowList());
+                intent.putExtra(USER, user);
+                startActivity(intent);
             }
         });
 
