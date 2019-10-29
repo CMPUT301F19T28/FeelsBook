@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -16,7 +15,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     RecyclerView feedView;
     Feed feedAdapter;
     RecyclerView.LayoutManager layoutManager;
-    boolean loggedOn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,10 +66,10 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     }
 
     public void edited(){
-
+        //Code for editing mood
     }
 
     public void deleted(Mood delete){
-
+        //For deleting mood
     }
 }

@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +26,7 @@ import com.cmput.feelsbook.post.Mood;
 public class AddMoodFragment extends DialogFragment {
 
     private EditText input;
-    private ImageButton dp;
+    private Bitmap dp;
     private OnFragmentInteractionListener listener;
 //    public static final String INPUT = "com.cmput.feelsbook.AddMoodFragment.input";
 
@@ -63,7 +64,7 @@ public class AddMoodFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.activity_add_post, null);
         input = view.findViewById(R.id.editText);
-        dp = view.findViewById(R.id.profileImage); //need to get profile pic
+        //dp.setImage; //need to get profile pic
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         try{
