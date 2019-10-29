@@ -23,7 +23,7 @@ public class LoginPageActivity extends AppCompatActivity {
     private Button loginButton;
     private TextView signupPrompt;
     private String signupMessage = "Don't have an account? Sign up";
-    public static final String USER = "com.example.LoginPageActivity.User";
+    public static final String USER = "com.cmput.feelsbook.LoginPageActivity.User";
     private FirebaseFirestore db;
 
     @Override

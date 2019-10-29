@@ -24,7 +24,7 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText usernameField;
     private FirebaseFirestore db;
     private final String SIGNUP_TAG = "Invalid field";
-    public static final String USER = "com.example.signUpActivity.User";
+    public static final String USER = "com.cmput.feelsbook.signUpActivity.User";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
