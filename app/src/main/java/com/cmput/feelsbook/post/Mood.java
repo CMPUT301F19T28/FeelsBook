@@ -17,7 +17,6 @@ public class Mood extends Post {
 
     private final static DateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.CANADA);
 
-
     private MoodType moodType;
     private String reason;
     private SocialSituation situation;
