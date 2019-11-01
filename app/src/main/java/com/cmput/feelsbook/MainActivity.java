@@ -1,12 +1,13 @@
 package com.cmput.feelsbook;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 
 public class MainActivity extends AppCompatActivity {
     private ImageButton profileButton;
@@ -19,9 +20,9 @@ public class MainActivity extends AppCompatActivity {
          * - added Profile display
          *
          * TO BE IMPLEMENTED:
-         * - display feed and Add Post button
+         * - display feed and make working Add Post button
          * - switch between feed and map
-         * - click on profile
+         * - click on profile < - current task
          */
 
         super.onCreate(savedInstanceState);
@@ -38,6 +39,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Toast.makeText(MainActivity.this, user.getName(), Toast.LENGTH_SHORT).show();
+                /**
+                 * TO-DO:
+                 * - convert ProfileFragment to ProfileActivity
+                 * - Fragments are meant for Maps
+                 * - successfully start Profile
+                 */
 
             }
         });
