@@ -117,11 +117,6 @@ public class SignUpActivity extends AppCompatActivity {
                 collectionReference.document(username).collection("data").document("Mood_History")
                 collectionReference.document(username).collection("data").document("Mood_History").collection("History").document()
                  */
-
-                Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
-                User user = new User("john", new Feed(), new FollowList());
-                intent.putExtra(USER, user);
-                startActivity(intent);
             }
         });
 

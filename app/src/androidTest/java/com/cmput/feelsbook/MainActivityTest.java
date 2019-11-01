@@ -3,7 +3,6 @@ package com.cmput.feelsbook;
 import android.app.Activity;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ListView;
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.platform.app.InstrumentationRegistry;

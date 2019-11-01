@@ -31,13 +31,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         feedView.setAdapter(feedAdapter);
 
 
-        try {
-            currentUser = (User) getIntent().getSerializableExtra(LoginPageActivity.USER);
-        }
-        catch(Exception e){
-            //must be from signup page else couldn't be in main activity
-            currentUser = (User) getIntent().getSerializableExtra(SignUpActivity.USER);
-        }
+        currentUser = (User) getIntent().getExtras().get("User");
 
         final FloatingActionButton addPostBttn = findViewById(R.id.addPostButton);
         addPostBttn.setOnClickListener(new View.OnClickListener() {
