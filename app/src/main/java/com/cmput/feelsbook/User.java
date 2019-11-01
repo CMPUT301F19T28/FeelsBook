@@ -2,16 +2,18 @@ package com.cmput.feelsbook;
 
 import android.graphics.Bitmap;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private String name;
     private Feed posts;
-    private FollowList followsList;
+    private FollowList followList;
     private Bitmap profilePicture;
 
     public User(String name, Feed posts, FollowList followsList){
         this.name = name;
         this.posts = posts;
-        this.followsList = followsList;
+        followList = followsList;
     }
 
     public User(String name){
@@ -35,11 +37,11 @@ public class User {
     }
 
     public FollowList getFollowsList() {
-        return followsList;
+        return followList;
     }
 
     public void setFollowsList(FollowList followsList) {
-        this.followsList = followsList;
+        followList = followsList;
     }
 
 

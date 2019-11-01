@@ -9,11 +9,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput.feelsbook.post.Post;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> {
+public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Serializable {
 
     private final String TAG = "Feed";
 

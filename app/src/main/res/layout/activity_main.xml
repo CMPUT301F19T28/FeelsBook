@@ -100,10 +100,11 @@
         android:layout_width="410dp"
         android:layout_height="622dp"
         android:layout_marginTop="46dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:scrollbars="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tableRow" />
+        app:layout_constraintTop_toBottomOf="@+id/tableRow"
+        app:layout_constraintBottom_toBottomOf="@id/pager"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addPostButton"
@@ -113,6 +114,7 @@
         android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp"
         android:clickable="true"
+        android:text="ADD POST"
         app:backgroundTint="@color/add_post_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
