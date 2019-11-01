@@ -2,10 +2,13 @@ package com.cmput.feelsbook;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
+
 import android.os.Bundle;
 import android.view.View;
 import com.cmput.feelsbook.post.Mood;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.tabs.TabLayout;
 
 /**
  * Homepage where feed of moods/Posts will be seen
@@ -16,6 +19,9 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     RecyclerView feedView;
     Feed feedAdapter;
     RecyclerView.LayoutManager layoutManager;
+    TabLayout tabLayout;
+    ViewPager viewPager;
+    ViewPagerAdapter viewPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +36,15 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         feedAdapter = new Feed();
         feedView.setAdapter(feedAdapter);
 
+        tabLayout = findViewById(R.id.tab_layout);
+        viewPager = findViewById(R.id.view_pager);
+        viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+        viewPagerAdapter.AddFragment(new FeedFragment(), "Feed");
+        viewPagerAdapter.AddFragment(new MapFragment(), "Title");
+
+        viewPager.setAdapter(viewPagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
 
         currentUser = (User) getIntent().getExtras().get("User");
 
