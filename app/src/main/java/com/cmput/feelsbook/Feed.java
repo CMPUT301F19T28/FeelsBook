@@ -9,10 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput.feelsbook.post.Post;
-<<<<<<< HEAD
-
-=======
->>>>>>> origin
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
