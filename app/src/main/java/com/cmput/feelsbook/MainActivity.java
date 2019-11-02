@@ -16,32 +16,34 @@ import com.google.android.material.tabs.TabLayout;
  */
 public class MainActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener{
     User currentUser;
-    RecyclerView feedView;
-    Feed feedAdapter;
+    //RecyclerView feedView;
+    //Feed feedAdapter;
     RecyclerView.LayoutManager layoutManager;
     TabLayout tabLayout;
     ViewPager viewPager;
     ViewPagerAdapter viewPagerAdapter;
+    FeedFragment feedFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        feedView = findViewById(R.id.feedList);
-        feedView.setHasFixedSize(true);
+      //  feedView = findViewById(R.id.feedList);
+      //  feedView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
-        feedView.setLayoutManager(layoutManager);
+      //  feedView.setLayoutManager(layoutManager);
 
-        feedAdapter = new Feed();
-        feedView.setAdapter(feedAdapter);
+      //  feedAdapter = new Feed();
+      //  feedView.setAdapter(feedAdapter);
 
         tabLayout = findViewById(R.id.tab_layout);
         viewPager = findViewById(R.id.view_pager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        viewPagerAdapter.AddFragment(new FeedFragment(), "Feed");
-        viewPagerAdapter.AddFragment(new MapFragment(), "Title");
+        feedFragment = new FeedFragment();
+        viewPagerAdapter.AddFragment(feedFragment, "Feed");
+        viewPagerAdapter.AddFragment(new MapFragment(), "Map");
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -67,7 +69,8 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
      * @param newMood
      */
     public void onSubmit(Mood newMood){
-        feedAdapter.addPost(newMood);
+        feedFragment.getRecyclerAdapter().addPost(newMood);
+
 
     }
 

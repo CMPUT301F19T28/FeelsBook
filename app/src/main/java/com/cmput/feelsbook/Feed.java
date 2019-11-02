@@ -19,13 +19,9 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
 
     private List<Post> feed;
 
-    public Feed() {
-        this.feed = new ArrayList<>();
-    }
+    public Feed() { this.feed = new ArrayList<>(); }
 
-    public Feed(List<Post> feed) {
-        this.feed = feed;
-    }
+    public Feed(List<Post> feed) { this.feed = feed; }
 
     public void addPost(Post post) {
         feed.add(post);

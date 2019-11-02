@@ -22,11 +22,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:ems="10"
+        android:hint="Full Name"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sign_up_prompt2"
-        tools:text="Full name: " />
+        app:layout_constraintTop_toBottomOf="@+id/sign_up_prompt2" />
 
     <EditText
         android:id="@+id/s_user_text"
@@ -34,11 +34,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:ems="10"
+        android:hint="Username"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/s_name_text"
-        tools:text="Username" />
+        app:layout_constraintTop_toBottomOf="@+id/s_name_text" />
 
     <EditText
         android:id="@+id/s_password_text"
@@ -46,11 +46,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:ems="10"
+        android:hint="Password"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/s_user_text"
-        tools:text="Password" />
+        app:layout_constraintTop_toBottomOf="@+id/s_user_text" />
 
     <Button
         android:id="@+id/confirm_signup"

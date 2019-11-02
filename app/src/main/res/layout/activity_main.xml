@@ -16,7 +16,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/menu_bar_color">
 
@@ -66,43 +66,27 @@
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/view_pager"
         android:layout_width="412dp"
-        android:layout_height="621dp"
-        android:layout_marginTop="1dp"
+        android:layout_height="669dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tab_layout"
-        app:layout_constraintVertical_bias="1.0">
-
-    </androidx.viewpager.widget.ViewPager>
-
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tab_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/feed_map_bar_color"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tableRow"
-        app:tabIndicatorColor="@color/add_post_color"
-        app:tabIndicatorHeight="4dp"
-        app:tabMode="fixed"
-        app:tabSelectedTextColor="@color/defaultWhite"
-        app:tabTextColor="@color/defaultGray">
+        app:layout_constraintVertical_bias="0.0">
 
-    </com.google.android.material.tabs.TabLayout>
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/feed_map_bar_color"
+            app:tabIndicatorColor="@color/add_post_color"
+            app:tabIndicatorHeight="4dp"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="@color/defaultWhite"
+            app:tabTextColor="@color/defaultGray">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/feedList"
-        android:layout_width="410dp"
-        android:layout_height="622dp"
-        android:layout_marginTop="46dp"
-        android:scrollbars="vertical"
-        app:layout_constraintBottom_toBottomOf="@id/view_pager"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tableRow" />
+        </com.google.android.material.tabs.TabLayout>
+    </androidx.viewpager.widget.ViewPager>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addPostButton"
