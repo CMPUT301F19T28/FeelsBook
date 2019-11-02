@@ -1,5 +1,6 @@
 package com.cmput.feelsbook;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -116,7 +117,6 @@ public class SignUpActivity extends AppCompatActivity {
                 collectionReference.document(username).collection("data").document("Mood_History")
                 collectionReference.document(username).collection("data").document("Mood_History").collection("History").document()
                  */
-
             }
         });
 

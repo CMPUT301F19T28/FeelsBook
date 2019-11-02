@@ -37,7 +37,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
         fullName.setText(currentUser.getName());
         //profilePicture.setImageDrawable();
-        
+
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
