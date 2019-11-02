@@ -72,7 +72,11 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                  * - Fragments are meant for Maps
                  * - successfully start Profile
                  */
-
+                Intent intent = new Intent();
+                Bundle userBundle = new Bundle();
+                userBundle.putSerializable("User",currentUser);
+                intent.putExtras(userBundle);
+                startActivity(intent);
             }
         });
 
