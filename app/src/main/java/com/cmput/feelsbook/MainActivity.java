@@ -42,8 +42,8 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         feedView.setAdapter(feedAdapter);
         profileButton = findViewById(R.id.profileButton);
         Bundle bundle = getIntent().getExtras();
-        if (bundle != null){
-            currentUser = (User)bundle.get("User");
+        if (bundle != null) {
+            currentUser = (User) bundle.get("User");
         }
         final FloatingActionButton addPostBttn = findViewById(R.id.addPostButton);
         addPostBttn.setOnClickListener(new View.OnClickListener() {
@@ -72,31 +72,26 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 startActivity(intent);
             }
         });
-
     }
     /**
      * Takes a mood from the implemented fragment and adds it to the feedAdapter
      * @param newMood
      */
-    public void onSubmit(Mood newMood){
+    public void onSubmit (Mood newMood){
         feedAdapter.addPost(newMood);
 
     }
-
     /**
      * will eventually be used to edit mood
      */
-    public void edited(){
+    public void edited () {
         //Code for editing mood
     }
-
     /**
      * will be used to delete passed in mood once implemented
      * @param delete
      */
-    public void deleted(Mood delete){
+    public void deleted (Mood delete){
         //For deleting mood
-            }
-        }
     }
 }
