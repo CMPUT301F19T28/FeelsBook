@@ -5,7 +5,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.content.Intent;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -36,6 +36,7 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseFirestore db;
 
     private final String SIGNUP_TAG = "Invalid field";
+    public static final String USER = "com.cmput.feelsbook.SignUpActivity.User";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

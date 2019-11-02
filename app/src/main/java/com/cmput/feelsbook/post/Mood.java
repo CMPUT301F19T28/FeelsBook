@@ -8,12 +8,13 @@ import android.widget.TextView;
 import com.cmput.feelsbook.Feed;
 import com.cmput.feelsbook.R;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class Mood extends Post {
+public class Mood extends Post implements Serializable {
 
     private final static DateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.CANADA);
 
