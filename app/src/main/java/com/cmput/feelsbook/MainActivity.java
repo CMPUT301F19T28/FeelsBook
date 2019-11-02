@@ -1,19 +1,14 @@
 package com.cmput.feelsbook;
-<<<<<<< HEAD
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.cmput.feelsbook.post.Mood;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.api.Distribution;
 
 
 /**
@@ -25,7 +20,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     RecyclerView feedView;
     Feed feedAdapter;
     RecyclerView.LayoutManager layoutManager;
-    private User currentUser;
+    User currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,29 +30,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
          * - switch between feed and map
          * - click on profile < - current task
          */
-
-=======
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.os.Bundle;
-import android.view.View;
-import com.cmput.feelsbook.post.Mood;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-/**
- * Homepage where feed of moods/Posts will be seen
- * comprises of a scrollable recyclerView
- */
-public class MainActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener{
-    User currentUser;
-    RecyclerView feedView;
-    Feed feedAdapter;
-    RecyclerView.LayoutManager layoutManager;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
->>>>>>> origin
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -68,39 +40,21 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
 
         feedAdapter = new Feed();
         feedView.setAdapter(feedAdapter);
-<<<<<<< HEAD
         profileButton = findViewById(R.id.profileButton);
         Bundle bundle = getIntent().getExtras();
         if (bundle != null){
             currentUser = (User)bundle.get("User");
         }
         final FloatingActionButton addPostBttn = findViewById(R.id.addPostButton);
-        addPostBttn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                //when floating action button is pressed instantiates the fragment so a Ride can be
-                // added to the list
-                // add post activity:
-                new AddMoodFragment().show(getSupportFragmentManager(),"ADD_MOOD");
-=======
-
-
-        currentUser = (User) getIntent().getExtras().get("User");
-
-        final FloatingActionButton addPostBttn = findViewById(R.id.addPostButton);
         addPostBttn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //When floating action button is pressed instantiates the fragment so a Ride can be
+                //when floating action button is pressed instantiates the fragment so a Ride can be
                 // added to the list
-                //add post activity ;
+                // add post activity:
                 new AddMoodFragment().show(getSupportFragmentManager(), "ADD_MOOD");
->>>>>>> origin
             }
         });
-
-
-<<<<<<< HEAD
         profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,17 +67,13 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                  */
                 Intent intent = new Intent();
                 Bundle userBundle = new Bundle();
-                userBundle.putSerializable("User",currentUser);
+                userBundle.putSerializable("User", currentUser);
                 intent.putExtras(userBundle);
                 startActivity(intent);
             }
         });
 
     }
-=======
-    }
-
->>>>>>> origin
     /**
      * Takes a mood from the implemented fragment and adds it to the feedAdapter
      * @param newMood
@@ -146,9 +96,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
      */
     public void deleted(Mood delete){
         //For deleting mood
+            }
+        }
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin
