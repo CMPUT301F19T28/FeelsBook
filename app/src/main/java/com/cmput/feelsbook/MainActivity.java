@@ -4,6 +4,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+
 import com.cmput.feelsbook.post.Mood;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -30,8 +33,27 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         feedAdapter = new Feed();
         feedView.setAdapter(feedAdapter);
 
-
         currentUser = (User) getIntent().getExtras().get("User");
+
+        Button dotButton = findViewById(R.id.dot_button);
+
+
+        // App crashes if there is no post present
+        // need to have if statment ... if there is a post then implement this onclick
+        if (currentUser.getPosts().getItemCount() > 0)
+//        if (feedAdapter.getItemCount() > 0)
+        {
+            Toast.makeText(this, "Delete selected",
+                    Toast.LENGTH_SHORT).show();
+
+            dotButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new PostDotFragment().show(getSupportFragmentManager(), "DotButton");
+                }
+            });
+        }
+
 
         final FloatingActionButton addPostBttn = findViewById(R.id.addPostButton);
         addPostBttn.setOnClickListener(new View.OnClickListener() {
@@ -44,8 +66,8 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
             }
         });
 
-    }
 
+    }
     /**
      * Takes a mood from the implemented fragment and adds it to the feedAdapter
      * @param newMood

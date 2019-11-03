@@ -38,9 +38,6 @@ public class AddMoodFragment extends DialogFragment {
     private OnFragmentInteractionListener listener;
 
 
-
-
-
     public interface OnFragmentInteractionListener{
         void onSubmit(Mood newMood);
         void edited();
@@ -91,7 +88,7 @@ public class AddMoodFragment extends DialogFragment {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.activity_add_post, null);
 
         /**
-         * spinner currently displays text for moodtype, wante to display emoji
+         * spinner currently displays text for moodtype, want to display emoji
          */
         input = view.findViewById(R.id.editText);
         Spinner spinner = view.findViewById(R.id.mood_spinner);

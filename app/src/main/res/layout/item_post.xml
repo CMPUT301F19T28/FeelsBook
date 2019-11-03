@@ -32,6 +32,13 @@
             android:text="Mood"
             android:textSize="24sp" />
 
+        <TextView
+            android:id="@+id/reason_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.6"
+            android:text="Reason" />
+
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
