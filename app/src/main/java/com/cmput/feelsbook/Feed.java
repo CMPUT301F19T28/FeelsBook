@@ -43,6 +43,8 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
         return feed.get(pos);
     }
 
+    public Serializable getFeed(){ return (Serializable)this.feed; }
+
     /**
      * Create a view holder of item post layout
      *

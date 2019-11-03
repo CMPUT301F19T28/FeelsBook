@@ -3,7 +3,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
          * - display feed and make working Add Post button
          * - switch between feed and map
          * - click on profile < - current task
+         * - pass in Feed to be displayed and personalized in ProfileActivity
          */
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -55,19 +55,21 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 new AddMoodFragment().show(getSupportFragmentManager(), "ADD_MOOD");
             }
         });
+
         profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, currentUser.getName(), Toast.LENGTH_SHORT).show();
                 /**
                  * TO-DO:
                  * - convert ProfileFragment to ProfileActivity
                  * - Fragments are meant for Maps
                  * - successfully start Profile
                  */
-                Intent intent = new Intent();
+                Intent intent = new Intent(MainActivity.this,ProfileActivity.class);
                 Bundle userBundle = new Bundle();
+                currentUser.setPosts(feedAdapter);
                 userBundle.putSerializable("User", currentUser);
+                userBundle.putSerializable("Post_list",feedAdapter.getFeed());
                 intent.putExtras(userBundle);
                 startActivity(intent);
             }
@@ -79,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
      */
     public void onSubmit (Mood newMood){
         feedAdapter.addPost(newMood);
-
     }
     /**
      * will eventually be used to edit mood
