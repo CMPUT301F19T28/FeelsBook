@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">FeelsBook</string>
     <string name="map">MAP</string>
     <string name="feed">FEED</string>

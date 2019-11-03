@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
             }
         });
 
-
     }
 
     /**
@@ -53,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
      */
     public void onSubmit(Mood newMood){
         feedAdapter.addPost(newMood);
-
     }
 
     /**
