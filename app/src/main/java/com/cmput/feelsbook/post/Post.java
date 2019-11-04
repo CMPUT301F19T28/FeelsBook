@@ -4,9 +4,10 @@ import android.graphics.Bitmap;
 
 import com.cmput.feelsbook.Feed;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public abstract class Post {
+public abstract class Post implements Serializable{
 
     protected Bitmap profilePic;
     protected Date dateTime;

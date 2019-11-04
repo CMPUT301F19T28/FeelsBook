@@ -32,9 +32,7 @@ public class User implements Serializable {
         return posts;
     }
 
-    public void setPosts(Feed posts) {
-        this.posts = posts;
-    }
+    public void setPosts(Feed posts) {this.posts = posts;}
 
     public FollowList getFollowsList() {
         return followList;

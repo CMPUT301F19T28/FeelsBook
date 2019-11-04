@@ -21,6 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.cmput.feelsbook.post.Mood;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * Fragment for adding or editing a Mood
