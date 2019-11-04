@@ -24,7 +24,6 @@
                 android:layout_width="35dp"
                 android:layout_height="35dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_weight="0.166"
                 android:contentDescription="Profile picture"
@@ -38,7 +37,6 @@
                 android:layout_height="35dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp"
                 android:layout_weight="0.833"
                 android:contentDescription="Filter button"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -50,7 +48,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
                 android:text="Home"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Headline"
                 android:textColor="#FFFFFF"
@@ -101,17 +98,16 @@
         android:layout_height="622dp"
         android:layout_marginTop="46dp"
         android:scrollbars="vertical"
+        app:layout_constraintBottom_toBottomOf="@id/pager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tableRow"
-        app:layout_constraintBottom_toBottomOf="@id/pager"/>
+        app:layout_constraintTop_toBottomOf="@+id/tableRow" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addPostButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp"
         android:clickable="true"
         android:text="ADD POST"
