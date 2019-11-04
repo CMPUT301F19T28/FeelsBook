@@ -145,7 +145,6 @@ public class AddMoodFragment extends DialogFragment {
 //                                Toast.makeText(getActivity(),spinner.getSelectedItem().toString(), Toast.LENGTH_SHORT).show();
 //                            }
 
-
                             String moodText = input.getText().toString();
                             Object selectedMood = spinner.getSelectedItem();
                             MoodType selected_type = MoodType.class.cast(selectedMood);

@@ -35,26 +35,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
 
         currentUser = (User) getIntent().getExtras().get("User");
 
-        Button dotButton = findViewById(R.id.dot_button);
-
-
-        // App crashes if there is no post present
-        // need to have if statment ... if there is a post then implement this onclick
-        if (currentUser.getPosts().getItemCount() > 0)
-//        if (feedAdapter.getItemCount() > 0)
-        {
-            Toast.makeText(this, "Delete selected",
-                    Toast.LENGTH_SHORT).show();
-
-            dotButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    new PostDotFragment().show(getSupportFragmentManager(), "DotButton");
-                }
-            });
-        }
-
-
         final FloatingActionButton addPostBttn = findViewById(R.id.addPostButton);
         addPostBttn.setOnClickListener(new View.OnClickListener() {
             @Override
