@@ -30,14 +30,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-      //  feedView = findViewById(R.id.feedList);
-      //  feedView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
-      //  feedView.setLayoutManager(layoutManager);
-
-      //  feedAdapter = new Feed();
-      //  feedView.setAdapter(feedAdapter);
-
         tabLayout = findViewById(R.id.tab_layout);
         viewPager = findViewById(R.id.view_pager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());

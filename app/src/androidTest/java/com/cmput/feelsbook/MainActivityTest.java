@@ -7,6 +7,7 @@ import android.widget.EditText;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
+
 import com.cmput.feelsbook.post.Mood;
 import com.robotium.solo.Solo;
 import org.junit.Before;
@@ -78,6 +79,22 @@ public class MainActivityTest {
 
         }
 
+    }
+
+    /**
+     * Check if swaps between feed and map screens function properly
+     */
+    @Test
+    public void checkViewPager() {
+        // Asserts that the current activity is the MainActivity. Otherwise, show "Wrong Activity"
+        solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
+        MainActivity activity = (MainActivity) solo.getCurrentActivity(); //access the activity
+        View googleMap = activity.findViewById(R.id.map_view);
+        View feedList = activity.findViewById(R.id.feed_list);
+        solo.clickOnButton("Map");
+        solo.waitForView(googleMap);
+        solo.clickOnButton("Feed");
+        solo.waitForView(feedList);
     }
 
 
