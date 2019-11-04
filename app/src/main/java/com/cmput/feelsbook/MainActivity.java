@@ -3,11 +3,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
 
 import com.cmput.feelsbook.post.Mood;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -46,18 +43,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 // added to the list
                 //add post activity ;
                 new AddMoodFragment().show(getSupportFragmentManager(), "ADD_MOOD");
-            }
-        });
-
-        final ImageButton profButton = findViewById(R.id.profileButton);
-        profButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, FollowActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("user", currentUser);
-                intent.putExtras(bundle);
-                startActivity(intent);
             }
         });
 
