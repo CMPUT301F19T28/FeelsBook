@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "525897306756",
+    "firebase_url": "https://feelsbook.firebaseio.com",
+    "project_id": "feelsbook",
+    "storage_bucket": "feelsbook.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:525897306756:android:ae1d10dec29c89ee8d68d1",
+        "android_client_info": {
+          "package_name": "com.cmput.feelsbook"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "525897306756-lhapip8623trd5do18cm3m3idieh8beo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSzweUrctdvM9CrpUjyjAWipxDINxzvgA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "525897306756-lhapip8623trd5do18cm3m3idieh8beo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
