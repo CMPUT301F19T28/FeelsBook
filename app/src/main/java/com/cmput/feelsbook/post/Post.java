@@ -2,6 +2,8 @@ package com.cmput.feelsbook.post;
 
 import android.graphics.Bitmap;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.cmput.feelsbook.Feed;
 
 import java.util.Date;
@@ -11,7 +13,7 @@ public abstract class Post {
     protected Bitmap profilePic;
     protected Date dateTime;
 
-    public abstract void displayPost(Feed.ViewHolder viewHolder);
+    public abstract void displayPost(RecyclerView.ViewHolder viewHolder);
 
     public Bitmap getProfilePic() {
         return profilePic;

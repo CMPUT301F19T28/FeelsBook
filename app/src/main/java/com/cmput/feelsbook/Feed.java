@@ -13,7 +13,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Serializable {
+public class Feed extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Serializable {
 
     private final String TAG = "Feed";
 
@@ -52,9 +52,9 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
      */
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_post, parent, false);
-        return new ViewHolder(view);
+        return new RecyclerView.ViewHolder(view) {};
     }
 
     /**
@@ -64,7 +64,7 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
      * @param position The position of the item in the data source
      */
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Log.d(TAG, "called onBindViewHolder");
         feed.get(position).displayPost(holder);
     }
@@ -72,13 +72,5 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
     @Override
     public int getItemCount() {
         return feed.size();
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-
-
-        public ViewHolder(final View view) {
-            super(view);
-        }
     }
 }

@@ -16,6 +16,7 @@ import com.google.firebase.firestore.SetOptions;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class User implements Serializable {
     private static final String TAG = "User";
@@ -33,6 +34,11 @@ public class User implements Serializable {
         followList = followsList;
     }
 
+
+    public void acceptFollowRequest() {
+
+    }
+
     /**
      * Send a follow request to the specified user
      * @param context
@@ -41,25 +47,46 @@ public class User implements Serializable {
      *      The name of the user to send the request
      */
     public void sendFollowRequest(Context context, String userId) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users").document(userId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()) {
-                    if(task.getResult() != null && task.getResult().exists()) {
-                        Map<String, String> data = new HashMap<>();
-                        data.put(getUserName(), getName());
-                        task.getResult().getReference().collection("info").document("followingRequests").set(data, SetOptions.merge());
+        if(userId.equals(getUserName())){
+            Toast.makeText(context, "You can't follow yourself.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(getUserName())
+                .collection("info")
+                .document("following")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (!task.getResult().exists() || !task.getResult().contains(userId)) {
+                            FirebaseFirestore.getInstance()
+                                    .collection("users")
+                                    .document(userId)
+                                    .get()
+                                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                            if(task.isSuccessful() && task.getResult().exists()) {
+                                                Map<String, Object> data = new HashMap<>();
+                                                data.put(getUserName(), getName());
+                                                task.getResult().getReference()
+                                                        .collection("info")
+                                                        .document("followingRequests")
+                                                        .set(data, SetOptions.merge());
+                                                Toast.makeText(context, "Follow request was sent to " + userId, Toast.LENGTH_SHORT).show();
+                                            }
+                                            else {
+                                                Toast.makeText(context, "No user exists with the id " + userId, Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                        } else {
+                            Toast.makeText(context, "You are already following " + userId, Toast.LENGTH_SHORT).show();
+                        }
                     }
-                    else {
-                        Toast.makeText(context, "No user with id: " + userId, Toast.LENGTH_SHORT).show();
-                    }
-                }
-                else {
-                    Log.d(TAG,"Failed with:  ", task.getException());
-                }
-            }
-        });
+                });
     }
 
     public User(String name){
