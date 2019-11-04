@@ -17,7 +17,6 @@ import javax.annotation.Nullable;
 
 public class FeedFragment extends Fragment {
 
-    View view;
     private RecyclerView recyclerView;
     private Feed recyclerAdapter;
 
@@ -28,15 +27,21 @@ public class FeedFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.feed_fragment, container, false);
-        recyclerView = view.findViewById(R.id.feedList);
+        View view = inflater.inflate(R.layout.feed_fragment, container, false);
+        recyclerView = view.findViewById(R.id.feed_list);
         recyclerAdapter = new Feed();
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(recyclerAdapter);
         return view;
     }
 
+    public RecyclerView getRecyclerView() {
+        return recyclerView;
+    }
+
     public Feed getRecyclerAdapter() {
         return recyclerAdapter;
     }
+
+
 }

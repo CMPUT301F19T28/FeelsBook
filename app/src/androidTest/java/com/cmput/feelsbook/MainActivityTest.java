@@ -64,7 +64,7 @@ public class MainActivityTest {
         //these fail
         try { //asserts theres something in the feedAdapter
             solo.wait(5);
-            final RecyclerView list = activity.feedView;
+            final RecyclerView list = activity.feedFragment.getRecyclerView();
             assertEquals(list.getChildCount(), 1);
 
         }catch(Exception e){
@@ -72,7 +72,7 @@ public class MainActivityTest {
         }
 
         try{ //Makes sure the right mood was added
-            final String reason = ((Mood) activity.feedAdapter.getPost(0)).getReason(); //get the feedAdapter
+            final String reason = ((Mood) activity.feedFragment.getRecyclerAdapter().getPost(0)).getReason(); //get the feedAdapter
             assertEquals("Happy", reason);
         }catch(Exception e){
 

@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     ViewPager viewPager;
     ViewPagerAdapter viewPagerAdapter;
     FeedFragment feedFragment;
+    MapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +43,9 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         feedFragment = new FeedFragment();
+        mapFragment = new MapFragment();
         viewPagerAdapter.AddFragment(feedFragment, "Feed");
-        viewPagerAdapter.AddFragment(new MapFragment(), "Map");
+        viewPagerAdapter.AddFragment(mapFragment, "Map");
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
