@@ -22,7 +22,7 @@ public class MainActivityTest {
 
     @Rule
     public ActivityTestRule<MainActivity> rule =
-            new ActivityTestRule<>(MainActivity.class, true, true);
+            new ActivityTestRule<>(MainActivity.class, false, false);
 
     /**
      * Runs before all tests and creates solo instance
