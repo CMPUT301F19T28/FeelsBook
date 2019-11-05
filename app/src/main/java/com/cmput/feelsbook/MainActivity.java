@@ -4,20 +4,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
-
-import com.cmput.feelsbook.post.Mood;
+import android.widget.ImageButton;
 import com.cmput.feelsbook.post.Post;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.ArrayList;
 
 /**
  * Homepage where feed of moods/Posts will be seen
  * comprises of a scrollable recyclerView
  */
 public class MainActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener{
+    private ImageButton profileButton;
     User currentUser;
     RecyclerView feedView;
     Feed feedAdapter;
@@ -42,7 +39,13 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
 
         feedView.setAdapter(feedAdapter);
 
-        currentUser = (User) getIntent().getExtras().get("User");
+
+        profileButton = findViewById(R.id.profileButton);
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            currentUser = (User) bundle.get("User");
+        }
+
 
         final FloatingActionButton addPostBttn = findViewById(R.id.addPostButton);
         addPostBttn.setOnClickListener(new View.OnClickListener() {
