@@ -9,36 +9,48 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
+import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.Post;
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.List;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener{
     private int followCount = 0;
     private int followersCount = 0;
     private int postCount = 0;
     private ImageView profilePicture;
     private User currentUser;
-    private RecyclerView historyList;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+    private ViewPagerAdapter viewPagerAdapter;
     private Feed historyAdapter;
-    private List<Post> history;
+    private FeedFragment historyFragment;
+    private MapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        /**
-         * TO BE IMPLEMENTED:
-         * - switch between feed and map
-         * - click on profile < - current task
-         */
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_screen);
         Bundle bundle = getIntent().getExtras();
+        tabLayout = findViewById(R.id.profile_tab);
+        viewPager = findViewById(R.id.history_pager);
+        viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         if (bundle != null){
             currentUser = (User)bundle.get("User");
-            history = (List<Post>)bundle.get("Post_list");
+            historyAdapter = (Feed)bundle.get("Post_list");
         }
+
+        historyFragment = new FeedFragment(historyAdapter);
+        mapFragment = new MapFragment();
+        viewPagerAdapter.AddFragment(historyFragment, "History");
+        viewPagerAdapter.AddFragment(mapFragment,"Map");
+
+        viewPager.setAdapter(viewPagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
 
         ImageButton backButton = findViewById(R.id.exit_profile);
         TextView fullName = findViewById(R.id.full_name);
@@ -47,18 +59,13 @@ public class ProfileActivity extends AppCompatActivity {
         TextView followingText = findViewById(R.id.following_count);
         TextView postsText = findViewById(R.id.total_posts);
 
-        historyList = findViewById(R.id.history);
-        historyList.setHasFixedSize(true);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        historyList.setLayoutManager(layoutManager);
-        historyAdapter = new Feed(history);
-        historyList.setAdapter(historyAdapter);
-
         // TO-DO: add profile picture taken from Firebase
         ImageView profilePicture = findViewById(R.id.profile_picture);
         // TO-DO: replace alias with the document name (username) inside of Firebase
         String alias = "testname123";
 
+
+        // TO-DO: replace with actual count of posts instead of using historyAdapter
         postCount = historyAdapter.getItemCount();
         fullName.setText(currentUser.getName());
         followText.setText(followCount + " following");
@@ -74,6 +81,27 @@ public class ProfileActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    /**
+     * Takes a mood from the implemented fragment and adds it to the feedAdapter
+     * @param newMood
+     */
+    public void onSubmit (Mood newMood){
+        historyFragment.getRecyclerAdapter().addPost(newMood);
+    }
+    /**
+     * will eventually be used to edit mood
+     */
+    public void edited () {
+        //Code for editing mood
+    }
+    /**
+     * will be used to delete passed in mood once implemented
+     * @param delete
+     */
+    public void deleted (Mood delete){
+        //For deleting mood
     }
 
 }
