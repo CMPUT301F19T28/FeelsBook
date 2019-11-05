@@ -52,11 +52,7 @@ public class ProfileActivity extends AppCompatActivity {
         historyList.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         historyList.setLayoutManager(layoutManager);
-        historyAdapter = new Feed(history,  new Feed.OnItemClickListener(){ //will need to change functionality
-            public void onItemClick(Post post){
-                //must implement what happens when clicked else can leave blank
-            }
-        });
+        historyAdapter = new Feed(history);
         historyList.setAdapter(historyAdapter);
 
         // TO-DO: add profile picture taken from Firebase

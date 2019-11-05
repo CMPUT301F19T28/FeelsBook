@@ -162,7 +162,7 @@ public class AddMoodFragment extends DialogFragment {
             }
 
             //checks to see if the editmood has a social situation
-            // if makes dropdown visible and sets the social situation 
+            // if makes dropdown visible and sets the social situation
             if(!editMood.getSituation().toString().isEmpty()){
                 for(int i = 0; i < socialSits.length; i++){
                     if(socialSits[i] == editMood.getSituation()){
