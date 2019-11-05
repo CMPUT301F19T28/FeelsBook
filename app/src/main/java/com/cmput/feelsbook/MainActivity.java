@@ -31,6 +31,12 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         feedView.setLayoutManager(layoutManager);
 
         feedAdapter = new Feed( new Feed.OnItemClickListener(){
+
+            /**
+             * Sets onItemClick to open a fragment in which the mood will be edited
+             * @param post
+             *          Post to be edited
+             */
              public void onItemClick(Post post){
                 //.makeText(getApplicationContext(), "itemClicked", Toast.LENGTH_SHORT). show();
                 new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
