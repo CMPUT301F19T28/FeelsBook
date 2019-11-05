@@ -111,7 +111,7 @@ public class AddMoodFragment extends DialogFragment {
         ArrayAdapter<SocialSituation> socialAdapter = new ArrayAdapter<SocialSituation>(getActivity(), android.R.layout.simple_spinner_item, socialSitList);
         socialAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         socialSpinner.setAdapter(socialAdapter);
-        socialSpinner.setVisibility(View.GONE);
+        socialSpinner.setVisibility(View.GONE); //sets the view to be gone because it is optional
 
         /**
          * button for opening camera to take picture
@@ -136,6 +136,7 @@ public class AddMoodFragment extends DialogFragment {
             }
         });
 
+        //if the social situatiion button is pressed then shows the drop down
         final Button socialBttn = view.findViewById(R.id.social_situation_button);
         socialBttn.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -160,12 +161,13 @@ public class AddMoodFragment extends DialogFragment {
                 }
             }
 
+            //checks to see if the editmood has a social situation
+            // if makes dropdown visible and sets the social situation 
             if(!editMood.getSituation().toString().isEmpty()){
                 for(int i = 0; i < socialSits.length; i++){
                     if(socialSits[i] == editMood.getSituation()){
                         socialSpinner.setVisibility(View.VISIBLE);
                         socialSpinner.setSelection(i);
-                        socialSituation = true;
                     }
                 }
             }
