@@ -87,11 +87,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
             }
         });
     }
-    /**
-     * Takes a mood from the implemented fragment and adds it to the feedAdapter
-     * @param newMood
-     */
-
     public void onSubmit (Mood newMood){
         Feed feedAdapter = feedFragment.getRecyclerAdapter();
         feedAdapter.addPost(newMood);

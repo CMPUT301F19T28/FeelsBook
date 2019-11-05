@@ -7,15 +7,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.cmput.feelsbook.post.Mood;
-import com.cmput.feelsbook.post.Post;
 import com.google.android.material.tabs.TabLayout;
 
-import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener{
     private int followCount = 0;
@@ -83,12 +79,8 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         });
     }
 
-    /**
-     * Takes a mood from the implemented fragment and adds it to the feedAdapter
-     * @param newMood
-     */
     public void onSubmit (Mood newMood){
-        historyFragment.getRecyclerAdapter().addPost(newMood);
+        historyAdapter.addPost(newMood);
     }
     /**
      * will eventually be used to edit mood
@@ -105,3 +97,4 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
     }
 
 }
+
