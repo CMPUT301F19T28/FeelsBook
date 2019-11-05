@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="250dp"
         android:text="@string/enter_account_details"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -22,6 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:ems="10"
+        android:hint="Full name"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,6 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:ems="10"
+        android:hint="Username"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,6 +49,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:ems="10"
+        android:hint="Password"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -60,6 +64,8 @@
         android:layout_marginLeft="100dp"
         android:layout_marginTop="8dp"
         android:text="@string/confirm"
+        android:textColor="@color/defaultWhite"
+        android:background="@drawable/default_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/s_password_text" />
 
@@ -71,6 +77,8 @@
         android:layout_marginEnd="100dp"
         android:layout_marginRight="100dp"
         android:text="@string/cancel"
+        android:textColor="@color/defaultWhite"
+        android:background="@drawable/default_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/s_password_text" />
 
