@@ -22,7 +22,7 @@ public class MainActivityTest {
 
     @Rule
     public ActivityTestRule<MainActivity> rule =
-            new ActivityTestRule<>(MainActivity.class, false, false);
+            new ActivityTestRule<>(MainActivity.class, true, true);
 
     /**
      * Runs before all tests and creates solo instance
@@ -46,7 +46,8 @@ public class MainActivityTest {
 
     /**
      * Add a mood to the recyclerView and checks the number of moods in the
-     * feed using assertFalse
+     * feed using assertEquals
+     * Also checks to make sure the right thing was added
      */
     @Test
     public void checkFeed() {
@@ -61,7 +62,6 @@ public class MainActivityTest {
         solo.clickOnButton("Post"); //Select Confirm button
 
         //Get MainActivity to access its variables and methods
-        //these fail
         try { //asserts theres something in the feedAdapter
             solo.wait(5);
             final RecyclerView list = activity.feedView;
@@ -79,6 +79,5 @@ public class MainActivityTest {
         }
 
     }
-
-
+    
 }
