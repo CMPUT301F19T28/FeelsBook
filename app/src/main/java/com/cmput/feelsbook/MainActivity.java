@@ -1,6 +1,11 @@
 package com.cmput.feelsbook;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageButton;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
+
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,10 +23,8 @@ import com.google.android.material.tabs.TabLayout;
  */
 public class MainActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener{
     private ImageButton profileButton;
-    User currentUser;
     RecyclerView feedView;
-    Feed feedAdapter;
-    RecyclerView.LayoutManager layoutManager;
+    User currentUser;
     TabLayout tabLayout;
     ViewPager viewPager;
     ViewPagerAdapter viewPagerAdapter;
@@ -31,11 +34,12 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        /**
+         * TO BE IMPLEMENTED:
+         * - pass in Feed to be displayed and personalized in ProfileActivity
+         */
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        layoutManager = new LinearLayoutManager(this);
-
 
         tabLayout = findViewById(R.id.tab_layout);
         viewPager = findViewById(R.id.view_pager);
@@ -49,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         feedFragment = new FeedFragment();
         mapFragment = new MapFragment();
         viewPagerAdapter.AddFragment(feedFragment, "Feed");
-        viewPagerAdapter.AddFragment(mapFragment, "Map");
+        viewPagerAdapter.AddFragment(mapFragment,"Map");
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -81,18 +85,11 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /**
-                 * TO-DO:
-                 * - convert ProfileFragment to ProfileActivity
-                 * - Fragments are meant for Maps
-                 * - successfully start Profile
-                 */
                 Intent intent = new Intent(MainActivity.this,ProfileActivity.class);
                 Bundle userBundle = new Bundle();
                 feedFragment.getRecyclerAdapter().setOnItemClickListener(null);
-                currentUser.setPosts(feedFragment.getRecyclerAdapter());
                 userBundle.putSerializable("User", currentUser);
-                userBundle.putSerializable("Post_list", feedFragment.getRecyclerAdapter().getFeed());
+                userBundle.putSerializable("Post_list",feedFragment.getRecyclerAdapter());
                 intent.putExtras(userBundle);
                 startActivity(intent);
             }

@@ -52,14 +52,14 @@ public class MainActivityTest {
      */
     @Test
     public void checkFeed() {
-        // Asserts that the current activity is the Mainactivity. Otherwise, show "Wrong Activity"
+        // Asserts that the current activity is the Main activity. Otherwise, show "Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
         MainActivity activity = (MainActivity) solo.getCurrentActivity(); //access the activity
-        View fab = activity.findViewById(R.id.addPostButton);//add city button
-        solo.clickOnView(fab); //Click ADD City buttton
+        View fab = activity.findViewById(R.id.addPostButton);//add post button
+        solo.clickOnView(fab); //Click Add post buttton
 
-        //Get view for EditText and enter a city name
-        solo.enterText((EditText) solo.getView(R.id.editText), "Happy");
+        //Get view for EditText and enter a reason
+        solo.enterText((EditText) solo.getView(R.id.edit_text), "Happy");
         solo.clickOnButton("Post"); //Select Confirm button
 
         //Get MainActivity to access its variables and methods

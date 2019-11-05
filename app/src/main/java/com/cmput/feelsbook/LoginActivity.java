@@ -77,8 +77,7 @@ public class LoginActivity extends AppCompatActivity {
                                 String password = passField.getText().toString();
                                 if (password.equals(saved_pass)) {
                                     Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
-                                    User user = new User(document.getString("name"), new FollowList());
-
+                                    User user = new User(username, document.getString("name"), new Feed(), new FollowList());
                                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                     Bundle bundle = new Bundle();
                                     bundle.putSerializable("User",user);

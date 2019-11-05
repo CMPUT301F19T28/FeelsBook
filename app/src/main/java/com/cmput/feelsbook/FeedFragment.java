@@ -8,19 +8,19 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.cmput.feelsbook.post.Post;
-
-import java.util.List;
-
 import javax.annotation.Nullable;
 
-public class FeedFragment extends Fragment {
+public class FeedFragment extends Fragment{
 
     private RecyclerView recyclerView;
     private Feed recyclerAdapter;
 
-    public FeedFragment() {
+    public FeedFragment(Feed adapter) {
+        this.recyclerAdapter = adapter;
+    }
+
+    public FeedFragment(){
+        // default constructor
         recyclerAdapter = new Feed();
     }
 
@@ -41,6 +41,4 @@ public class FeedFragment extends Fragment {
     public Feed getRecyclerAdapter() {
         return recyclerAdapter;
     }
-
-
 }
