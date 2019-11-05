@@ -22,6 +22,10 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
@@ -73,17 +77,17 @@ public class LoginActivity extends AppCompatActivity {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
                                 String saved_pass = document.getString("password");
-                                String password = passField.getText().toString();
-                                if (password.equals(saved_pass)) {
-                                    Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
-                                    User user = new User(username, document.getString("name"), new Feed(), new FollowList());
-                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                    Bundle bundle = new Bundle();
-                                    bundle.putSerializable("User",user);
-                                    intent.putExtras(bundle);
-                                    startActivity(intent);
-                                } else {
-                                    Toast.makeText(LoginActivity.this, "Invalid Username or Password", Toast.LENGTH_SHORT).show();
+                                try {
+                                    byte[] encodedHash = getHash(passField.getText().toString());
+                                    String hashedPassword = bytesToHex(encodedHash);
+
+                                    if (hashedPassword.equals(saved_pass)) {
+                                        successfulLogin(document);
+                                    } else {
+                                        Toast.makeText(LoginActivity.this, "Invalid Username or Password", Toast.LENGTH_SHORT).show();
+                                    }
+                                } catch (NoSuchAlgorithmException e){
+                                    Log.d(TAG, "Exception thrown for incorrect algorithm " + e);
                                 }
                             } else {
                                 Toast.makeText(LoginActivity.this, "Invalid Username or Password", Toast.LENGTH_SHORT).show();
@@ -101,4 +105,33 @@ public class LoginActivity extends AppCompatActivity {
         signupPrompt.setMovementMethod(LinkMovementMethod.getInstance());
 
     }
+
+    private static byte[] getHash(String password) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        return digest.digest(password.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private static String bytesToHex(byte[] hash){
+        StringBuffer hexString = new StringBuffer();
+        for (int i = 0; i < hash.length; i++){
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if (hex.length() ==  1) {
+                hexString.append('0');
+            } else {
+                hexString.append(hex);
+            }
+        }
+        return  hexString.toString();
+    }
+
+    private void successfulLogin(DocumentSnapshot document){
+        Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
+        User user = new User(document.getId(), document.getString("name"), new Feed(), new FollowList());
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("User",user);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
 }
