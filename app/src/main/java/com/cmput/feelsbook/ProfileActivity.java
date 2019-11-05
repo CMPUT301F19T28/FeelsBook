@@ -48,7 +48,7 @@ public class ProfileActivity extends AppCompatActivity {
         TextView followingText = findViewById(R.id.following_count);
         TextView postsText = findViewById(R.id.total_posts);
 
-        historyList = findViewById(R.id.history);
+//        historyList = findViewById(R.id.history);
         historyList.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         historyList.setLayoutManager(layoutManager);
