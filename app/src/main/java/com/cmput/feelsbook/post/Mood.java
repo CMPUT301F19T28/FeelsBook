@@ -112,10 +112,12 @@ public class Mood extends Post implements Serializable {
         TextView dateTimeText = viewHolder.itemView.findViewById(R.id.dateText);
         TextView moodText = viewHolder.itemView.findViewById(R.id.moodText);
         ImageView profile_pic_feed = viewHolder.itemView.findViewById(R.id.profileImage);
+        TextView reasonText = viewHolder.itemView.findViewById(R.id.reasonText);
 
         dateTimeText.setText(dateFormatter.format(dateTime));
         moodText.setText(moodType.getEmoticon());
         profile_pic_feed.setImageBitmap(this.profilePic);
+        reasonText.setText(reason);
 
 //        TODO: Implemented but out of scope for sprint 1
 //
