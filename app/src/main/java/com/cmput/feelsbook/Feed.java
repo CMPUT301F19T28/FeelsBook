@@ -18,10 +18,33 @@ public class Feed extends RecyclerView.Adapter<RecyclerView.ViewHolder> implemen
     private final String TAG = "Feed";
 
     private List<Post> feed;
+    private OnItemClickListener listener;
 
-    public Feed() { this.feed = new ArrayList<>(); }
+    public interface OnItemClickListener{ //define OnClickListener for when a post is clicked
+        void onItemClick(Post post);
+    }
 
-    public Feed(List<Post> feed) { this.feed = feed; }
+    public Feed() {
+        this.feed = new ArrayList<>();
+        setOnItemClickListener(new Feed.OnItemClickListener(){
+            @Override
+            public void onItemClick(Post post) {
+                //Do nothing
+            }
+        });
+    }
+
+    public Feed(List<Post> feed) {
+
+        this.feed = feed;
+        setOnItemClickListener(new Feed.OnItemClickListener(){
+            @Override
+            public void onItemClick(Post post) {
+                //Do nothing
+            }
+        });
+    }
+
 
     public void addPost(Post post) {
         feed.add(post);
@@ -40,6 +63,12 @@ public class Feed extends RecyclerView.Adapter<RecyclerView.ViewHolder> implemen
     }
 
     public Serializable getFeed(){ return (Serializable)this.feed; }
+
+    public void setOnItemClickListener(OnItemClickListener listener){
+        this.listener = listener;
+    }
+
+
 
     /**
      * Create a view holder of item post layout
@@ -65,10 +94,29 @@ public class Feed extends RecyclerView.Adapter<RecyclerView.ViewHolder> implemen
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Log.d(TAG, "called onBindViewHolder");
         feed.get(position).displayPost(holder);
+        holder.bind(this.feed.get(position), listener);
     }
+
 
     @Override
     public int getItemCount() {
         return feed.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder  implements Serializable{
+
+
+        public ViewHolder(final View view) {
+            super(view);
+        }
+
+        public void bind(final Post post, final OnItemClickListener listener) {
+            itemView.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    listener.onItemClick(post);
+                }
+            });
+        }
     }
 }

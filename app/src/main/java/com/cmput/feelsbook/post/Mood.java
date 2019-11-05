@@ -1,7 +1,9 @@
 package com.cmput.feelsbook.post;
 
 import android.graphics.Bitmap;
+import android.graphics.Picture;
 import android.location.Location;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -112,12 +114,13 @@ public class Mood extends Post implements Serializable {
         TextView dateTimeText = viewHolder.itemView.findViewById(R.id.dateText);
         TextView moodText = viewHolder.itemView.findViewById(R.id.moodText);
         ImageView profile_pic_feed = viewHolder.itemView.findViewById(R.id.profileImage);
-        TextView reasonText = viewHolder.itemView.findViewById(R.id.reasonText);
-
+        TextView reasonText = viewHolder.itemView.findViewById(R.id.reason_text);
+//        ImageView camera_photo = viewHolder.itemView.findViewById((R.id.camera_photo));
         dateTimeText.setText(dateFormatter.format(dateTime));
         moodText.setText(moodType.getEmoticon());
         profile_pic_feed.setImageBitmap(this.profilePic);
-        reasonText.setText(reason);
+        reasonText.setText(this.reason);
+//        this.setPhoto(camera_photo);
 
 //        TODO: Implemented but out of scope for sprint 1
 //

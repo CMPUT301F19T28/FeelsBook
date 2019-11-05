@@ -30,7 +30,7 @@ public class User implements Serializable {
     public User(String userName, String name, Feed posts, FollowList followsList){
         this.userName = userName;
         this.name = name;
-        this.posts = posts;
+        //this.posts = posts;
         followList = followsList;
     }
 

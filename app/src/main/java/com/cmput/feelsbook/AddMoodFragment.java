@@ -6,12 +6,16 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,6 +24,12 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.cmput.feelsbook.post.Mood;
+import com.cmput.feelsbook.post.Post;
+import com.cmput.feelsbook.post.SocialSituation;
+
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Fragment for adding or editing a Mood
@@ -32,9 +42,9 @@ public class AddMoodFragment extends DialogFragment {
 
 
     public interface OnFragmentInteractionListener{
-        void onSubmit(Mood newMood);
+        void onSubmit(Post newMood);
         void edited();
-        void deleted(Mood delete);
+        void deleted(Post delete);
     }
 
     /**
@@ -49,9 +59,9 @@ public class AddMoodFragment extends DialogFragment {
             listener = (OnFragmentInteractionListener) context;
         } else{
             throw new RuntimeException(context.toString()
-                    + "must implement OnFragmentInteractionListener");
-        }
+                + "must implement OnFragmentInteractionListener");
     }
+}
 
     /**
      * Returns a new instance of the fragment and passes a mood to be edited
@@ -61,10 +71,9 @@ public class AddMoodFragment extends DialogFragment {
      * @return
      *      a fragment object
      */
-    public static AddMoodFragment newInstance(Mood mood){
+    public static AddMoodFragment newInstance(Post mood){
         Bundle args = new Bundle();
         args.putSerializable("mood", mood);
-
         AddMoodFragment fragment = new AddMoodFragment();
         fragment.setArguments(args);
         return fragment;
@@ -80,14 +89,89 @@ public class AddMoodFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.activity_add_post, null);
-        input = view.findViewById(R.id.edit_text);
+
+        /**
+         * spinner currently displays text for moodtype, want to display emoji
+         */
+        input = view.findViewById(R.id.editText);
+        Spinner spinner = view.findViewById(R.id.mood_spinner);
+        Spinner socialSpinner = view.findViewById(R.id.social_spinner);
+
+        MoodType moodTypes[] = {MoodType.HAPPY, MoodType.SAD,MoodType.ANGRY, MoodType.ANNOYED,MoodType.SLEEPY, MoodType.SEXY};
+        ArrayList<MoodType > moodList = new ArrayList<MoodType>();
+        moodList.addAll(Arrays.asList(moodTypes));
+        ArrayAdapter<MoodType> moodTypeAdapter = new ArrayAdapter<MoodType>(getActivity(), android.R.layout.simple_spinner_item, moodList);
+        moodTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(moodTypeAdapter);
+
+        //creates social situation spinner drop down menu
+        SocialSituation socialSits[] = {SocialSituation.ALONE, SocialSituation.ONEPERSON, SocialSituation.SEVERAL, SocialSituation.CROWD };
+        ArrayList<SocialSituation> socialSitList = new ArrayList<SocialSituation>();
+        socialSitList.addAll(Arrays.asList(socialSits));
+        ArrayAdapter<SocialSituation> socialAdapter = new ArrayAdapter<SocialSituation>(getActivity(), android.R.layout.simple_spinner_item, socialSitList);
+        socialAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        socialSpinner.setAdapter(socialAdapter);
+        socialSpinner.setVisibility(View.GONE); //sets the view to be gone because it is optional
+
+        /**
+         * button for opening camera to take picture
+         * photo stored as "photo"
+         */
+        Bitmap camera_photo;
+        Button cameraButton = view.findViewById(R.id.add_picture_button);
+        cameraButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent cameraIntent = new Intent("android.media.action.IMAGE_CAPTURE");
+                startActivity(cameraIntent);
+            }
+
+            /**
+             * photo taken by cameraIntent stored as Bitmap Photo
+             * Need to get picture and add to mood in setPositive in Builder
+             * @param CameraIntent
+             */
+            public void onActivityResult(Intent CameraIntent) {
+                Bitmap photo = (Bitmap) CameraIntent.getExtras().get("data");
+            }
+        });
+
+        //if the social situatiion button is pressed then shows the drop down
+        final Button socialBttn = view.findViewById(R.id.social_situation_button);
+        socialBttn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                socialSpinner.setVisibility(View.VISIBLE);
+            }
+        });
+
+
+        //add modtypes to this array
         //dp.setImage; //need to get profile pic
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         try{
             //For editing mood
             final Mood editMood = (Mood) getArguments().getSerializable("mood");
+            boolean socialSituation = false;
             input.setText(editMood.getReason());
+            for(int i = 0; i < moodTypes.length; i++){
+                if(moodTypes[i] == editMood.getMoodType()){
+                    spinner.setSelection(i);
+                }
+            }
+
+            //checks to see if the editmood has a social situation
+            // if makes dropdown visible and sets the social situation
+            if(!editMood.getSituation().toString().isEmpty()){
+                for(int i = 0; i < socialSits.length; i++){
+                    if(socialSits[i] == editMood.getSituation()){
+                        socialSpinner.setVisibility(View.VISIBLE);
+                        socialSpinner.setSelection(i);
+                    }
+                }
+            }
+
             return builder
                     .setView(view)
                     .setTitle("Edit Post")
@@ -102,8 +186,19 @@ public class AddMoodFragment extends DialogFragment {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             String newMoodReason = input.getText().toString();
+                            MoodType newSelectedType = MoodType.class.cast(spinner.getSelectedItem());
+                            SocialSituation selectedSocial = SocialSituation.class.cast(socialSpinner.getSelectedItem());
+
                             if(!newMoodReason.isEmpty()){
+
+                                if(socialSpinner.getVisibility() == View.VISIBLE){
+                                    editMood.setSituation(selectedSocial);
+                                }
+
+                                editMood.setReason(newMoodReason);
+                                editMood.setMoodType(newSelectedType);
                                 listener.edited();
+
                             }else{
                                 Toast.makeText(getContext(), "Must fill required text",
                                         Toast.LENGTH_SHORT).show();
@@ -118,15 +213,29 @@ public class AddMoodFragment extends DialogFragment {
                     .setPositiveButton("Post", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
+                            // This is for the spinner if the top header is selected "Choose a mood" then no mood will be posted , not implemented yet
+//                            if(!spinner.getSelectedItem().toString().equalsIgnoreCase("Choose a mood")){
+//                                Toast.makeText(getActivity(),spinner.getSelectedItem().toString(), Toast.LENGTH_SHORT).show();
+//                            }
+
                             String moodText = input.getText().toString();
+                            Object selectedMood = spinner.getSelectedItem();
+                            MoodType selected_type = MoodType.class.cast(selectedMood);
+                            SocialSituation selectedSocial = SocialSituation.class.cast(socialSpinner.getSelectedItem());
 
                             if(!moodText.isEmpty()){
-                                listener.onSubmit(new Mood(MoodType.HAPPY, null).withReason(moodText));
+
+                                if(socialSpinner.getVisibility() == View.VISIBLE){
+                                    listener.onSubmit(new Mood(selected_type, null).withReason(moodText).withSituation(selectedSocial));
+                                }else {
+                                    listener.onSubmit(new Mood(selected_type, null).withReason(moodText));
+                                }
                             }else{
                                 Toast.makeText(getContext(), "Must fill required text",
                                         Toast.LENGTH_SHORT).show();
                             }
                         }
+
                     }).create();
 
         }
