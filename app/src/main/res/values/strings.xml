@@ -1,5 +1,4 @@
-
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="google_map_api_key">AIzaSyDyMVWeW3tV-YDB9D5n9yV-mB8xowshFsg</string>
     <string name="app_name">FeelsBook</string>
     <string name="map">MAP</string>
