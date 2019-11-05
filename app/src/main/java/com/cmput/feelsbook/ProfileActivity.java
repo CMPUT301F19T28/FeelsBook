@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -51,7 +52,11 @@ public class ProfileActivity extends AppCompatActivity {
         historyList.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         historyList.setLayoutManager(layoutManager);
-        historyAdapter = new Feed(history);
+        historyAdapter = new Feed(history,  new Feed.OnItemClickListener(){ //will need to change functionality
+            public void onItemClick(Post post){
+                //must implement what happens when clicked else can leave blank
+            }
+        });
         historyList.setAdapter(historyAdapter);
 
         // TO-DO: add profile picture taken from Firebase

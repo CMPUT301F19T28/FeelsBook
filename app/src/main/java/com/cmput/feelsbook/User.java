@@ -10,9 +10,9 @@ public class User implements Serializable {
     private FollowList followList;
     private Bitmap profilePicture;
 
-    public User(String name, Feed posts, FollowList followsList){
+    public User(String name, FollowList followsList){
         this.name = name;
-        this.posts = posts;
+        //this.posts = posts;
         followList = followsList;
     }
 

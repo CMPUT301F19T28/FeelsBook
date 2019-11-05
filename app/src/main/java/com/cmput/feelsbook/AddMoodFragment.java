@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.cmput.feelsbook.post.Mood;
+import com.cmput.feelsbook.post.Post;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -41,9 +42,9 @@ public class AddMoodFragment extends DialogFragment {
 
 
     public interface OnFragmentInteractionListener{
-        void onSubmit(Mood newMood);
+        void onSubmit(Post newMood);
         void edited();
-        void deleted(Mood delete);
+        void deleted(Post delete);
     }
 
     /**
@@ -70,7 +71,7 @@ public class AddMoodFragment extends DialogFragment {
      * @return
      *      a fragment object
      */
-    public static AddMoodFragment newInstance(Mood mood){
+    public static AddMoodFragment newInstance(Post mood){
         Bundle args = new Bundle();
         args.putSerializable("mood", mood);
         AddMoodFragment fragment = new AddMoodFragment();
@@ -132,6 +133,13 @@ public class AddMoodFragment extends DialogFragment {
             //For editing mood
             final Mood editMood = (Mood) getArguments().getSerializable("mood");
             input.setText(editMood.getReason());
+            int index = 0;
+            for(int i = 0; i < moodTypes.length; i++){
+                if(moodTypes[i] == editMood.getMoodType()){
+                    spinner.setSelection(i);
+                }
+            }
+
             return builder
                     .setView(view)
                     .setTitle("Edit Post")
@@ -139,6 +147,7 @@ public class AddMoodFragment extends DialogFragment {
                     .setNegativeButton("Delete", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
+
                             listener.deleted(editMood);
                         }
                     })
@@ -146,7 +155,11 @@ public class AddMoodFragment extends DialogFragment {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             String newMoodReason = input.getText().toString();
+                            MoodType newSelectedType = MoodType.class.cast(spinner.getSelectedItem());
+
                             if(!newMoodReason.isEmpty()){
+                                editMood.setReason(newMoodReason);
+                                editMood.setMoodType(newSelectedType);
                                 listener.edited();
                             }else{
                                 Toast.makeText(getContext(), "Must fill required text",

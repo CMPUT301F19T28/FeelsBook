@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.cmput.feelsbook.post.Post;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -76,7 +77,8 @@ public class LoginActivity extends AppCompatActivity {
                                 String password = passField.getText().toString();
                                 if (password.equals(saved_pass)) {
                                     Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
-                                    User user = new User(document.getString("name"), new Feed(), new FollowList());
+                                    User user = new User(document.getString("name"), new FollowList());
+
                                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                     Bundle bundle = new Bundle();
                                     bundle.putSerializable("User",user);

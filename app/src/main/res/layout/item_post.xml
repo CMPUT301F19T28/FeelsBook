@@ -45,14 +45,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/camera_photo"
-            android:layout_width="80dp"
-            android:layout_height="68dp"
-            app:layout_constraintEnd_toStartOf="@+id/dot_button"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:srcCompat="@tools:sample/avatars" />
 
         <Button
             android:id="@+id/dot_button"
@@ -64,6 +56,15 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/camera_photo"
+            android:layout_width="80dp"
+            android:layout_height="68dp"
+            app:layout_constraintEnd_toStartOf="@id/dot_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

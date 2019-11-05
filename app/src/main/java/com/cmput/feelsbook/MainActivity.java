@@ -8,7 +8,10 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.cmput.feelsbook.post.Mood;
+import com.cmput.feelsbook.post.Post;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.ArrayList;
 
 /**
  * Homepage where feed of moods/Posts will be seen
@@ -30,7 +33,13 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         layoutManager = new LinearLayoutManager(this);
         feedView.setLayoutManager(layoutManager);
 
-        feedAdapter = new Feed();
+        feedAdapter = new Feed( new Feed.OnItemClickListener(){
+             public void onItemClick(Post post){
+                //.makeText(getApplicationContext(), "itemClicked", Toast.LENGTH_SHORT). show();
+                new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
+            }
+        });
+
         feedView.setAdapter(feedAdapter);
 
         currentUser = (User) getIntent().getExtras().get("User");
@@ -47,27 +56,36 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         });
 
 
+
+
+
+
     }
     /**
      * Takes a mood from the implemented fragment and adds it to the feedAdapter
      * @param newMood
+     *          mood that will be added to the feed
      */
-    public void onSubmit(Mood newMood){
+    public void onSubmit(Post newMood){
         feedAdapter.addPost(newMood);
     }
 
     /**
-     * will eventually be used to edit mood
+     * notifies the adapter that the data set has changed
      */
     public void edited(){
         //Code for editing mood
+        feedAdapter.notifyDataSetChanged();
     }
 
     /**
      * will be used to delete passed in mood once implemented
-     * @param delete
+     * @param mood
+     *      mood to be deleted
      */
-    public void deleted(Mood delete){
+    public void deleted(Post mood){
         //For deleting mood
+        feedAdapter.removePost(mood);
+        feedAdapter.notifyDataSetChanged();
     }
 }
