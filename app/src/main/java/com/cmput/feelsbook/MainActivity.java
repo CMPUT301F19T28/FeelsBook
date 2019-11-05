@@ -1,15 +1,13 @@
 package com.cmput.feelsbook;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
+
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
-
-import android.os.Bundle;
-import android.view.View;
 import com.cmput.feelsbook.post.Mood;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
@@ -21,8 +19,8 @@ import com.google.android.material.tabs.TabLayout;
  */
 public class MainActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener{
     private ImageButton profileButton;
+    RecyclerView feedView;
     User currentUser;
-    RecyclerView.LayoutManager layoutManager;
     TabLayout tabLayout;
     ViewPager viewPager;
     ViewPagerAdapter viewPagerAdapter;
@@ -33,15 +31,11 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     protected void onCreate(Bundle savedInstanceState) {
         /**
          * TO BE IMPLEMENTED:
-         * - display feed and make working Add Post button
-         * - switch between feed and map
-         * - click on profile < - current task
          * - pass in Feed to be displayed and personalized in ProfileActivity
          */
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        layoutManager = new LinearLayoutManager(this);
         tabLayout = findViewById(R.id.tab_layout);
         viewPager = findViewById(R.id.view_pager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
@@ -50,11 +44,11 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
         }
-        
+      
         feedFragment = new FeedFragment();
         mapFragment = new MapFragment();
         viewPagerAdapter.AddFragment(feedFragment, "Feed");
-        viewPagerAdapter.AddFragment(mapFragment, "Map");
+        viewPagerAdapter.AddFragment(mapFragment,"Map");
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -73,30 +67,18 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /**
-                 * TO-DO:
-                 * - convert ProfileFragment to ProfileActivity
-                 * - Fragments are meant for Maps
-                 * - successfully start Profile
-                 */
                 Intent intent = new Intent(MainActivity.this,ProfileActivity.class);
                 Bundle userBundle = new Bundle();
-                currentUser.setPosts(feedFragment.getRecyclerAdapter());
                 userBundle.putSerializable("User", currentUser);
-                userBundle.putSerializable("Post_list", feedFragment.getRecyclerAdapter().getFeed());
+                userBundle.putSerializable("Post_list",feedFragment.getRecyclerAdapter());
                 intent.putExtras(userBundle);
                 startActivity(intent);
             }
         });
     }
-    /**
-     * Takes a mood from the implemented fragment and adds it to the feedAdapter
-     * @param newMood
-     */
-    public void onSubmit(Mood newMood){
-        feedFragment.getRecyclerAdapter().addPost(newMood);
-
-
+    public void onSubmit (Mood newMood){
+        Feed feedAdapter = feedFragment.getRecyclerAdapter();
+        feedAdapter.addPost(newMood);
     }
     /**
      * will eventually be used to edit mood
