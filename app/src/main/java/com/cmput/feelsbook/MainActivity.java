@@ -8,8 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
-
-
 import com.cmput.feelsbook.post.Mood;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
@@ -33,9 +31,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     protected void onCreate(Bundle savedInstanceState) {
         /**
          * TO BE IMPLEMENTED:
-         * - display feed and make working Add Post button
-         * - switch between feed and map
-         * - click on profile < - current task
          * - pass in Feed to be displayed and personalized in ProfileActivity
          */
         super.onCreate(savedInstanceState);
@@ -49,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
         }
-
+      
         feedFragment = new FeedFragment();
         mapFragment = new MapFragment();
         viewPagerAdapter.AddFragment(feedFragment, "Feed");
@@ -72,12 +67,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /**
-                 * TO-DO:
-                 * - convert ProfileFragment to ProfileActivity
-                 * - Fragments are meant for Maps
-                 * - successfully start Profile
-                 */
                 Intent intent = new Intent(MainActivity.this,ProfileActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);

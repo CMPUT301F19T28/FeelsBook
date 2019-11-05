@@ -9,13 +9,15 @@
         android:id="@+id/app_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="130dp"
+        android:layout_marginTop="216dp"
         android:text="@string/app_title"
-        android:textSize="30sp"
+        android:textColor="#000000"
+        android:textSize="36sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="FeelsBook" />
+        tools:text="FeelsBook." />
 
     <EditText
         android:id="@+id/user_text"
@@ -27,8 +29,7 @@
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/app_title"
-        tools:text="Username" />
+        app:layout_constraintTop_toBottomOf="@+id/app_title" />
 
     <EditText
         android:id="@+id/password_text"
@@ -40,8 +41,7 @@
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/user_text"
-        tools:text="Password" />
+        app:layout_constraintTop_toBottomOf="@+id/user_text" />
 
     <Button
         android:id="@+id/confirm_login"
