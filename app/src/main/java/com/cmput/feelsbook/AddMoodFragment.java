@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -26,7 +25,8 @@ import androidx.fragment.app.DialogFragment;
 
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.Post;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.cmput.feelsbook.post.SocialSituation;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,12 +95,24 @@ public class AddMoodFragment extends DialogFragment {
          */
         input = view.findViewById(R.id.editText);
         Spinner spinner = view.findViewById(R.id.mood_spinner);
+        Spinner socialSpinner = view.findViewById(R.id.social_spinner);
+
         MoodType moodTypes[] = {MoodType.HAPPY, MoodType.SAD,MoodType.ANGRY, MoodType.ANNOYED,MoodType.SLEEPY, MoodType.SEXY};
         ArrayList<MoodType > moodList = new ArrayList<MoodType>();
         moodList.addAll(Arrays.asList(moodTypes));
         ArrayAdapter<MoodType> moodTypeAdapter = new ArrayAdapter<MoodType>(getActivity(), android.R.layout.simple_spinner_item, moodList);
         moodTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(moodTypeAdapter);
+
+        //creates social situation spinner drop down menu
+        SocialSituation socialSits[] = {SocialSituation.ALONE, SocialSituation.ONEPERSON, SocialSituation.SEVERAL, SocialSituation.CROWD };
+        ArrayList<SocialSituation> socialSitList = new ArrayList<SocialSituation>();
+        socialSitList.addAll(Arrays.asList(socialSits));
+        ArrayAdapter<SocialSituation> socialAdapter = new ArrayAdapter<SocialSituation>(getActivity(), android.R.layout.simple_spinner_item, socialSitList);
+        socialAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        socialSpinner.setAdapter(socialAdapter);
+        socialSpinner.setVisibility(View.GONE);
+
         /**
          * button for opening camera to take picture
          * photo stored as "photo"
@@ -124,6 +136,14 @@ public class AddMoodFragment extends DialogFragment {
             }
         });
 
+        final Button socialBttn = view.findViewById(R.id.social_situation_button);
+        socialBttn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                socialSpinner.setVisibility(View.VISIBLE);
+            }
+        });
+
 
         //add modtypes to this array
         //dp.setImage; //need to get profile pic
@@ -132,11 +152,21 @@ public class AddMoodFragment extends DialogFragment {
         try{
             //For editing mood
             final Mood editMood = (Mood) getArguments().getSerializable("mood");
+            boolean socialSituation = false;
             input.setText(editMood.getReason());
-            int index = 0;
             for(int i = 0; i < moodTypes.length; i++){
                 if(moodTypes[i] == editMood.getMoodType()){
                     spinner.setSelection(i);
+                }
+            }
+
+            if(!editMood.getSituation().toString().isEmpty()){
+                for(int i = 0; i < socialSits.length; i++){
+                    if(socialSits[i] == editMood.getSituation()){
+                        socialSpinner.setVisibility(View.VISIBLE);
+                        socialSpinner.setSelection(i);
+                        socialSituation = true;
+                    }
                 }
             }
 
@@ -147,7 +177,6 @@ public class AddMoodFragment extends DialogFragment {
                     .setNegativeButton("Delete", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-
                             listener.deleted(editMood);
                         }
                     })
@@ -156,11 +185,18 @@ public class AddMoodFragment extends DialogFragment {
                         public void onClick(DialogInterface dialogInterface, int i) {
                             String newMoodReason = input.getText().toString();
                             MoodType newSelectedType = MoodType.class.cast(spinner.getSelectedItem());
+                            SocialSituation selectedSocial = SocialSituation.class.cast(socialSpinner.getSelectedItem());
 
                             if(!newMoodReason.isEmpty()){
+
+                                if(socialSpinner.getVisibility() == View.VISIBLE){
+                                    editMood.setSituation(selectedSocial);
+                                }
+
                                 editMood.setReason(newMoodReason);
                                 editMood.setMoodType(newSelectedType);
                                 listener.edited();
+
                             }else{
                                 Toast.makeText(getContext(), "Must fill required text",
                                         Toast.LENGTH_SHORT).show();
@@ -183,9 +219,15 @@ public class AddMoodFragment extends DialogFragment {
                             String moodText = input.getText().toString();
                             Object selectedMood = spinner.getSelectedItem();
                             MoodType selected_type = MoodType.class.cast(selectedMood);
+                            SocialSituation selectedSocial = SocialSituation.class.cast(socialSpinner.getSelectedItem());
 
                             if(!moodText.isEmpty()){
-                                listener.onSubmit(new Mood(selected_type, null).withReason(moodText));
+
+                                if(socialSpinner.getVisibility() == View.VISIBLE){
+                                    listener.onSubmit(new Mood(selected_type, null).withReason(moodText).withSituation(selectedSocial));
+                                }else {
+                                    listener.onSubmit(new Mood(selected_type, null).withReason(moodText));
+                                }
                             }else{
                                 Toast.makeText(getContext(), "Must fill required text",
                                         Toast.LENGTH_SHORT).show();
