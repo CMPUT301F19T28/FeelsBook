@@ -7,6 +7,7 @@ import android.widget.EditText;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
+
 import com.cmput.feelsbook.post.Mood;
 import com.robotium.solo.Solo;
 import org.junit.Before;
@@ -64,7 +65,7 @@ public class MainActivityTest {
         //these fail
         try { //asserts theres something in the feedAdapter
             solo.wait(5);
-            final RecyclerView list = activity.feedView;
+            final RecyclerView list = activity.feedFragment.getRecyclerView();
             assertEquals(list.getChildCount(), 1);
 
         }catch(Exception e){
@@ -72,12 +73,28 @@ public class MainActivityTest {
         }
 
         try{ //Makes sure the right mood was added
-            final String reason = ((Mood) activity.feedAdapter.getPost(0)).getReason(); //get the feedAdapter
+            final String reason = ((Mood) activity.feedFragment.getRecyclerAdapter().getPost(0)).getReason(); //get the feedAdapter
             assertEquals("Happy", reason);
         }catch(Exception e){
 
         }
 
+    }
+
+    /**
+     * Check if swaps between feed and map screens function properly
+     */
+    @Test
+    public void checkViewPager() {
+        // Asserts that the current activity is the MainActivity. Otherwise, show "Wrong Activity"
+        solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
+        MainActivity activity = (MainActivity) solo.getCurrentActivity(); //access the activity
+        View googleMap = activity.findViewById(R.id.map_view);
+        View feedList = activity.findViewById(R.id.feed_list);
+        solo.clickOnButton("Map");
+        solo.waitForView(googleMap);
+        solo.clickOnButton("Feed");
+        solo.waitForView(feedList);
     }
 
 
