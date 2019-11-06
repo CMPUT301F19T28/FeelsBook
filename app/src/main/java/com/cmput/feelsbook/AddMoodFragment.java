@@ -115,6 +115,10 @@ public class AddMoodFragment extends DialogFragment {
             /**
              * photo taken by cameraIntent stored as Bitmap Photo
              * Need to get picture and add to mood in setPositive in Builder
+             *
+             * TA ADVICE : pass in own intent and extend and call super to get the bitmap photo
+             * BUG ISSUE: TA advice : refresh the add
+             *
              * @param CameraIntent
              */
             public void onActivityResult(Intent CameraIntent) {
