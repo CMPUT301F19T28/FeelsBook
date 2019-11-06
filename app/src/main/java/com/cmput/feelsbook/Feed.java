@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Serializable {
+
 
     private final String TAG = "Feed";
 
@@ -68,8 +70,6 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
         this.listener = listener;
     }
 
-
-
     /**
      * Create a view holder of item post layout
      *
@@ -97,11 +97,11 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
         holder.bind(this.feed.get(position), listener);
     }
 
-
     @Override
     public int getItemCount() {
         return feed.size();
     }
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder  implements Serializable{
 
@@ -110,7 +110,7 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
             super(view);
         }
 
-        public void bind(final Post post, final OnItemClickListener listener) {
+        public void bind(final Post post, final AdapterView.OnItemClickListener listener) {
             itemView.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
@@ -119,4 +119,5 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
             });
         }
     }
+
 }

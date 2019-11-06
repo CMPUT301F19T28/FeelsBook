@@ -20,7 +20,13 @@ public class FeedFragment extends Fragment {
     private RecyclerView recyclerView;
     private Feed recyclerAdapter;
 
-    public FeedFragment() {
+
+    public FeedFragment(Feed adapter) {
+        this.recyclerAdapter = adapter;
+    }
+
+    public FeedFragment(){
+        // default constructor
         recyclerAdapter = new Feed();
     }
 

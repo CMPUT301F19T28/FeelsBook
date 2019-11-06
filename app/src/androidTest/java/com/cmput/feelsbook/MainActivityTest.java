@@ -47,8 +47,7 @@ public class MainActivityTest {
 
     /**
      * Add a mood to the recyclerView and checks the number of moods in the
-     * feed using assertEquals
-     * Also checks to make sure the right thing was added
+     * feed using assertFalse
      */
     @Test
     public void checkFeed() {
@@ -63,6 +62,7 @@ public class MainActivityTest {
         solo.clickOnButton("Post"); //Select Confirm button
 
         //Get MainActivity to access its variables and methods
+        //these fail
         try { //asserts theres something in the feedAdapter
             solo.wait(5);
             final RecyclerView list = activity.feedFragment.getRecyclerView();
