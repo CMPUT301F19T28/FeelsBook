@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -15,7 +16,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/menu_bar_color">
 
@@ -24,7 +25,6 @@
                 android:layout_width="35dp"
                 android:layout_height="35dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_weight="0.166"
                 android:contentDescription="Profile picture"
@@ -38,7 +38,6 @@
                 android:layout_height="35dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp"
                 android:layout_weight="0.833"
                 android:contentDescription="Filter button"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -46,11 +45,10 @@
                 app:srcCompat="@android:drawable/ic_menu_sort_by_size" />
 
             <TextView
-                android:id="@+id/titleText"
+                android:id="@+id/title_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
                 android:text="Home"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Headline"
                 android:textColor="#FFFFFF"
@@ -63,55 +61,35 @@
     </TableRow>
 
     <androidx.viewpager.widget.ViewPager
-        android:id="@+id/pager"
-        android:layout_width="0dp"
+        android:id="@+id/view_pager"
+        android:layout_width="412dp"
         android:layout_height="669dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tableRow"
         app:layout_constraintVertical_bias="0.0">
 
         <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/feed_map_bar_color"
             app:tabIndicatorColor="@color/add_post_color"
             app:tabIndicatorHeight="4dp"
-            app:tabTextColor="@color/defaultGray"
-            app:tabSelectedTextColor="@color/defaultWhite">
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="FEED"/>
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="MAP"/>
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="@color/defaultWhite"
+            app:tabTextColor="@color/defaultGray">
 
         </com.google.android.material.tabs.TabLayout>
-
     </androidx.viewpager.widget.ViewPager>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/feedList"
-        android:layout_width="410dp"
-        android:layout_height="622dp"
-        android:layout_marginTop="46dp"
-        android:scrollbars="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tableRow"
-        app:layout_constraintBottom_toBottomOf="@id/pager"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addPostButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp"
         android:clickable="true"
         android:text="ADD POST"

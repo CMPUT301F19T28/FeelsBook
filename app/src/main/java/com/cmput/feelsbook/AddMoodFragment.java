@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -81,7 +80,7 @@ public class AddMoodFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.activity_add_post, null);
-        input = view.findViewById(R.id.editText);
+        input = view.findViewById(R.id.edit_text);
         //dp.setImage; //need to get profile pic
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());

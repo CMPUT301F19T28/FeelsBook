@@ -1,12 +1,10 @@
 package com.cmput.feelsbook;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,6 +20,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 
@@ -37,7 +38,7 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseFirestore db;
 
     private final String SIGNUP_TAG = "Invalid field";
-    public static final String USER = "com.cmput.feelsbook.signUpActivity.User";
+    public static final String USER = "com.cmput.feelsbook.SignUpActivity.User";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,31 +72,7 @@ public class SignUpActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             DocumentSnapshot doc = task.getResult();
                             if (!doc.exists()) {
-                                final String password = passwordField.getText().toString();
-                                final String name = nameField.getText().toString();
-
-
-                                HashMap<String, String> data = new HashMap<>();
-                                data.put("password", password);
-                                data.put("name", name);
-
-                                collectionReference
-                                        .document(username)
-                                        .set(data)
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                Log.d(TAG, "User creation successful");
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Log.w(TAG, "User creation failed", e);
-                                            }
-                                        });
-
-                                finish();
+                                createUser(username);
                             }
                             else {
                                 Toast.makeText(SignUpActivity.this, "Username is not available", Toast.LENGTH_SHORT).show();
@@ -106,17 +83,6 @@ public class SignUpActivity extends AppCompatActivity {
                         }
                     }
                 });
-
-
-                /*
-                Structure of the database:
-
-                collectionReference.document(username).collection("data").document("Followers")
-                collectionReference.document(username).collection("data").document("Following")
-                collectionReference.document(username).collection("data").document("Follow_Requests")
-                collectionReference.document(username).collection("data").document("Mood_History")
-                collectionReference.document(username).collection("data").document("Mood_History").collection("History").document()
-                 */
             }
         });
 
@@ -150,5 +116,64 @@ public class SignUpActivity extends AppCompatActivity {
             return false;
         }
         return  true;
+    }
+
+    /**
+     * Create a new document with the entered username as doc ID
+     * Fill in name and password entries into the document
+     * @param username
+     *  The username the user has entered
+     */
+    private void createUser(String username){
+        final String password = passwordField.getText().toString();
+        final String name = nameField.getText().toString();
+
+        try{
+            byte[] encodedHash = getHash(password);
+            String hashedPassword = bytesToHex(encodedHash);
+
+            HashMap<String, String> data = new HashMap<>();
+            data.put("password", hashedPassword);
+            data.put("name", name);
+
+            db.collection("users")
+                    .document(username)
+                    .set(data)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "User creation successful");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "User creation failed", e);
+                        }
+                    });
+
+            finish();
+        }
+        catch (NoSuchAlgorithmException e){
+            Log.d(TAG, "Exception thrown for incorrect algorithm " + e);
+        }
+    }
+
+    private static byte[] getHash(String password) throws NoSuchAlgorithmException{
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        return digest.digest(password.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private static String bytesToHex(byte[] hash) {
+        StringBuffer hexString = new StringBuffer();
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            } else {
+                hexString.append(hex);
+            }
+        }
+        return hexString.toString();
     }
 }

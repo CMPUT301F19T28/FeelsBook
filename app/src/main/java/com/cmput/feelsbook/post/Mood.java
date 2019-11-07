@@ -5,6 +5,8 @@ import android.location.Location;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.cmput.feelsbook.Feed;
 import com.cmput.feelsbook.R;
 
@@ -106,14 +108,16 @@ public class Mood extends Post implements Serializable {
      * @Param viewHolder Contains the view for the mood feed item which has the other views
      */
     @Override
-    public void displayPost(Feed.ViewHolder viewHolder) {
+    public void displayPost(RecyclerView.ViewHolder viewHolder) {
         TextView dateTimeText = viewHolder.itemView.findViewById(R.id.dateText);
         TextView moodText = viewHolder.itemView.findViewById(R.id.moodText);
         ImageView profile_pic_feed = viewHolder.itemView.findViewById(R.id.profileImage);
+        TextView reasonText = viewHolder.itemView.findViewById(R.id.reasonText);
 
         dateTimeText.setText(dateFormatter.format(dateTime));
         moodText.setText(moodType.getEmoticon());
         profile_pic_feed.setImageBitmap(this.profilePic);
+        reasonText.setText(reason);
 
 //        TODO: Implemented but out of scope for sprint 1
 //
