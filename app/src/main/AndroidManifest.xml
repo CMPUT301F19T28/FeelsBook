@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cmput.feelsbook">
-<<<<<<< HEAD
-
 
     <uses-feature android:name="android.hardware.camera"
         android:required="true" />
 
-=======
->>>>>>> 40750d77ef61f35a11472768b0235d8cf08eeaad
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true">
