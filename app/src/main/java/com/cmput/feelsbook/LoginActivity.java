@@ -77,20 +77,6 @@ public class LoginActivity extends AppCompatActivity {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
                                 String saved_pass = document.getString("password");
-<<<<<<< HEAD
-                                String password = passField.getText().toString();
-                                if (password.equals(saved_pass)) {
-                                    Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
-                                    User user = new User(document.getString("name"), new FollowList());
-
-                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                    Bundle bundle = new Bundle();
-                                    bundle.putSerializable("User",user);
-                                    intent.putExtras(bundle);
-                                    startActivity(intent);
-                                } else {
-                                    Toast.makeText(LoginActivity.this, "Invalid Username or Password", Toast.LENGTH_SHORT).show();
-=======
                                 try {
                                     byte[] encodedHash = getHash(passField.getText().toString());
                                     String hashedPassword = bytesToHex(encodedHash);
@@ -102,7 +88,6 @@ public class LoginActivity extends AppCompatActivity {
                                     }
                                 } catch (NoSuchAlgorithmException e){
                                     Log.d(TAG, "Exception thrown for incorrect algorithm " + e);
->>>>>>> 40750d77ef61f35a11472768b0235d8cf08eeaad
                                 }
                             } else {
                                 Toast.makeText(LoginActivity.this, "Invalid Username or Password", Toast.LENGTH_SHORT).show();
