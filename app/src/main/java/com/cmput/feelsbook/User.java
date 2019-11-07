@@ -10,12 +10,8 @@ public class User implements Serializable {
     private FollowList followList;
     private Bitmap profilePicture;
 
-<<<<<<< HEAD
-    public User(String name, FollowList followsList){
-=======
     public User(String userName, String name, Feed posts, FollowList followsList){
         this.userName = userName;
->>>>>>> 40750d77ef61f35a11472768b0235d8cf08eeaad
         this.name = name;
         this.posts = posts;
         followList = followsList;
