@@ -1,21 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<<<<<<< HEAD
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
-=======
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
->>>>>>> 40750d77ef61f35a11472768b0235d8cf08eeaad
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
 
     <ImageView
         android:id="@+id/profileImage"
-<<<<<<< HEAD
-=======
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_marginStart="8dp"
@@ -26,64 +18,8 @@
 
     <TextView
         android:id="@+id/moodText"
->>>>>>> 40750d77ef61f35a11472768b0235d8cf08eeaad
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-<<<<<<< HEAD
-        android:layout_marginLeft="16dp"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/dateText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.6"
-            android:text="date:time" />
-
-        <TextView
-            android:id="@+id/moodText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Mood"
-            android:textSize="24sp" />
-
-        <TextView
-            android:id="@+id/reason_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.6"
-            android:text="Reason" />
-
-    </LinearLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-
-        <Button
-            android:id="@+id/dot_button"
-            android:layout_width="57dp"
-            android:layout_height="28dp"
-            android:layout_marginEnd="16dp"
-            android:text="... "
-            android:textSize="8sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/camera_photo"
-            android:layout_width="80dp"
-            android:layout_height="68dp"
-            app:layout_constraintEnd_toStartOf="@id/dot_button"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:srcCompat="@tools:sample/avatars" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</LinearLayout>
-=======
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="Mood"
@@ -113,4 +49,3 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
->>>>>>> 40750d77ef61f35a11472768b0235d8cf08eeaad
