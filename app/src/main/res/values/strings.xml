@@ -14,4 +14,7 @@
     <string name="angry">&#128544;</string>
     <string name="annoyed">&#128580;</string>
     <string name="sexy">&#127814;</string>
+    <string name="follow_requests">Follow Requests</string>
+    <string name="following">Following</string>
+    <string name="followers">Followers</string>
 </resources>
