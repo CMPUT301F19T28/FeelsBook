@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 // add post activity:
                 new AddMoodFragment().show(getSupportFragmentManager(), "ADD_MOOD");
             }
+
         });
 
         profileButton.setOnClickListener(new View.OnClickListener() {
@@ -83,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     public void onSubmit (Mood newMood){
         Feed feedAdapter = feedFragment.getRecyclerAdapter();
         feedAdapter.addPost(newMood);
+        feedAdapter.notifyDataSetChanged();
     }
     /**
      * will eventually be used to edit mood
@@ -97,4 +99,5 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     public void deleted (Mood delete){
         //For deleting mood
     }
+
 }
