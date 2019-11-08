@@ -113,7 +113,6 @@ public class AddMoodFragment extends DialogFragment {
          * photo stored as "photo"
          */
 
-
         Button cameraButton = view.findViewById(R.id.add_picture_button);
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,18 +122,7 @@ public class AddMoodFragment extends DialogFragment {
                 if(intent.resolveActivity(getActivity().getPackageManager()) !=  null)
                     startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
             }
-            /**
-             * photo taken by cameraIntent stored as Bitmap Photo
-             * Need to get picture and add to mood in setPositive in Builder
-             *
-             * TA ADVICE : pass in own intent and extend and call super to get the bitmap photo
-             * BUG ISSUE: TA advice : refresh the add
-             *
-             * @param CameraIntent
-             */
-//            public void onActivityResult(Intent CameraIntent) {
-//                Bitmap photo = (Bitmap) CameraIntent.getExtras().get("data");
-//            }
+
         });
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -172,10 +160,6 @@ public class AddMoodFragment extends DialogFragment {
                     .setPositiveButton("Post", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            // This is for the spinner if the top header is selected "Choose a mood" then no mood will be posted , not implemented yet
-//                            if(!spinner.getSelectedItem().toString().equalsIgnoreCase("Choose a mood")){
-//                                Toast.makeText(getActivity(),spinner.getSelectedItem().toString(), Toast.LENGTH_SHORT).show();
-//                            }
 
                             String moodText = input.getText().toString();
                             Object selectedMood = spinner.getSelectedItem();
@@ -185,7 +169,7 @@ public class AddMoodFragment extends DialogFragment {
                             if (!moodText.isEmpty()) {
                                 Mood newMood = new Mood(selected_type, null).withReason(moodText).withPhoto(picture);
                                 listener.onSubmit(newMood);
-//                                Toast.makeText(getContext(), "This Part", Toast.LENGTH_SHORT).show();
+
                             } else {
                                 Toast.makeText(getContext(), "Must fill required text",
                                         Toast.LENGTH_SHORT).show();
@@ -202,10 +186,8 @@ public class AddMoodFragment extends DialogFragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_IMAGE_CAPTURE) {
-                // Do something with imagePath
                 picture = (Bitmap) data.getExtras().get("data");
             }
-
         }
 
     }
