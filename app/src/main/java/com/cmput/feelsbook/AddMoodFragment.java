@@ -42,7 +42,8 @@ public class AddMoodFragment extends DialogFragment {
     private EditText input;
     private Bitmap dp;
     private OnFragmentInteractionListener listener;
-    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+    private Bitmap picture;
+
     private static final int REQUEST_IMAGE_CAPTURE = 1;
 
     public interface OnFragmentInteractionListener {
@@ -118,7 +119,9 @@ public class AddMoodFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
 
-                getActivity().startActivityForResult(intent, 1);
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if(intent.resolveActivity(getActivity().getPackageManager()) !=  null)
+                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
             }
             /**
              * photo taken by cameraIntent stored as Bitmap Photo
@@ -180,9 +183,7 @@ public class AddMoodFragment extends DialogFragment {
 
 
                             if (!moodText.isEmpty()) {
-                                Mood newMood = new Mood(selected_type, null).withReason(moodText);
-                                int REQUEST_IMAGE_CAPTURE = 1;
-                                onActivityResult(REQUEST_IMAGE_CAPTURE, 1, intent, newMood);
+                                Mood newMood = new Mood(selected_type, null).withReason(moodText).withPhoto(picture);
                                 listener.onSubmit(newMood);
 //                                Toast.makeText(getContext(), "This Part", Toast.LENGTH_SHORT).show();
                             } else {
@@ -196,18 +197,13 @@ public class AddMoodFragment extends DialogFragment {
     }
 
 
-    //    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data, Mood newMood) {
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_IMAGE_CAPTURE) {
                 // Do something with imagePath
-
-                Bitmap photo = (Bitmap) data.getExtras().get("data");
-
-                //Attempting to attach the camera photo to the moods profile image and appear on Post
-                newMood.withPhoto(photo);
-//                newMood.setPhoto(photo);
+                picture = (Bitmap) data.getExtras().get("data");
             }
 
         }
