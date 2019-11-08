@@ -17,6 +17,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import javax.annotation.Nullable;
 
+/**
+ * Displays a map with standard map functions.
+ * MapView mapView - window used to display the map
+ * String MAPVIEW_BUNDLE_KEY - used to uniquely identify a map Bundle object
+ */
 public class MapFragment extends Fragment implements OnMapReadyCallback {
     private MapView mapView;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
@@ -36,6 +41,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return view;
 
     }
+
 
     private void initGoogleMap(Bundle savedInstanceState) {
         // *** IMPORTANT ***

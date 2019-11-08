@@ -18,6 +18,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Used to represent the individual using the application. Contains personal information and
+ * allows for creation of new posts.
+ * String userName, name - contains the username and name of the user, respectively
+ * Feed posts - contains the user's personal posts
+ * FollowList followList - contains the user's following list
+ * Bitmap profilePicture - contains the user's profile pictur
+ */
 public class User implements Serializable {
     private static final String TAG = "User";
 

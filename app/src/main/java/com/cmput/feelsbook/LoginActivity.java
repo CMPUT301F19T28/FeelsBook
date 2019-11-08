@@ -26,6 +26,14 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Handles the login and verification of a user.
+ * EditText userField, passField - username and password fields used to get username and password
+ * TextView signUpPrompt - used to display clickable text that launches SignUpActivity
+ * String signUpMessage - message used for clickable text
+ * FirebaseFireStore db - database instance used to extract information for verification/addition
+ * of users
+ */
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
@@ -39,13 +47,6 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        /**
-         * Basic login screen features:
-         * - button for login
-         * - text fields for username and password
-         * - prompt for register account
-         */
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_screen);
 
@@ -106,11 +107,26 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Creates a hashed password from a given String.
+     * @param password
+     * Password to be hashed
+     * @return
+     * Returns hashed password
+     * @throws NoSuchAlgorithmException
+     */
     private static byte[] getHash(String password) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         return digest.digest(password.getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * Converts given byte array to hexadecimal.
+     * @param hash
+     * hash array to be converted
+     * @return
+     * Returns a String object containing a hexadecimal string
+     */
     private static String bytesToHex(byte[] hash){
         StringBuffer hexString = new StringBuffer();
         for (int i = 0; i < hash.length; i++){
@@ -124,6 +140,11 @@ public class LoginActivity extends AppCompatActivity {
         return  hexString.toString();
     }
 
+    /**
+     * Passes a valid user if login was successful
+     * @param document
+     * Document context used to create a User object to pass to MainActivity
+     */
     private void successfulLogin(DocumentSnapshot document){
         Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
         User user = new User(document.getId(), document.getString("name"), new Feed(), new FollowList());

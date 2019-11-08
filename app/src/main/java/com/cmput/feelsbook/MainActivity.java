@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
         }
-      
+
         feedFragment = new FeedFragment();
         mapFragment = new MapFragment();
         viewPagerAdapter.AddFragment(feedFragment, "Feed");
@@ -93,9 +93,9 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         });
     }
     /**
-     * Takes a mood from the implemented fragment and adds it to the feedAdapter
+     * Adds a post/mood object to the feed list.
      * @param newMood
-     *          mood that will be added to the feed
+     * New mood object to be added
      */
     public void onSubmit(Post newMood){
         feedFragment.getRecyclerAdapter().addPost(newMood);
