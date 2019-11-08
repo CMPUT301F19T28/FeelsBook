@@ -14,7 +14,19 @@ import com.cmput.feelsbook.post.Post;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-
+/**
+ * Handles the profile activities and displays the user profile information.
+ * int followCount, followersCount, postCount - displays number of following users, followers, and
+ * number of posts respectively
+ * ImageView profilePicture - displays user's profile picture
+ * User currentUser - current user whose profile is displayed
+ * Feed historyAdapter - contains user's personal posts
+ * TabLayout tabLayout - used to display clickable tab items
+ * ViewPager viewPager - contains the area where MapFragment and FeedFragment is displayed
+ * MapFragment mapFragment - contains the map activity to be displayed
+ * FeedFragment feedFragment - contains the feed activity to be displayed
+ * FirebaseFirestore db - created instance of the database where data is being pulled from
+ */
 public class ProfileActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener{
     private int followCount = 0;
     private int followersCount = 0;

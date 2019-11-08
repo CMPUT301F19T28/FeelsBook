@@ -25,7 +25,13 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
-
+/**
+ * Creates a signup activity where a new user can be created.
+ * Button signupButton, cancelButton - used to confirm or cancel the user creation process
+ * EditText nameField, passwordField, usernameField - contains the inputted name, password, and
+ * username entered by the user respectively.
+ * FirebaseFirestore db - created instance of the database used for storing the created user
+ */
 public class SignUpActivity extends AppCompatActivity {
 
     private static final String TAG = "SignUpActivity";

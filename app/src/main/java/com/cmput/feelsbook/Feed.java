@@ -13,6 +13,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Holds the list of posts/moods to be displayed.
+ * List<Post> feed - contains all moods/posts to be displayed
+ * String TAG - identifier used for Log messages
+ */
 public class Feed extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Serializable {
 
     private final String TAG = "Feed";
@@ -41,13 +46,6 @@ public class Feed extends RecyclerView.Adapter<RecyclerView.ViewHolder> implemen
 
     public Serializable getFeed(){ return (Serializable)this.feed; }
 
-    /**
-     * Create a view holder of item post layout
-     *
-     * @param parent
-     * @param viewType
-     * @return
-     */
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -56,10 +54,11 @@ public class Feed extends RecyclerView.Adapter<RecyclerView.ViewHolder> implemen
     }
 
     /**
-     * When binding a viewholder to the recycler view calls the post to fill the fields.
-     *
-     * @param holder   The viewholder which will display the item
-     * @param position The position of the item in the data source
+     * When binding a ViewHolder to the RecyclerView, calls the post to fill the fields.
+     * @param holder
+     * The ViewHolder which will display the item
+     * @param position
+     * The position of the item in the data source
      */
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {

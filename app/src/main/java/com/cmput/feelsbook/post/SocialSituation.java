@@ -2,6 +2,9 @@ package com.cmput.feelsbook.post;
 
 import androidx.annotation.NonNull;
 
+/**
+ * Contains the social situations used for displaying a Post object.
+ */
 public enum SocialSituation {
 
     ALONE,

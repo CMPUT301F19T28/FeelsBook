@@ -32,7 +32,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * Fragment for adding or editing a Mood
+ * Fragment for adding or editing a Mood.
+ * EditText input - used for adding the reason and context for the Post object
+ * Bitmap dp - used to display the user's profile image
+ * OnFragmentInteractionListener listener - listens to fragment actions and executes the
+ * corresponding command
  */
 public class AddMoodFragment extends DialogFragment {
 

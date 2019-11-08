@@ -8,6 +8,11 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Handles fragments passed into the ViewPagerAdapter object.
+ * List<Fragment> lstFragment - contains list of fragments to be used
+ * List<String> lstTitles - contains list of titles to add to fragments
+ */
 public class ViewPagerAdapter extends FragmentPagerAdapter {
 
     private final List<Fragment> lstFragment = new ArrayList<>();

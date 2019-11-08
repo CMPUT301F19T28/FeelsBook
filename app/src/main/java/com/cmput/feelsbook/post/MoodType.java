@@ -2,6 +2,9 @@ package com.cmput.feelsbook.post;
 
 import com.cmput.feelsbook.R;
 
+/**
+ * Contains the emoticon used by each MoodType.
+ */
 public enum MoodType {
 
 

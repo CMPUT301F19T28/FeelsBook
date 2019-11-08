@@ -1,11 +1,10 @@
 package com.cmput.feelsbook;
 
-import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -23,6 +22,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Extracts list of following requests received by the user.
+ * List<String> list - contains users that requested to follow the current user
+ * User user - current user used to display information
+ */
 public class FollowingRequests extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<String> list;
@@ -34,6 +38,10 @@ public class FollowingRequests extends RecyclerView.Adapter<RecyclerView.ViewHol
         fillList();
     }
 
+    /**
+     * Populates list attribute with all users that made follow requests pulled from the
+     * user's database
+     */
     public void fillList() {
         FirebaseFirestore.getInstance()
                 .collection("users")

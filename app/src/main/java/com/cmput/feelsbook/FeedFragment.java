@@ -10,6 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import javax.annotation.Nullable;
 
+/**
+ * Creates the feed list from the user's own posts and following users' posts.
+ * recyclerView - tied to the RecyclerView object to display the feed
+ * Feed recyclerAdapter - contains the list of posts to display and other methods
+ */
 public class FeedFragment extends Fragment{
 
     private RecyclerView recyclerView;
