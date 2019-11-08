@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import com.cmput.feelsbook.post.Mood;
+import com.cmput.feelsbook.post.Post;
 import com.google.android.material.tabs.TabLayout;
 
 
@@ -79,7 +80,7 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         });
     }
 
-    public void onSubmit (Mood newMood){
+    public void onSubmit (Post newMood){
         historyAdapter.addPost(newMood);
     }
     /**
@@ -92,7 +93,7 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
      * will be used to delete passed in mood once implemented
      * @param delete
      */
-    public void deleted (Mood delete){
+    public void deleted (Post delete){
         //For deleting mood
     }
 
