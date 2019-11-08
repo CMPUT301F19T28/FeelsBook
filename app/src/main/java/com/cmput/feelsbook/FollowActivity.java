@@ -13,6 +13,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class FollowActivity extends AppCompatActivity {
 
@@ -20,13 +26,22 @@ public class FollowActivity extends AppCompatActivity {
     private RecyclerView follow_requests;
     private RecyclerView.LayoutManager layoutManager;
     private FollowingRequests followingRequests;
+    private TabLayout tabLayout;
+    private ViewPagerAdapter viewPagerAdapter;
+    private ViewPager viewPager;
+    private FollowList followingList;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.follow_activity);
-        user = (User) getIntent().getExtras().get("user");
+        if (getIntent().getExtras()!= null){
+            user = (User) getIntent().getExtras().get("user");
+        }
+        db = FirebaseFirestore.getInstance();
 
+        followingList = new FollowList();
         follow_requests = findViewById(R.id.follow_requests_list);
         layoutManager = new LinearLayoutManager(this);
         follow_requests.setLayoutManager(layoutManager);

@@ -135,6 +135,7 @@ public class SignUpActivity extends AppCompatActivity {
             HashMap<String, String> data = new HashMap<>();
             data.put("password", hashedPassword);
             data.put("name", name);
+            data.put("username",username);
 
             db.collection("users")
                     .document(username)

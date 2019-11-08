@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.cmput.feelsbook.post.Mood;
+import com.cmput.feelsbook.post.Post;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
@@ -80,21 +81,26 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
             }
         });
     }
-    public void onSubmit (Mood newMood){
+    public void onSubmit (Post newMood){
         Feed feedAdapter = feedFragment.getRecyclerAdapter();
         feedAdapter.addPost(newMood);
+        feedAdapter.notifyDataSetChanged();
     }
     /**
      * will eventually be used to edit mood
      */
-    public void edited () {
+    public void edited(){
         //Code for editing mood
+        feedFragment.getRecyclerAdapter().notifyDataSetChanged();
     }
     /**
      * will be used to delete passed in mood once implemented
-     * @param delete
+     * @param mood
+     *      mood to be deleted
      */
-    public void deleted (Mood delete){
+    public void deleted(Post mood){
         //For deleting mood
+        feedFragment.getRecyclerAdapter().removePost(mood);
+        feedFragment.getRecyclerAdapter().notifyDataSetChanged();
     }
 }

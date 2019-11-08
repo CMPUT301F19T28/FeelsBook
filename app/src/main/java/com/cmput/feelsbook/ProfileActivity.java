@@ -1,16 +1,18 @@
 package com.cmput.feelsbook;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
-import com.cmput.feelsbook.post.Mood;
+import com.cmput.feelsbook.post.Post;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 
 public class ProfileActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener{
@@ -25,6 +27,7 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
     private Feed historyAdapter;
     private FeedFragment historyFragment;
     private MapFragment mapFragment;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +38,8 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         tabLayout = findViewById(R.id.profile_tab);
         viewPager = findViewById(R.id.history_pager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        db = FirebaseFirestore.getInstance();
+
         if (bundle != null){
             currentUser = (User)bundle.get("User");
             historyAdapter = (Feed)bundle.get("Post_list");
@@ -48,25 +53,19 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
-        ImageButton backButton = findViewById(R.id.exit_profile);
+        Button backButton = findViewById(R.id.exit_profile);
         TextView fullName = findViewById(R.id.full_name);
         TextView userName = findViewById(R.id.username);
         TextView followText = findViewById(R.id.follower_count);
         TextView followingText = findViewById(R.id.following_count);
         TextView postsText = findViewById(R.id.total_posts);
-
-        // TO-DO: add profile picture taken from Firebase
         ImageView profilePicture = findViewById(R.id.profile_picture);
-        // TO-DO: replace alias with the document name (username) inside of Firebase
-        String alias = "testname123";
 
-
-        // TO-DO: replace with actual count of posts instead of using historyAdapter
         postCount = historyAdapter.getItemCount();
         fullName.setText(currentUser.getName());
         followText.setText(followCount + " following");
         followingText.setText(followersCount + " followers");
-        userName.setText("@"+alias);
+        userName.setText("@"+currentUser.getUserName());
 
         if (postCount > 1 || postCount == 0){postsText.setText(postCount + " total posts");}
         else if (postCount == 1){postsText.setText(postCount + " total post");}
@@ -79,21 +78,45 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         });
     }
 
-    public void onSubmit (Mood newMood){
-        historyAdapter.addPost(newMood);
-    }
     /**
-     * will eventually be used to edit mood
+     * Takes a mood from the implemented fragment and adds it to the feedAdapter
+     * @param newMood
+     *          mood that will be added to the feed
      */
-    public void edited () {
-        //Code for editing mood
+    public void onSubmit(Post newMood){
+        historyAdapter.addPost(newMood);
+        historyAdapter.notifyDataSetChanged();
     }
+
+    /**
+     * notifies the adapter that the data set has changed
+     */
+    public void edited(){
+        //Code for editing mood
+        historyAdapter.notifyDataSetChanged();
+    }
+
     /**
      * will be used to delete passed in mood once implemented
-     * @param delete
+     * @param mood
+     *      mood to be deleted
      */
-    public void deleted (Mood delete){
+    public void deleted(Post mood){
         //For deleting mood
+        historyAdapter.removePost(mood);
+        historyAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Launches follower list / following list activity
+     * @param v
+     */
+    public void showFollow(View v){
+        Intent intent = new Intent(ProfileActivity.this,FollowActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("user",currentUser);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
 }
