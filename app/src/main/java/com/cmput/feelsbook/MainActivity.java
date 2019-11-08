@@ -5,16 +5,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import androidx.appcompat.app.AppCompatActivity;
-
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
-
-import android.os.Bundle;
-import android.view.View;
-
-import com.cmput.feelsbook.post.Mood;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.cmput.feelsbook.post.Post;
 
 
 /**
@@ -30,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     ViewPagerAdapter viewPagerAdapter;
     FeedFragment feedFragment;
     MapFragment mapFragment;
+    Feed.OnItemClickListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +40,18 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         viewPager = findViewById(R.id.view_pager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         profileButton = findViewById(R.id.profileButton);
+        listener = new Feed.OnItemClickListener(){
+            /**
+             * Sets onItemClick to open a fragment in which the mood will be edited
+             * @param post
+             *          Post to be edited
+             */
+
+            @Override
+            public void onItemClick(Post post){
+                new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
+            }
+        };
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
@@ -64,9 +72,12 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 //when floating action button is pressed instantiates the fragment so a Ride can be
                 // added to the list
                 // add post activity:
+
                 new AddMoodFragment().show(getSupportFragmentManager(), "ADD_MOOD");
             }
         });
+
+        feedFragment.getRecyclerAdapter().setOnItemClickListener(listener);
 
         profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,27 +85,39 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 Intent intent = new Intent(MainActivity.this,ProfileActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
+                feedFragment.getRecyclerAdapter().setOnItemClickListener(null);
                 userBundle.putSerializable("Post_list",feedFragment.getRecyclerAdapter());
                 intent.putExtras(userBundle);
                 startActivity(intent);
             }
         });
     }
-    public void onSubmit (Mood newMood){
-        Feed feedAdapter = feedFragment.getRecyclerAdapter();
-        feedAdapter.addPost(newMood);
-    }
     /**
-     * will eventually be used to edit mood
+     * Takes a mood from the implemented fragment and adds it to the feedAdapter
+     * @param newMood
+     *          mood that will be added to the feed
      */
-    public void edited () {
-        //Code for editing mood
+    public void onSubmit(Post newMood){
+        feedFragment.getRecyclerAdapter().addPost(newMood);
+        feedFragment.getRecyclerAdapter().notifyDataSetChanged();
     }
+
+    /**
+     * notifies the adapter that the data set has changed
+     */
+    public void edited(){
+        //Code for editing mood
+        feedFragment.getRecyclerAdapter().notifyDataSetChanged();
+    }
+
     /**
      * will be used to delete passed in mood once implemented
-     * @param delete
+     * @param mood
+     *      mood to be deleted
      */
-    public void deleted (Mood delete){
+    public void deleted(Post mood){
         //For deleting mood
+        feedFragment.getRecyclerAdapter().removePost(mood);
+        feedFragment.getRecyclerAdapter().notifyDataSetChanged();
     }
 }

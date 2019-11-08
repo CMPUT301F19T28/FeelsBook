@@ -13,15 +13,28 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Feed extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Serializable {
+public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Serializable {
 
     private final String TAG = "Feed";
 
     private List<Post> feed;
 
-    public Feed() { this.feed = new ArrayList<>(); }
+    private OnItemClickListener listener;
 
-    public Feed(List<Post> feed) { this.feed = feed; }
+    public interface OnItemClickListener{ //define OnClickListener for when a post is clicked
+        void onItemClick(Post post);
+    }
+
+    public Feed() {
+        this.feed = new ArrayList<>();
+        setOnItemClickListener(null);
+    }
+
+    public Feed(List<Post> feed) {
+
+        this.feed = feed;
+        setOnItemClickListener(null);
+    }
 
     public void addPost(Post post) {
         feed.add(post);
@@ -41,6 +54,10 @@ public class Feed extends RecyclerView.Adapter<RecyclerView.ViewHolder> implemen
 
     public Serializable getFeed(){ return (Serializable)this.feed; }
 
+    public void setOnItemClickListener(OnItemClickListener listener){
+        this.listener = listener;
+    }
+
     /**
      * Create a view holder of item post layout
      *
@@ -50,9 +67,9 @@ public class Feed extends RecyclerView.Adapter<RecyclerView.ViewHolder> implemen
      */
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_post, parent, false);
-        return new RecyclerView.ViewHolder(view) {};
+        return new ViewHolder(view) {};
     }
 
     /**
@@ -62,13 +79,31 @@ public class Feed extends RecyclerView.Adapter<RecyclerView.ViewHolder> implemen
      * @param position The position of the item in the data source
      */
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Log.d(TAG, "called onBindViewHolder");
         feed.get(position).displayPost(holder);
+        holder.bind(feed.get(position), listener);
     }
 
     @Override
     public int getItemCount() {
         return feed.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder  implements Serializable{
+
+
+        public ViewHolder(final View view) {
+            super(view);
+        }
+
+        public void bind(final Post post, final Feed.OnItemClickListener listener) {
+            itemView.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    listener.onItemClick(post);
+                }
+            });
+        }
     }
 }
