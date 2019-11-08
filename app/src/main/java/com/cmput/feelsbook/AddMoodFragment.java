@@ -153,7 +153,6 @@ public class AddMoodFragment extends DialogFragment {
         try{
             //For editing mood
             final Mood editMood = (Mood) getArguments().getSerializable("mood");
-            boolean socialSituation = false;
             input.setText(editMood.getReason());
             for(int i = 0; i < moodTypes.length; i++){
                 if(moodTypes[i] == editMood.getMoodType()){
@@ -163,7 +162,7 @@ public class AddMoodFragment extends DialogFragment {
 
             //checks to see if the editmood has a social situation
             // if makes dropdown visible and sets the social situation
-            if(!editMood.getSituation().toString().isEmpty()){
+            if(editMood.hasSituation()){
                 for(int i = 0; i < socialSits.length; i++){
                     if(socialSits[i] == editMood.getSituation()){
                         socialSpinner.setVisibility(View.VISIBLE);

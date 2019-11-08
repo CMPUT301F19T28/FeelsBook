@@ -155,6 +155,11 @@ public class Mood extends Post implements Serializable {
         return situation;
     }
 
+    //returns true if a situation has been set false otherwise
+    public boolean hasSituation(){
+        return situation != null;
+    }
+
     public void setSituation(SocialSituation situation) {
         this.situation = situation;
     }
