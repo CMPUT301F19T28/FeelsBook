@@ -25,6 +25,7 @@ import java.util.Locale;
  * Location location - contextual information about the place the mood was experienced
  * DateFormat dateFormatter - specifies the date format used when displaying the mood
  */
+
 public class Mood extends Post implements Serializable {
 
     private final static DateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.CANADA);
