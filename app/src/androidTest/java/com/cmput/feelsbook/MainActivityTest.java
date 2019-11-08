@@ -1,8 +1,11 @@
 package com.cmput.feelsbook;
 
 import android.app.Activity;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -101,6 +104,23 @@ public class MainActivityTest {
         }catch(Exception e){}
 
 
+    }
+
+    /**
+     * Checks to see if camera activity starts when picture button is pressed
+     */
+    @Test
+    public void checkCameraActivity(){
+        solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
+        MainActivity activity = (MainActivity) solo.getCurrentActivity(); //access the activity
+        View fab = activity.findViewById(R.id.addPostButton);//add post button
+        solo.clickOnView(fab); //Click Add post buttton
+        solo.clickOnButton("Picture");
+        try{
+            solo.wait(5);
+            solo.assertCurrentActivity("Wrong activity", MediaStore.ACTION_IMAGE_CAPTURE);
+        }
+        catch (Exception e) { }
     }
 
     /**
