@@ -232,27 +232,20 @@ public class AddMoodFragment extends DialogFragment {
                             String moodText = input.getText().toString();
                             Object selectedMood = spinner.getSelectedItem();
                             MoodType selected_type = MoodType.class.cast(selectedMood);
+                            SocialSituation selectedSocial = SocialSituation.class.cast(socialSpinner.getSelectedItem());
 
                             if (!moodText.isEmpty()) {
-                                Mood newMood = new Mood(selected_type, null).withReason(moodText).withPhoto(picture);
-                                listener.onSubmit(newMood);
 
-                            } else {
-
-                                SocialSituation selectedSocial = SocialSituation.class.cast(socialSpinner.getSelectedItem());
-
-                                if (!moodText.isEmpty()) {
-
-                                    if (socialSpinner.getVisibility() == View.VISIBLE) {
-                                        listener.onSubmit(new Mood(selected_type, null).withReason(moodText).withSituation(selectedSocial));
-                                    } else {
-                                        listener.onSubmit(new Mood(selected_type, null).withReason(moodText));
-                                    }
+                                if (socialSpinner.getVisibility() == View.VISIBLE) {
+                                    listener.onSubmit(new Mood(selected_type, null).withReason(moodText).withSituation(selectedSocial).withPhoto(picture));
                                 } else {
-                                    Toast.makeText(getContext(), "Must fill required text",
-                                            Toast.LENGTH_SHORT).show();
+                                    listener.onSubmit(new Mood(selected_type, null).withReason(moodText).withPhoto(picture));
                                 }
+                            } else {
+                                Toast.makeText(getContext(), "Must fill required text",
+                                        Toast.LENGTH_SHORT).show();
                             }
+
                         }
                     }).create();
         }

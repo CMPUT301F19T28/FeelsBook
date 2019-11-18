@@ -224,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 });
 
     }
-    
+
 
     /**
      * will be used to delete passed in mood once implemented
