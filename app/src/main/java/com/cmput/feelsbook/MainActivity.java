@@ -2,14 +2,31 @@ package com.cmput.feelsbook;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
+
+import com.cmput.feelsbook.post.Mood;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.cmput.feelsbook.post.Post;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.HashMap;
 
 
 /**
@@ -26,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     FeedFragment feedFragment;
     MapFragment mapFragment;
     Feed.OnItemClickListener listener;
+    FirebaseFirestore db;
+    CollectionReference cr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
          */
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        db = FirebaseFirestore.getInstance();
+
 
         tabLayout = findViewById(R.id.tab_layout);
         viewPager = findViewById(R.id.view_pager);
@@ -56,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
         }
+        cr = db.collection("users").document(currentUser.getUserName())
+                .collection("Moods");
 
         feedFragment = new FeedFragment();
         mapFragment = new MapFragment();
@@ -91,15 +114,46 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 startActivity(intent);
             }
         });
+
+        cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
+//                    Log.d("Sample", S)
+                    Post newPost = (Post) doc.getData().get("Mood");
+                    feedFragment.getRecyclerAdapter().addPost(newPost);
+                }
+                feedFragment.getRecyclerAdapter().notifyDataSetChanged();
+            }
+        });
     }
+
     /**
      * Adds a post/mood object to the feed list.
      * @param newMood
      * New mood object to be added
      */
     public void onSubmit(Post newMood){
-        feedFragment.getRecyclerAdapter().addPost(newMood);
-        feedFragment.getRecyclerAdapter().notifyDataSetChanged();
+
+        HashMap<String, Post> data = new HashMap<>();
+        data.put("Mood", newMood);
+
+        cr
+                .document("Mood1")
+                .set(data)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("Sample", "Data addition successful");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("Sample", "Data addition failed" + e.toString());
+                    }
+                });
+
     }
 
     /**
