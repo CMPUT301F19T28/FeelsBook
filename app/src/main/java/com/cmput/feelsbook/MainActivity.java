@@ -1,6 +1,8 @@
 package com.cmput.feelsbook;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,11 +15,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.cmput.feelsbook.post.Mood;
+import com.cmput.feelsbook.post.MoodType;
+import com.cmput.feelsbook.post.SocialSituation;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.cmput.feelsbook.post.Post;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
@@ -26,7 +31,9 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -118,11 +125,66 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+//                for(int i = 0; i < feedFragment.getRecyclerAdapter().)
+//                feedFragment.getRecyclerAdapter().;
                 for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
 //                    Log.d("Sample", S)
-                    Post newPost = (Post) doc.getData().get("Mood");
-                    feedFragment.getRecyclerAdapter().addPost(newPost);
+                    MoodType moodType = null;
+                    String reason = null;
+                    SocialSituation situation = null;
+                    Bitmap photo = null;
+                    Location location = null;
+                    Bitmap profilePic = null;
+                    Date dateTime = null;
+
+                    HashMap<String,Object> data = (HashMap) doc.getData().get("Mood");
+                    try {
+                        for (Map.Entry mapElement : data.entrySet()) {
+                            String key = (String) mapElement.getKey();
+
+                            if (key.equals("dateTime"))
+                                dateTime = ((Timestamp) mapElement.getValue()).toDate();
+
+                            if (key.equals("location"))
+                                location = (Location) mapElement.getValue();
+
+                            if (key.equals("photo"))
+                                photo = (Bitmap) mapElement.getValue();
+
+                            if (key.equals("profilePic"))
+                                profilePic = (Bitmap) mapElement.getValue();
+
+                            if (key.equals("reason"))
+                                reason = (String) mapElement.getValue();
+
+                            if (key.equals("situation") & (mapElement.getValue() != null)) {
+                                situation = SocialSituation.getSocialSituation((String) mapElement.getValue());
+                            }
+
+                            if (key.equals("moodType") & (mapElement.getValue() != null)) {
+                                moodType = MoodType.getMoodType((String) mapElement.getValue());
+                            }
+                        }
+                        Mood mood = new Mood(dateTime, moodType, profilePic);
+
+                        if(reason != null)
+                            mood = mood.withReason(reason);
+                        if(situation != null)
+                            mood = mood.withSituation(situation);
+                        if(photo != null)
+                            mood = mood.withPhoto(photo);
+                        if(location != null)
+                            mood.withLocation(location);
+
+                        feedFragment.getRecyclerAdapter().addPost(mood);
+
+
+                    }catch(Exception error){
+                        Log.d("-----UPLOAD SAMPLE-----",
+                                "****DATABASE UPLOAD FAILED: " + error);
+                    }
                 }
+
                 feedFragment.getRecyclerAdapter().notifyDataSetChanged();
             }
         });
@@ -139,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         data.put("Mood", newMood);
 
         cr
-                .document("Mood1")
+                .document(newMood.toString())
                 .set(data)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
