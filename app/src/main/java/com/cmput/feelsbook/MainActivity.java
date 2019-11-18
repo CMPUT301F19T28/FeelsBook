@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -125,10 +126,17 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-//                for(int i = 0; i < feedFragment.getRecyclerAdapter().)
-//                feedFragment.getRecyclerAdapter().;
+
+                //clears list
+                while( feedFragment.getRecyclerAdapter().getItemCount() > 0) {
+                    feedFragment.getRecyclerAdapter().removePost(0);
+                    feedFragment.getRecyclerAdapter().notifyItemRemoved(0);
+                }
+
+
+
                 for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
-//                    Log.d("Sample", S)
+
                     MoodType moodType = null;
                     String reason = null;
                     SocialSituation situation = null;
@@ -232,8 +240,26 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
      *      mood to be deleted
      */
     public void deleted(Post mood){
+        Toast.makeText(MainActivity.this, mood.toString(), Toast.LENGTH_SHORT).show();
         //For deleting mood
-        feedFragment.getRecyclerAdapter().removePost(mood);
+        cr
+                .document(mood.toString())
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("--DELETE OPERATION---: ",
+                                "Data removal successful");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("--DELETE OPERATION---: ",
+                                "Data removal failed" + e.toString());
+                    }
+                });
+//        feedFragment.getRecyclerAdapter().removePost(mood);
         feedFragment.getRecyclerAdapter().notifyDataSetChanged();
     }
 }
