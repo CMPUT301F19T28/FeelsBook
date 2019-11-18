@@ -133,8 +133,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                     feedFragment.getRecyclerAdapter().notifyItemRemoved(0);
                 }
 
-
-
                 for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
 
                     MoodType moodType = null;
@@ -199,9 +197,10 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     }
 
     /**
-     * Adds a post/mood object to the feed list.
+     * takes a mood and puts it in the database. If the mood is new will create a new mood in the
+     * database else will edit the mood in the database with the new parameters
      * @param newMood
-     * New mood object to be added
+     *      New mood object to be added or edited
      */
     public void onSubmit(Post newMood){
 
@@ -226,13 +225,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
 
     }
 
-    /**
-     * notifies the adapter that the data set has changed
-     */
-    public void edited(){
-        //Code for editing mood
-        feedFragment.getRecyclerAdapter().notifyDataSetChanged();
-    }
 
     /**
      * will be used to delete passed in mood once implemented

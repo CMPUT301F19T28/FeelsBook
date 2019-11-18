@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -20,7 +19,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.Post;
 import com.cmput.feelsbook.post.SocialSituation;
@@ -35,14 +33,12 @@ public class AddMoodFragment extends DialogFragment {
     private EditText input;
     private OnFragmentInteractionListener listener;
     private Bitmap picture;
-//    private Bitmap dp;
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
 
 
     public interface OnFragmentInteractionListener{
         void onSubmit(Post newMood);
-        void edited();
         void deleted(Post delete);
     }
 
@@ -200,7 +196,8 @@ public class AddMoodFragment extends DialogFragment {
                                 if (!editMood.hasPhoto()){
                                     editMood.withPhoto(picture);
                                 }
-                                listener.edited();
+
+                                listener.onSubmit(editMood);
 
                             }else{
                                 Toast.makeText(getContext(), "Must fill required text",
