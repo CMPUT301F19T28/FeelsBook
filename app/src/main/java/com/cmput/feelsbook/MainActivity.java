@@ -44,7 +44,6 @@ import java.util.Map;
  */
 public class MainActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener{
     private ImageButton profileButton;
-    RecyclerView feedView;
     User currentUser;
     TabLayout tabLayout;
     ViewPager viewPager;
@@ -64,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         db = FirebaseFirestore.getInstance();
-
 
         tabLayout = findViewById(R.id.tab_layout);
         viewPager = findViewById(R.id.view_pager);
@@ -87,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
             currentUser = (User) bundle.get("User");
         }
 
+        //Sets the document to that of the current user
         cr = db.collection("users").document(currentUser.getUserName())
                 .collection("Moods");
 
@@ -125,6 +124,9 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
             }
         });
 
+        /**
+         * Listens for updates the the database and updates the recyclerView when updates
+         */
         cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
