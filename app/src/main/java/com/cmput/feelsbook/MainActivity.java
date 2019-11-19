@@ -32,6 +32,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
         }
+
         cr = db.collection("users").document(currentUser.getUserName())
                 .collection("Moods");
 
@@ -204,8 +206,21 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
      */
     public void onSubmit(Post newMood){
 
-        HashMap<String, Post> data = new HashMap<>();
+        HashMap<String, Object> data = new HashMap<>();
         data.put("Mood", newMood);
+//        data.put("datetime", newMood.getDateTime());
+//        data.put("location", ((Mood) newMood).getLocation());
+////        data.put("profilePic",  newMood.getProfilePic());
+//        data.put("reason", ((Mood) newMood).getReason());
+//        data.put("situation", ((Mood) newMood).getSituation());
+//        data.put("moodType", ((Mood) newMood).getMoodType());
+
+
+        /*//puts image into hashmap
+        Bitmap bitmap = ((Mood) newMood).getPhoto();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        data.put("photo", baos.toByteArray());*/
 
         cr
                 .document(newMood.toString())
