@@ -2,6 +2,7 @@ package com.cmput.feelsbook;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,6 +32,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
@@ -53,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     Feed.OnItemClickListener listener;
     FirebaseFirestore db;
     CollectionReference cr;
+    FirebaseStorage storage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         //Sets the document to that of the current user
         cr = db.collection("users").document(currentUser.getUserName())
                 .collection("Moods");
+        storage = FirebaseStorage.getInstance();
 
         feedFragment = new FeedFragment();
         mapFragment = new MapFragment();
@@ -158,8 +164,11 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                             if (key.equals("location"))
                                 location = (Location) mapElement.getValue();
 
-                            if (key.equals("photo"))
-                                photo = (Bitmap) mapElement.getValue();
+                            if (key.equals("photo")) {
+
+                                photo = BitmapFactory.decodeByteArray((byte[]) mapElement.getValue()
+                                        , 0, ((byte[]) mapElement.getValue()).length);
+                            }
 
                             if (key.equals("profilePic"))
                                 profilePic = (Bitmap) mapElement.getValue();
@@ -209,20 +218,32 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     public void onSubmit(Post newMood){
 
         HashMap<String, Object> data = new HashMap<>();
-        data.put("Mood", newMood);
-//        data.put("datetime", newMood.getDateTime());
-//        data.put("location", ((Mood) newMood).getLocation());
-////        data.put("profilePic",  newMood.getProfilePic());
-//        data.put("reason", ((Mood) newMood).getReason());
-//        data.put("situation", ((Mood) newMood).getSituation());
-//        data.put("moodType", ((Mood) newMood).getMoodType());
+//        data.put("Mood", newMood);
 
-
-        /*//puts image into hashmap
+        //puts image into hashmap
         Bitmap bitmap = ((Mood) newMood).getPhoto();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        data.put("photo", baos.toByteArray());*/
+        byte[] picData = baos.toByteArray();
+
+        data.put("datetime", newMood.getDateTime());
+        data.put("location", ((Mood) newMood).getLocation());
+        data.put("profilePic",  newMood.getProfilePic());
+        data.put("reason", ((Mood) newMood).getReason());
+        data.put("situation", ((Mood) newMood).getSituation());
+        data.put("moodType", ((Mood) newMood).getMoodType());
+        data.put("photo", picData);
+
+
+
+
+//        //creates a storage reference
+//        StorageReference sRef = storage.getReference();
+//        StorageReference picRef = sRef.child("photo.jpg");
+//        StorageReference picImageRef = sRef.child("images/photo.jpg");
+//
+//        UploadTask uploadTask = picRef.putBytes(picData);
+////        data.put("photo", baos.toByteArray());
 
         cr
                 .document(newMood.toString())
