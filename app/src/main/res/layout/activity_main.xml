@@ -30,7 +30,7 @@
                 android:contentDescription="Profile picture"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@mipmap/ic_launcher" />
+                app:srcCompat="@mipmap/ic_default_profile_pic_round" />
 
             <ImageButton
                 android:id="@+id/filterButton"

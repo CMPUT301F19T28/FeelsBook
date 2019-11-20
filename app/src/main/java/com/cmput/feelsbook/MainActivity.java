@@ -359,5 +359,11 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
 
     public void setProfilePic(Bitmap profilePic){
 
+        try{
+//            currentUser.setProfilePic(profilePic);
+            profileButton.setImageBitmap(profilePic);
+        }catch(Exception e){
+            //Do nothing for now
+        }
     }
 }

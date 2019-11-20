@@ -127,6 +127,10 @@ public class User implements Serializable {
         return this.profilePicture;
     }
 
+    public void setProfilePic(Bitmap photo){
+        this.profilePicture = photo;
+    }
+
     public String getUserName() {
         return userName;
     }
