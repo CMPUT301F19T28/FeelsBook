@@ -94,7 +94,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         //Sets the document to that of the current user
         cr = db.collection("users").document(currentUser.getUserName())
                 .collection("Moods");
-        storage = FirebaseStorage.getInstance();
 
         feedFragment = new FeedFragment();
         mapFragment = new MapFragment();
@@ -162,11 +161,27 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         }
 
         /*
+        If the newMood contains a profilePic will convert it into a Base64 String to be stored in the
+        database if no profilePic is present sets the field to null
+         */
+        try {
+            //puts profilePic into hashmap
+            Bitmap bitmap = ((Mood) newMood).getProfilePic();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] picData = baos.toByteArray();
+            data.put("profilePic", Base64.getEncoder().encodeToString(picData));
+        }catch (Exception e) {
+            Log.d("-----UPLOAD PHOTO-----",
+                    "****NO profilepic UPLOADED: " + e);
+            data.put("profilePic", null);
+        }
+
+        /*
         puts the other parameters into the hashmap to be sent to the database
          */
         data.put("datetime", newMood.getDateTime());
         data.put("location", ((Mood) newMood).getLocation());
-        data.put("profilePic", newMood.getProfilePic());
         data.put("reason", ((Mood) newMood).getReason());
         data.put("situation", ((Mood) newMood).getSituation());
         data.put("moodType", ((Mood) newMood).getMoodType());
@@ -245,10 +260,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
 
 
                     try {
-                        /*HashMap<String,Object> data = (HashMap) doc.getData().get("Mood");
-                        for (Map.Entry mapElement : data.entrySet()) {
-                            String key = (String) mapElement.getKey();*/
-
                         if (doc.contains("datetime"))
                             dateTime = ((Timestamp) doc.get("datetime")).toDate();
 
@@ -256,6 +267,11 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                             location = (Location) doc.get("location");
 
                         if (doc.contains("photo")) {
+
+                            /*
+                            converts the photo is present converts from a base64 string to a byte[]
+                            and then into a bitmap if no photo is present sets photo to null
+                             */
                             try {
                                 byte[] decoded = Base64.getDecoder()
                                         .decode((String)  doc.get("photo"));
@@ -268,8 +284,23 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                             }
                         }
 
-                        if (doc.contains("profilePic"))
-                            profilePic = (Bitmap) doc.get("profilePic");
+                        if (doc.contains("profilePic")) {
+
+                            /*
+                            converts the profilePic is present converts from a base64 string to a byte[]
+                            and then into a bitmap if no photo is present sets profilePic to null
+                             */
+                            try {
+                                byte[] decoded = Base64.getDecoder()
+                                        .decode((String)  doc.get("profilePic"));
+                                profilePic = BitmapFactory.decodeByteArray(decoded
+                                        , 0, decoded.length);
+                            }catch(Exception error) {
+                                Log.d("-----UPLOAD PHOTO-----",
+                                        "****NO PHOTO DOWNLOADED: " + e);
+                                profilePic = null;
+                            }
+                        }
 
                         if (doc.contains("reason"))
                             reason = (String) doc.get("reason");
