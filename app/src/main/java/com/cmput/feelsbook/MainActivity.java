@@ -37,6 +37,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     Feed.OnItemClickListener listener;
     FirebaseFirestore db;
     CollectionReference cr;
-    FirebaseStorage storage;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,83 +131,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
             }
         });
 
-        /**
-         * Listens for updates the the database and updates the recyclerView when updates
-         */
-        cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-
-                //clears list
-                while( feedFragment.getRecyclerAdapter().getItemCount() > 0) {
-                    feedFragment.getRecyclerAdapter().removePost(0);
-                    feedFragment.getRecyclerAdapter().notifyItemRemoved(0);
-                }
-
-                for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
-
-                    MoodType moodType = null;
-                    String reason = null;
-                    SocialSituation situation = null;
-                    Bitmap photo = null;
-                    Location location = null;
-                    Bitmap profilePic = null;
-                    Date dateTime = null;
-
-                    HashMap<String,Object> data = (HashMap) doc.getData().get("Mood");
-                    try {
-                        for (Map.Entry mapElement : data.entrySet()) {
-                            String key = (String) mapElement.getKey();
-
-                            if (key.equals("dateTime"))
-                                dateTime = ((Timestamp) mapElement.getValue()).toDate();
-
-                            if (key.equals("location"))
-                                location = (Location) mapElement.getValue();
-
-                            if (key.equals("photo")) {
-
-                                photo = BitmapFactory.decodeByteArray((byte[]) mapElement.getValue()
-                                        , 0, ((byte[]) mapElement.getValue()).length);
-                            }
-
-                            if (key.equals("profilePic"))
-                                profilePic = (Bitmap) mapElement.getValue();
-
-                            if (key.equals("reason"))
-                                reason = (String) mapElement.getValue();
-
-                            if (key.equals("situation") & (mapElement.getValue() != null)) {
-                                situation = SocialSituation.getSocialSituation((String) mapElement.getValue());
-                            }
-
-                            if (key.equals("moodType") & (mapElement.getValue() != null)) {
-                                moodType = MoodType.getMoodType((String) mapElement.getValue());
-                            }
-                        }
-                        Mood mood = new Mood(dateTime, moodType, profilePic);
-
-                        if(reason != null)
-                            mood = mood.withReason(reason);
-                        if(situation != null)
-                            mood = mood.withSituation(situation);
-                        if(photo != null)
-                            mood = mood.withPhoto(photo);
-                        if(location != null)
-                            mood.withLocation(location);
-
-                        feedFragment.getRecyclerAdapter().addPost(mood);
-
-
-                    }catch(Exception error){
-                        Log.d("-----UPLOAD SAMPLE-----",
-                                "****DATABASE UPLOAD FAILED: " + error);
-                    }
-                }
-
-                feedFragment.getRecyclerAdapter().notifyDataSetChanged();
-            }
-        });
+        updateFeed();
     }
 
     /**
@@ -218,32 +143,33 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     public void onSubmit(Post newMood){
 
         HashMap<String, Object> data = new HashMap<>();
-//        data.put("Mood", newMood);
 
-        //puts image into hashmap
-        Bitmap bitmap = ((Mood) newMood).getPhoto();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] picData = baos.toByteArray();
+        /*
+        If the newMood contains a photo will convert it into a Base64 String to be stored in the
+        database if no photo is present sets the field to null
+         */
+        try {
+            //puts photo into hashmap
+            Bitmap bitmap = ((Mood) newMood).getPhoto();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] picData = baos.toByteArray();
+            data.put("photo", Base64.getEncoder().encodeToString(picData));
+        }catch (Exception e) {
+            Log.d("-----UPLOAD PHOTO-----",
+                    "****NO PHOTO UPLOADED: " + e);
+            data.put("photo", null);
+        }
 
+        /*
+        puts the other parameters into the hashmap to be sent to the database
+         */
         data.put("datetime", newMood.getDateTime());
         data.put("location", ((Mood) newMood).getLocation());
-        data.put("profilePic",  newMood.getProfilePic());
+        data.put("profilePic", newMood.getProfilePic());
         data.put("reason", ((Mood) newMood).getReason());
         data.put("situation", ((Mood) newMood).getSituation());
         data.put("moodType", ((Mood) newMood).getMoodType());
-        data.put("photo", picData);
-
-
-
-
-//        //creates a storage reference
-//        StorageReference sRef = storage.getReference();
-//        StorageReference picRef = sRef.child("photo.jpg");
-//        StorageReference picImageRef = sRef.child("images/photo.jpg");
-//
-//        UploadTask uploadTask = picRef.putBytes(picData);
-////        data.put("photo", baos.toByteArray());
 
         cr
                 .document(newMood.toString())
@@ -291,5 +217,93 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 });
 //        feedFragment.getRecyclerAdapter().removePost(mood);
         feedFragment.getRecyclerAdapter().notifyDataSetChanged();
+    }
+
+    /**
+     * Listens for updates the the database and updates the recyclerView when updates
+     */
+    public void updateFeed(){
+        cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+
+                //clears list
+                while( feedFragment.getRecyclerAdapter().getItemCount() > 0) {
+                    feedFragment.getRecyclerAdapter().removePost(0);
+                    feedFragment.getRecyclerAdapter().notifyItemRemoved(0);
+                }
+
+                for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
+
+                    MoodType moodType = null;
+                    String reason = null;
+                    SocialSituation situation = null;
+                    Bitmap photo = null;
+                    Location location = null;
+                    Bitmap profilePic = null;
+                    Date dateTime = null;
+
+
+                    try {
+                        /*HashMap<String,Object> data = (HashMap) doc.getData().get("Mood");
+                        for (Map.Entry mapElement : data.entrySet()) {
+                            String key = (String) mapElement.getKey();*/
+
+                        if (doc.contains("datetime"))
+                            dateTime = ((Timestamp) doc.get("datetime")).toDate();
+
+                        if (doc.contains("location"))
+                            location = (Location) doc.get("location");
+
+                        if (doc.contains("photo")) {
+                            try {
+                                byte[] decoded = Base64.getDecoder()
+                                        .decode((String)  doc.get("photo"));
+                                photo = BitmapFactory.decodeByteArray(decoded
+                                        , 0, decoded.length);
+                            }catch(Exception error) {
+                                Log.d("-----UPLOAD PHOTO-----",
+                                        "****NO PHOTO DOWNLOADED: " + e);
+                                photo = null;
+                            }
+                        }
+
+                        if (doc.contains("profilePic"))
+                            profilePic = (Bitmap) doc.get("profilePic");
+
+                        if (doc.contains("reason"))
+                            reason = (String) doc.get("reason");
+
+                        if (doc.contains("situation") & (doc.get("situation") != null)) {
+                            situation = SocialSituation.getSocialSituation((String) doc.get("situation"));
+                        }
+
+                        if (doc.contains("moodType") & (doc.get("moodType") != null)) {
+                            moodType = MoodType.getMoodType((String) doc.get("moodType"));
+                        }
+
+                        Mood mood = new Mood(dateTime, moodType, profilePic);
+
+                        if(reason != null)
+                            mood = mood.withReason(reason);
+                        if(situation != null)
+                            mood = mood.withSituation(situation);
+                        if(photo != null)
+                            mood = mood.withPhoto(photo);
+                        if(location != null)
+                            mood.withLocation(location);
+
+                        feedFragment.getRecyclerAdapter().addPost(mood);
+
+
+                    }catch(Exception error){
+                        Log.d("-----UPLOAD SAMPLE-----",
+                                "****MOOD DOWNLOAD FAILED: " + error);
+                    }
+                }
+
+                feedFragment.getRecyclerAdapter().notifyDataSetChanged();
+            }
+        });
     }
 }
