@@ -10,7 +10,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
@@ -19,6 +21,8 @@ import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.Post;
 import com.cmput.feelsbook.post.SocialSituation;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
@@ -28,8 +32,10 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Handles the profile activities and displays the user profile information.
@@ -138,16 +144,68 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
      *          mood that will be added to the feed
      */
     public void onSubmit(Post newMood){
-        historyFragment.getRecyclerAdapter().addPost(newMood);
-        historyFragment.getRecyclerAdapter().notifyDataSetChanged();
-    }
 
-    /**
-     * notifies the adapter that the data set has changed
-     */
-    public void edited(){
-        //Code for editing mood
-        historyFragment.getRecyclerAdapter().notifyDataSetChanged();
+        HashMap<String, Object> data = new HashMap<>();
+
+        /*
+        If the newMood contains a photo will convert it into a Base64 String to be stored in the
+        database if no photo is present sets the field to null
+         */
+        try {
+            //puts photo into hashmap
+            Bitmap bitmap = ((Mood) newMood).getPhoto();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] picData = baos.toByteArray();
+            data.put("photo", Base64.getEncoder().encodeToString(picData));
+        }catch (Exception e) {
+            Log.d("-----UPLOAD PHOTO-----",
+                    "****NO PHOTO UPLOADED: " + e);
+            data.put("photo", null);
+        }
+
+        /*
+        If the newMood contains a profilePic will convert it into a Base64 String to be stored in the
+        database if no profilePic is present sets the field to null
+         */
+        try {
+            //puts profilePic into hashmap
+            Bitmap bitmap = ((Mood) newMood).getProfilePic();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] picData = baos.toByteArray();
+            data.put("profilePic", Base64.getEncoder().encodeToString(picData));
+        }catch (Exception e) {
+            Log.d("-----UPLOAD PHOTO-----",
+                    "****NO profilepic UPLOADED: " + e);
+            data.put("profilePic", null);
+        }
+
+        /*
+        puts the other parameters into the hashmap to be sent to the database
+         */
+        data.put("datetime", newMood.getDateTime());
+        data.put("location", ((Mood) newMood).getLocation());
+        data.put("reason", ((Mood) newMood).getReason());
+        data.put("situation", ((Mood) newMood).getSituation());
+        data.put("moodType", ((Mood) newMood).getMoodType());
+
+        cr
+                .document(newMood.toString())
+                .set(data)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("Sample", "Data addition successful");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("Sample", "Data addition failed" + e.toString());
+                    }
+                });
+
     }
 
     /**
@@ -156,8 +214,26 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
      *      mood to be deleted
      */
     public void deleted(Post mood){
+        Toast.makeText(ProfileActivity.this, "Mood Deleted", Toast.LENGTH_SHORT).show();
         //For deleting mood
-        historyFragment.getRecyclerAdapter().removePost(mood);
+        cr
+                .document(mood.toString())
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("--DELETE OPERATION---: ",
+                                "Data removal successful");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("--DELETE OPERATION---: ",
+                                "Data removal failed" + e.toString());
+                    }
+                });
+//        feedFragment.getRecyclerAdapter().removePost(mood);
         historyFragment.getRecyclerAdapter().notifyDataSetChanged();
     }
 

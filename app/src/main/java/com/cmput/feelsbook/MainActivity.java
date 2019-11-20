@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
      *      mood to be deleted
      */
     public void deleted(Post mood){
-        Toast.makeText(MainActivity.this, mood.toString(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, "Mood Deleted", Toast.LENGTH_SHORT).show();
         //For deleting mood
         cr
                 .document(mood.toString())
