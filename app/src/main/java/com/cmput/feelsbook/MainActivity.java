@@ -13,7 +13,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.cmput.feelsbook.post.Mood;
@@ -26,21 +25,17 @@ import com.google.android.material.tabs.TabLayout;
 import com.cmput.feelsbook.post.Post;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
+
 
 
 /**
@@ -123,14 +118,13 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 Intent intent = new Intent(MainActivity.this,ProfileActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
-                feedFragment.getRecyclerAdapter().setOnItemClickListener(null);
-                userBundle.putSerializable("Post_list",feedFragment.getRecyclerAdapter());
                 intent.putExtras(userBundle);
                 startActivity(intent);
             }
         });
 
         updateFeed();
+
     }
 
     /**
@@ -203,7 +197,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 });
 
     }
-
 
     /**
      * will be used to delete passed in mood once implemented
