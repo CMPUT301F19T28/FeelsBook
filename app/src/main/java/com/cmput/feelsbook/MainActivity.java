@@ -18,13 +18,17 @@ import androidx.viewpager.widget.ViewPager;
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.SocialSituation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.cmput.feelsbook.post.Post;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -52,7 +56,8 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     MapFragment mapFragment;
     Feed.OnItemClickListener listener;
     FirebaseFirestore db;
-    CollectionReference cr;
+    CollectionReference MoodCollection;
+    DocumentReference UserDocument;
 
 
     @Override
@@ -87,8 +92,35 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         }
 
         //Sets the document to that of the current user
-        cr = db.collection("users").document(currentUser.getUserName())
-                .collection("Moods");
+        UserDocument = db.collection("users").document(currentUser.getUserName());
+
+        //Sets the collectionReference to that of the current users moods
+        MoodCollection = UserDocument.collection("Moods");
+
+        //try to get profilePic from database if no profile pic sets to default
+        UserDocument.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+
+                    if (document.exists()) {
+                        Log.d("---DOWNLOAD USER---", "DocumentSnapshot data: " + document.getData());
+
+                        if(document.contains("profilePic")){
+                            setProfilePic(getPhoto((String) document.get("profilePic")));
+                        }else{
+                            setProfilePic(null);
+                        }
+
+                    } else {
+                        Log.d("---DOWNLOAD USER---", "No such document");
+                    }
+                } else {
+                    Log.d("---DOWNLOAD USER---", "get failed with ", task.getException());
+                }
+            }
+        });
 
         feedFragment = new FeedFragment();
         mapFragment = new MapFragment();
@@ -124,6 +156,8 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         });
 
         updateFeed();
+
+
 
     }
 
@@ -180,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         data.put("situation", ((Mood) newMood).getSituation());
         data.put("moodType", ((Mood) newMood).getMoodType());
 
-        cr
+        MoodCollection
                 .document(newMood.toString())
                 .set(data)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -206,7 +240,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     public void deleted(Post mood){
         Toast.makeText(MainActivity.this, "Mood Deleted", Toast.LENGTH_SHORT).show();
         //For deleting mood
-        cr
+        MoodCollection
                 .document(mood.toString())
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -231,7 +265,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
      * Listens for updates the the database and updates the recyclerView when updates
      */
     public void updateFeed(){
-        cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        MoodCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
 
@@ -260,39 +294,11 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                             location = (Location) doc.get("location");
 
                         if (doc.contains("photo")) {
-
-                            /*
-                            converts the photo is present converts from a base64 string to a byte[]
-                            and then into a bitmap if no photo is present sets photo to null
-                             */
-                            try {
-                                byte[] decoded = Base64.getDecoder()
-                                        .decode((String)  doc.get("photo"));
-                                photo = BitmapFactory.decodeByteArray(decoded
-                                        , 0, decoded.length);
-                            }catch(Exception error) {
-                                Log.d("-----UPLOAD PHOTO-----",
-                                        "****NO PHOTO DOWNLOADED: " + e);
-                                photo = null;
-                            }
+                            photo = getPhoto((String)  doc.get("photo"));
                         }
 
                         if (doc.contains("profilePic")) {
-
-                            /*
-                            converts the profilePic is present converts from a base64 string to a byte[]
-                            and then into a bitmap if no photo is present sets profilePic to null
-                             */
-                            try {
-                                byte[] decoded = Base64.getDecoder()
-                                        .decode((String)  doc.get("profilePic"));
-                                profilePic = BitmapFactory.decodeByteArray(decoded
-                                        , 0, decoded.length);
-                            }catch(Exception error) {
-                                Log.d("-----UPLOAD PHOTO-----",
-                                        "****NO PHOTO DOWNLOADED: " + e);
-                                profilePic = null;
-                            }
+                            profilePic = getPhoto((String)  doc.get("profilePic"));
                         }
 
                         if (doc.contains("reason"))
@@ -329,5 +335,29 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 feedFragment.getRecyclerAdapter().notifyDataSetChanged();
             }
         });
+    }
+
+    /**
+     * Takes in a base64 string and converts it into a bitmap
+     * @param photo
+     *          photo to be converted in base64 String format format
+     * @return
+     *      returns bitmap of decoded photo returns null if base64 string was not passed in
+     */
+    public Bitmap getPhoto(String photo){
+        try {
+            byte[] decoded = Base64.getDecoder()
+                    .decode(photo);
+            return BitmapFactory.decodeByteArray(decoded
+                    , 0, decoded.length);
+        }catch(Exception e){
+            Log.d("-----CONVERT PHOTO-----",
+                    "****NO PHOTO CONVERTED: " + e);
+            return null;
+        }
+    }
+
+    public void setProfilePic(Bitmap profilePic){
+
     }
 }
