@@ -1,10 +1,16 @@
 package com.cmput.feelsbook;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -27,6 +33,12 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     MapFragment mapFragment;
     Feed.OnItemClickListener listener;
 
+    //Location permission vars
+    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
+    private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
+    private Boolean locationPermisisionsGranted = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         /**
@@ -35,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
          */
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        getLocationPermission();
         tabLayout = findViewById(R.id.tab_layout);
         viewPager = findViewById(R.id.view_pager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
@@ -91,6 +103,41 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 startActivity(intent);
             }
         });
+    }
+
+    private void getLocationPermission(){
+        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this.getApplicationContext(), COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                locationPermisisionsGranted = true;
+            }
+            else {
+                ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
+            }
+        }
+        else {
+            ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        locationPermisisionsGranted = false;
+
+        switch (requestCode) {
+            case LOCATION_PERMISSION_REQUEST_CODE: {
+                if (grantResults.length > 0) {
+                    for (int i = 0; i < grantResults.length; i++) {
+                        if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                            locationPermisisionsGranted = false;
+                            return;
+                        }
+                    }
+                    locationPermisisionsGranted = true;
+
+                }
+            }
+        }
     }
     /**
      * Takes a mood from the implemented fragment and adds it to the feedAdapter
