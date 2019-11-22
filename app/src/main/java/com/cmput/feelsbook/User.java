@@ -55,10 +55,10 @@ public class User implements Serializable {
      *  The username of the user who sent the follow request
      */
     public void acceptFollowRequest(String userId) {
-        DocumentReference fromRequest = FirebaseFirestore.getInstance().collection("users").document(getUserName()).collection("FollowRequests").document(userId);
-        DocumentReference toFollowers = FirebaseFirestore.getInstance().collection("users").document(getUserName()).collection("Followers").document(userId);
+        DocumentReference fromRequest = FirebaseFirestore.getInstance().collection("users").document(getUserName()).collection("followRequests").document(userId);
+        DocumentReference toFollowers = FirebaseFirestore.getInstance().collection("users").document(getUserName()).collection("followers").document(userId);
         moveFirestoreDoc(fromRequest, toFollowers);
-        DocumentReference toFollowing = FirebaseFirestore.getInstance().collection("users").document(userId).collection("Following").document(getUserName());
+        DocumentReference toFollowing = FirebaseFirestore.getInstance().collection("users").document(userId).collection("following").document(getUserName());
         moveFirestoreDoc(fromRequest, toFollowing);
 
         fromRequest.delete()
@@ -102,7 +102,6 @@ public class User implements Serializable {
                     }
                 }
             });
-        }
     }
 
     /**
@@ -120,7 +119,7 @@ public class User implements Serializable {
         CollectionReference cr = FirebaseFirestore.getInstance().collection("users");
         cr
                 .document(getUserName())
-                .collection("Following")
+                .collection("following")
                 .document(userId)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -152,7 +151,7 @@ public class User implements Serializable {
                                                 data.put("fullname", getName());
                                                 data.put("username", getUserName());
                                                 task.getResult().getReference()
-                                                        .collection("FollowRequests")
+                                                        .collection("followRequests")
                                                         .document(getUserName())
                                                         .set(data)
                                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
