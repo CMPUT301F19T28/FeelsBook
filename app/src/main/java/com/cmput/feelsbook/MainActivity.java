@@ -58,13 +58,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     FirebaseFirestore db;
     CollectionReference cr;
 
-
-    //Location permission vars
-    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
-    private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
-    private Boolean locationPermisisionsGranted = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         /**
@@ -73,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
          */
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getLocationPermission();
         db = FirebaseFirestore.getInstance();
 
         tabLayout = findViewById(R.id.tab_layout);
@@ -138,40 +130,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
 
     }
 
-    private void getLocationPermission(){
-        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            if (ContextCompat.checkSelfPermission(this.getApplicationContext(), COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                locationPermisisionsGranted = true;
-            }
-            else {
-                ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
-            }
-        }
-        else {
-            ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        locationPermisisionsGranted = false;
-
-        switch (requestCode) {
-            case LOCATION_PERMISSION_REQUEST_CODE: {
-                if (grantResults.length > 0) {
-                    for (int i = 0; i < grantResults.length; i++) {
-                        if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                            locationPermisisionsGranted = false;
-                            return;
-                        }
-                    }
-                    locationPermisisionsGranted = true;
-
-                }
-            }
-        }
-    }
     /**
      * takes a mood and puts it in the database. If the mood is new will create a new mood in the
      * database else will edit the mood in the database with the new parameters
