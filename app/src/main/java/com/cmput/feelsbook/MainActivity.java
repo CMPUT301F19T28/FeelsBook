@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.cmput.feelsbook.AddMoodActivity;
+import com.cmput.feelsbook.post.Mood;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.cmput.feelsbook.post.Post;
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 feedFragment.getRecyclerAdapter().setOnItemClickListener(null);
                 userBundle.putSerializable("Post_list",feedFragment.getRecyclerAdapter());
                 intent.putExtras(userBundle);
-                startActivity(intent);
+                startActivityForResult(intent, 1);
             }
         });
 
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this,ProfileActivity.class);
                 Bundle userBundle = new Bundle();
-                userBundle.putSerializable("User", currentUser);
+                userBundle.putSerializable("User", currentUser);-
                 feedFragment.getRecyclerAdapter().setOnItemClickListener(null);
                 userBundle.putSerializable("Post_list",feedFragment.getRecyclerAdapter());
                 intent.putExtras(userBundle);
@@ -99,6 +100,19 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
             }
         });
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent result) {
+        super.onActivityResult(requestCode,resultCode,result);
+        if(requestCode == 1) {
+            if(resultCode == RESULT_OK) {
+                Mood mood = (Mood) result.getExtras().get("Mood");
+                feedFragment.getRecyclerAdapter().addPost(mood);
+                feedFragment.getRecyclerAdapter().notifyDataSetChanged();
+            }
+        }
+    }
+
     /**
      * Adds a post/mood object to the feed list.
      * @param newMood

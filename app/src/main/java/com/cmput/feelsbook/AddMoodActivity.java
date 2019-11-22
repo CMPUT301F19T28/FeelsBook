@@ -113,16 +113,14 @@ public class AddMoodActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 String moodText = input.getText().toString();
-                Object selectedMood = spinner.getSelectedItem();
-                MoodType selected_type = MoodType.class.cast(selectedMood);
-
-                if (socialSpinner.getVisibility() == View.VISIBLE) {
-                    SocialSituation selectedSocial = SocialSituation.class.cast(socialSpinner.getSelectedItem());
-                    onSubmit(new Mood(selected_type, null).withReason(moodText).withPhoto(picture).withSituation(selectedSocial));
-
-                } else {
-                    onSubmit(new Mood(selected_type, null).withPhoto(picture).withReason(moodText));
-                }
+                MoodType selected_type = (MoodType) spinner.getSelectedItem();
+                SocialSituation selectedSocial = null;
+                if (socialSpinner.getVisibility() == View.VISIBLE)
+                    selectedSocial = (SocialSituation) socialSpinner.getSelectedItem();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("Mood", new Mood(selected_type, null).withPhoto(picture).withReason(moodText).withSituation(selectedSocial));
+                Intent intent = new Intent().putExtras(bundle);
+                setResult(RESULT_OK, intent);
                 finish();
             }
         });
