@@ -65,6 +65,9 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         };
+
+        userField.setText("");
+        passField.setText("");
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

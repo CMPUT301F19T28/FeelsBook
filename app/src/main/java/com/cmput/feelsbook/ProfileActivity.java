@@ -53,9 +53,9 @@ import java.util.HashMap;
  * FirebaseFirestore db - created instance of the database where data is being pulled from
  */
 public class ProfileActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener{
-    private int followCount;
-    private int followersCount;
-    private int postCount;
+    private int followCount = 0;
+    private int followersCount = 0;
+    private int postCount = 0;
     private ImageView profilePicture;
     private User currentUser;
     private TabLayout tabLayout;
@@ -64,7 +64,6 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
     private FeedFragment historyFragment;
     private MapFragment mapFragment;
     private FirebaseFirestore db;
-    private ImageButton filterButton;
     private CollectionReference cr;
     private Feed.OnItemClickListener listener;
 
@@ -76,6 +75,7 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         Bundle bundle = getIntent().getExtras();
         tabLayout = findViewById(R.id.profile_tab);
         viewPager = findViewById(R.id.history_pager);
+        //profilePicture = findViewById(R.drawable.);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         db = FirebaseFirestore.getInstance();
         listener = new Feed.OnItemClickListener(){
@@ -90,10 +90,6 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
                 new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
             }
         };
-        postCount = 0;
-        followCount = 0;
-        followersCount = 0;
-
 
         if (bundle != null){
             currentUser = (User)bundle.get("User");
@@ -127,9 +123,8 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         updateFeed();
         postCount = historyFragment.getRecyclerAdapter().getItemCount();
 
-        postsText.setText(postCount + " total post");
-//        if (postCount > 1 || postCount == 0){postsText.setText(postCount + " total posts");}
-//        else if (postCount == 1){postsText.setText(postCount + " total post");}
+        if (postCount > 1 || postCount == 0){postsText.setText(postCount + " total posts");}
+        else if (postCount == 1){postsText.setText(postCount + " total post");}
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,15 +136,17 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         final FloatingActionButton editButton = findViewById(R.id.edit_float_button);
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
-                //
+            public void onClick(View v) {
+                finish();
             }
         });
+        final ImageButton filterButton = findViewById(R.id.profile_filter_button);
         filterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
                 // creates small popup window to filter
-                
+                Log.d("message","Clicked filter");
+                finish();
             }
         });
     }
@@ -181,8 +178,8 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         }
 
         /*
-        If the newMood contains a profilePic will convert it into a Base64 String to be stored in the
-        database if no profilePic is present sets the field to null
+        If the newMood contains a profilePic, it will convert it into a Base64 String to be stored
+        in the database if no profilePic is present sets the field to null
          */
         try {
             //puts profilePic into hashmap
@@ -198,7 +195,7 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         }
 
         /*
-        puts the other parameters into the hashmap to be sent to the database
+        Puts the other parameters into the hashmap to be sent to the database
          */
         data.put("datetime", newMood.getDateTime());
         data.put("location", ((Mood) newMood).getLocation());
@@ -206,8 +203,7 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         data.put("situation", ((Mood) newMood).getSituation());
         data.put("moodType", ((Mood) newMood).getMoodType());
 
-        cr
-                .document(newMood.toString())
+        cr.document(newMood.toString())
                 .set(data)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -224,15 +220,14 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
     }
 
     /**
-     * will be used to delete passed in mood once implemented
+     * Will be used to delete passed in mood once implemented
      * @param mood
-     *      mood to be deleted
+     * Post mood - mood to be deleted
      */
     public void deleted(Post mood){
         Toast.makeText(ProfileActivity.this, "Mood Deleted", Toast.LENGTH_SHORT).show();
         //For deleting mood
-        cr
-                .document(mood.toString())
+        cr.document(mood.toString())
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override

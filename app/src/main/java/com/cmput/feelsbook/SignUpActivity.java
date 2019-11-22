@@ -57,6 +57,10 @@ public class SignUpActivity extends AppCompatActivity {
         passwordField = findViewById(R.id.s_password_text);
         usernameField = findViewById(R.id.s_user_text);
 
+        nameField.getText().clear();
+        passwordField.getText().clear();
+        usernameField.getText().clear();
+
         db = FirebaseFirestore.getInstance();  // Create an instance to access Cloud Firestore
         final CollectionReference collectionReference = db.collection("users");
 
