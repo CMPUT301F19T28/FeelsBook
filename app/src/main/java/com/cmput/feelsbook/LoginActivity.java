@@ -50,7 +50,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText passField;
     private Button loginButton;
     private TextView signupPrompt;
-    private List<User> following;
     private String signupMessage = "Don't have an account? Sign up";
     private FirebaseFirestore db;
 
@@ -92,7 +91,7 @@ public class LoginActivity extends AppCompatActivity {
                                     String hashedPassword = bytesToHex(encodedHash);
 
                                     if (hashedPassword.equals(saved_pass)) {
-                                        successfulLogin(document);
+                                        getFollowing(document);
                                     } else {
                                         Toast.makeText(LoginActivity.this, "Invalid Username or Password", Toast.LENGTH_SHORT).show();
                                     }
@@ -154,9 +153,8 @@ public class LoginActivity extends AppCompatActivity {
      * @param document
      * Document context used to create a User object to pass to MainActivity
      */
-    private void successfulLogin(DocumentSnapshot document){
+    private void successfulLogin(DocumentSnapshot document, List<User> following){
         Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
-        List<User> following = getFollowing(document.getId());
         User user = new User(document.getId(), document.getString("name"), new Feed(), following);
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         Bundle bundle = new Bundle();
@@ -165,12 +163,12 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private List<User> getFollowing(String userId){
-        following = new ArrayList<User>();
+    private void getFollowing(DocumentSnapshot doc){
+        List<User> following = new ArrayList<User>();
 
         FirebaseFirestore.getInstance()
                 .collection("users")
-                .document(userId)
+                .document(doc.getId())
                 .collection("following")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -184,10 +182,10 @@ public class LoginActivity extends AppCompatActivity {
                                         null,null);
                                 following.add(newUser);
                             }
+                            successfulLogin(doc, following);
                         }
                     }
                 });
-        return following;
     }
 
 }

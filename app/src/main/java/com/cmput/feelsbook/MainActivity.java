@@ -253,8 +253,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     public void updateFeed(){
         CollectionReference cRef = db.collection("mostRecent");
         List<User> followingList = currentUser.getFollowingList();
-        System.out.println("test 22222");
-        System.out.println(currentUser.getUserName());
         for (int i = 0; i < followingList.size(); i++){
             System.out.println(followingList.get(i));
             System.out.println(followingList.get(i).getUserName());
@@ -266,8 +264,88 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                         @Override
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                             if (task.getResult().exists()){
-                                Mood mood = getMood(task.getResult());
-                                feedFragment.getRecyclerAdapter().addPost(mood);
+                                DocumentSnapshot doc = task.getResult();
+
+                                MoodType moodType = null;
+                                String reason = null;
+                                SocialSituation situation = null;
+                                Bitmap photo = null;
+                                Location location = null;
+                                Bitmap profilePic = null;
+                                Date dateTime = null;
+
+                                try {
+                                    if (doc.contains("datetime"))
+                                        dateTime = ((Timestamp) doc.get("datetime")).toDate();
+
+                                    if (doc.contains("location"))
+                                        location = (Location) doc.get("location");
+
+                                    if (doc.contains("photo")) {
+
+                            /*
+                            converts the photo is present converts from a base64 string to a byte[]
+                            and then into a bitmap if no photo is present sets photo to null
+                             */
+                                        try {
+                                            byte[] decoded = Base64.getDecoder()
+                                                    .decode((String)  doc.get("photo"));
+                                            photo = BitmapFactory.decodeByteArray(decoded
+                                                    , 0, decoded.length);
+                                        }catch(Exception e) {
+                                            Log.d("-----UPLOAD PHOTO-----",
+                                                    "****NO PHOTO DOWNLOADED: " + e);
+                                            photo = null;
+                                        }
+                                    }
+
+                                    if (doc.contains("profilePic")) {
+
+                            /*
+                            converts the profilePic is present converts from a base64 string to a byte[]
+                            and then into a bitmap if no photo is present sets profilePic to null
+                             */
+                                        try {
+                                            byte[] decoded = Base64.getDecoder()
+                                                    .decode((String)  doc.get("profilePic"));
+                                            profilePic = BitmapFactory.decodeByteArray(decoded
+                                                    , 0, decoded.length);
+                                        }catch(Exception e) {
+                                            Log.d("-----UPLOAD PHOTO-----",
+                                                    "****NO PHOTO DOWNLOADED: " + e);
+                                            profilePic = null;
+                                        }
+                                    }
+
+                                    if (doc.contains("reason"))
+                                        reason = (String) doc.get("reason");
+
+                                    if (doc.contains("situation") & (doc.get("situation") != null)) {
+                                        situation = SocialSituation.getSocialSituation((String) doc.get("situation"));
+                                    }
+
+                                    if (doc.contains("moodType") & (doc.get("moodType") != null)) {
+                                        moodType = MoodType.getMoodType((String) doc.get("moodType"));
+                                    }
+
+                                    Mood mood = new Mood(dateTime, moodType, profilePic);
+
+                                    if(reason != null)
+                                        mood = mood.withReason(reason);
+                                    if(situation != null)
+                                        mood = mood.withSituation(situation);
+                                    if(photo != null)
+                                        mood = mood.withPhoto(photo);
+                                    if(location != null)
+                                        mood.withLocation(location);
+
+                                    feedFragment.getRecyclerAdapter().addPost(mood);
+
+
+                                }catch(Exception error){
+                                    Log.d("-----UPLOAD SAMPLE-----",
+                                            "****MOOD DOWNLOAD FAILED: " + error);
+                                }
                             }
                         }
                     });
@@ -276,86 +354,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
 
     public Mood getMood(DocumentSnapshot doc){
 
-        MoodType moodType = null;
-        String reason = null;
-        SocialSituation situation = null;
-        Bitmap photo = null;
-        Location location = null;
-        Bitmap profilePic = null;
-        Date dateTime = null;
-
-        try {
-            if (doc.contains("datetime"))
-                dateTime = ((Timestamp) doc.get("datetime")).toDate();
-
-            if (doc.contains("location"))
-                location = (Location) doc.get("location");
-
-            if (doc.contains("photo")) {
-
-                            /*
-                            converts the photo is present converts from a base64 string to a byte[]
-                            and then into a bitmap if no photo is present sets photo to null
-                             */
-                try {
-                    byte[] decoded = Base64.getDecoder()
-                            .decode((String)  doc.get("photo"));
-                    photo = BitmapFactory.decodeByteArray(decoded
-                            , 0, decoded.length);
-                }catch(Exception e) {
-                    Log.d("-----UPLOAD PHOTO-----",
-                            "****NO PHOTO DOWNLOADED: " + e);
-                    photo = null;
-                }
-            }
-
-            if (doc.contains("profilePic")) {
-
-                            /*
-                            converts the profilePic is present converts from a base64 string to a byte[]
-                            and then into a bitmap if no photo is present sets profilePic to null
-                             */
-                try {
-                    byte[] decoded = Base64.getDecoder()
-                            .decode((String)  doc.get("profilePic"));
-                    profilePic = BitmapFactory.decodeByteArray(decoded
-                            , 0, decoded.length);
-                }catch(Exception e) {
-                    Log.d("-----UPLOAD PHOTO-----",
-                            "****NO PHOTO DOWNLOADED: " + e);
-                    profilePic = null;
-                }
-            }
-
-            if (doc.contains("reason"))
-                reason = (String) doc.get("reason");
-
-            if (doc.contains("situation") & (doc.get("situation") != null)) {
-                situation = SocialSituation.getSocialSituation((String) doc.get("situation"));
-            }
-
-            if (doc.contains("moodType") & (doc.get("moodType") != null)) {
-                moodType = MoodType.getMoodType((String) doc.get("moodType"));
-            }
-
-            Mood mood = new Mood(dateTime, moodType, profilePic);
-
-            if(reason != null)
-                mood = mood.withReason(reason);
-            if(situation != null)
-                mood = mood.withSituation(situation);
-            if(photo != null)
-                mood = mood.withPhoto(photo);
-            if(location != null)
-                mood.withLocation(location);
-
-            return mood;
-
-
-        }catch(Exception error){
-            Log.d("-----UPLOAD SAMPLE-----",
-                    "****MOOD DOWNLOAD FAILED: " + error);
-        }
         return null;
     }
 }
