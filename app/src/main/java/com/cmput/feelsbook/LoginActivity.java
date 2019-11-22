@@ -25,6 +25,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Handles the login and verification of a user.
@@ -147,12 +149,15 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void successfulLogin(DocumentSnapshot document){
         Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
-        User user = new User(document.getId(), document.getString("name"), new Feed(), new FollowList());
+        List<User> following = new ArrayList<User>();
+        User user = new User(document.getId(), document.getString("name"), new Feed(), following);
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("User",user);
         intent.putExtras(bundle);
         startActivity(intent);
     }
+
+    private List<User>
 
 }

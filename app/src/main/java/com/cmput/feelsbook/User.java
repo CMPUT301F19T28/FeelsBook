@@ -14,7 +14,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,16 +34,15 @@ public class User implements Serializable {
     private String userName;
     private String name;
     private Feed posts;
-    private FollowList followList;
+    private List<User> following;
     private Bitmap profilePicture;
 
-    public User(String userName, String name, Feed posts, FollowList followsList){
+    public User(String userName, String name, Feed posts, List<User> following){
         this.userName = userName;
         this.name = name;
         this.posts = posts;
-        followList = followsList;
+        this.following = following;
     }
-
 
     public void acceptFollowRequest() {
 
@@ -115,12 +116,8 @@ public class User implements Serializable {
 
     public void setPosts(Feed posts) {this.posts = posts;}
 
-    public FollowList getFollowsList() {
-        return followList;
-    }
-
-    public void setFollowsList(FollowList followsList) {
-        followList = followsList;
+    public List<User> getFollowingList() {
+        return following;
     }
 
     public Bitmap getProfilePic(){

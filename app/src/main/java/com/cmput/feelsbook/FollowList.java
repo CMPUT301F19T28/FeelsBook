@@ -20,25 +20,5 @@ import javax.annotation.Nullable;
  * List<User> following - list of other users the current user is following
  */
 public class FollowList extends Fragment implements Serializable {
-    private RecyclerView recView;
-    private Feed followList;
-    private List<User> following;
 
-    public FollowList(){
-        followList = new Feed();
-    }
-
-    public FollowList(Feed feed, List<User> following){
-        this.followList = feed;
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.follow_activity, container, false);
-        recView = view.findViewById(R.id.following_list);
-        recView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recView.setAdapter(followList);
-        return view;
-    }
 }

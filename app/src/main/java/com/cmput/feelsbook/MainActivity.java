@@ -18,13 +18,16 @@ import androidx.viewpager.widget.ViewPager;
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.SocialSituation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.cmput.feelsbook.post.Post;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -32,10 +35,11 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
-
+import java.util.List;
 
 
 /**
@@ -246,103 +250,107 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
      * Listens for updates the the database and updates the recyclerView when updates
      */
     public void updateFeed(){
-        cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+        CollectionReference cRef = db.collection("mostRecent");
+        List<User> followingList = currentUser.getFollowingList();
+        for (int i = 0; i < followingList.size(); i++){
+            cRef
+                    // Get the username of the i user that current user is following
+                    .document(followingList.get(i).getUserName())
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.getResult().exists()){
+                                Mood mood = getMood(task.getResult());
+                                feedFragment.getRecyclerAdapter().addPost(mood);
+                            }
+                        }
+                    });
+        }
+    }
 
-                //clears list
-                while( feedFragment.getRecyclerAdapter().getItemCount() > 0) {
-                    feedFragment.getRecyclerAdapter().removePost(0);
-                    feedFragment.getRecyclerAdapter().notifyItemRemoved(0);
-                }
+    public Mood getMood(DocumentSnapshot doc){
 
-                for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
+        MoodType moodType = null;
+        String reason = null;
+        SocialSituation situation = null;
+        Bitmap photo = null;
+        Location location = null;
+        Bitmap profilePic = null;
+        Date dateTime = null;
 
-                    MoodType moodType = null;
-                    String reason = null;
-                    SocialSituation situation = null;
-                    Bitmap photo = null;
-                    Location location = null;
-                    Bitmap profilePic = null;
-                    Date dateTime = null;
+        try {
+            if (doc.contains("datetime"))
+                dateTime = ((Timestamp) doc.get("datetime")).toDate();
 
+            if (doc.contains("location"))
+                location = (Location) doc.get("location");
 
-                    try {
-                        if (doc.contains("datetime"))
-                            dateTime = ((Timestamp) doc.get("datetime")).toDate();
-
-                        if (doc.contains("location"))
-                            location = (Location) doc.get("location");
-
-                        if (doc.contains("photo")) {
+            if (doc.contains("photo")) {
 
                             /*
                             converts the photo is present converts from a base64 string to a byte[]
                             and then into a bitmap if no photo is present sets photo to null
                              */
-                            try {
-                                byte[] decoded = Base64.getDecoder()
-                                        .decode((String)  doc.get("photo"));
-                                photo = BitmapFactory.decodeByteArray(decoded
-                                        , 0, decoded.length);
-                            }catch(Exception error) {
-                                Log.d("-----UPLOAD PHOTO-----",
-                                        "****NO PHOTO DOWNLOADED: " + e);
-                                photo = null;
-                            }
-                        }
+                try {
+                    byte[] decoded = Base64.getDecoder()
+                            .decode((String)  doc.get("photo"));
+                    photo = BitmapFactory.decodeByteArray(decoded
+                            , 0, decoded.length);
+                }catch(Exception e) {
+                    Log.d("-----UPLOAD PHOTO-----",
+                            "****NO PHOTO DOWNLOADED: " + e);
+                    photo = null;
+                }
+            }
 
-                        if (doc.contains("profilePic")) {
+            if (doc.contains("profilePic")) {
 
                             /*
                             converts the profilePic is present converts from a base64 string to a byte[]
                             and then into a bitmap if no photo is present sets profilePic to null
                              */
-                            try {
-                                byte[] decoded = Base64.getDecoder()
-                                        .decode((String)  doc.get("profilePic"));
-                                profilePic = BitmapFactory.decodeByteArray(decoded
-                                        , 0, decoded.length);
-                            }catch(Exception error) {
-                                Log.d("-----UPLOAD PHOTO-----",
-                                        "****NO PHOTO DOWNLOADED: " + e);
-                                profilePic = null;
-                            }
-                        }
-
-                        if (doc.contains("reason"))
-                            reason = (String) doc.get("reason");
-
-                        if (doc.contains("situation") & (doc.get("situation") != null)) {
-                            situation = SocialSituation.getSocialSituation((String) doc.get("situation"));
-                        }
-
-                        if (doc.contains("moodType") & (doc.get("moodType") != null)) {
-                            moodType = MoodType.getMoodType((String) doc.get("moodType"));
-                        }
-
-                        Mood mood = new Mood(dateTime, moodType, profilePic);
-
-                        if(reason != null)
-                            mood = mood.withReason(reason);
-                        if(situation != null)
-                            mood = mood.withSituation(situation);
-                        if(photo != null)
-                            mood = mood.withPhoto(photo);
-                        if(location != null)
-                            mood.withLocation(location);
-
-                        feedFragment.getRecyclerAdapter().addPost(mood);
-
-
-                    }catch(Exception error){
-                        Log.d("-----UPLOAD SAMPLE-----",
-                                "****MOOD DOWNLOAD FAILED: " + error);
-                    }
+                try {
+                    byte[] decoded = Base64.getDecoder()
+                            .decode((String)  doc.get("profilePic"));
+                    profilePic = BitmapFactory.decodeByteArray(decoded
+                            , 0, decoded.length);
+                }catch(Exception e) {
+                    Log.d("-----UPLOAD PHOTO-----",
+                            "****NO PHOTO DOWNLOADED: " + e);
+                    profilePic = null;
                 }
-
-                feedFragment.getRecyclerAdapter().notifyDataSetChanged();
             }
-        });
+
+            if (doc.contains("reason"))
+                reason = (String) doc.get("reason");
+
+            if (doc.contains("situation") & (doc.get("situation") != null)) {
+                situation = SocialSituation.getSocialSituation((String) doc.get("situation"));
+            }
+
+            if (doc.contains("moodType") & (doc.get("moodType") != null)) {
+                moodType = MoodType.getMoodType((String) doc.get("moodType"));
+            }
+
+            Mood mood = new Mood(dateTime, moodType, profilePic);
+
+            if(reason != null)
+                mood = mood.withReason(reason);
+            if(situation != null)
+                mood = mood.withSituation(situation);
+            if(photo != null)
+                mood = mood.withPhoto(photo);
+            if(location != null)
+                mood.withLocation(location);
+
+            return mood;
+
+
+        }catch(Exception error){
+            Log.d("-----UPLOAD SAMPLE-----",
+                    "****MOOD DOWNLOAD FAILED: " + error);
+        }
+        return null;
     }
 }
