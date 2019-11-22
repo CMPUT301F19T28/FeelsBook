@@ -45,7 +45,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@android:drawable/ic_menu_sort_by_size" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </TableRow>

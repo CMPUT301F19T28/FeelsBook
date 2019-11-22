@@ -37,4 +37,9 @@ public abstract class Post implements Serializable{
     public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
     }
+
+    @Override
+    public String toString(){
+        return getClass().getName()+"@"+Integer.toHexString(dateTime.hashCode());
+    }
 }
