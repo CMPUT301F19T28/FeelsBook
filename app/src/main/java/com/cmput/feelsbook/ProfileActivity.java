@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.Post;
@@ -62,6 +64,7 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
     private FeedFragment historyFragment;
     private MapFragment mapFragment;
     private FirebaseFirestore db;
+    private ImageButton filterButton;
     private CollectionReference cr;
     private Feed.OnItemClickListener listener;
 
@@ -116,13 +119,11 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         TextView followingText = findViewById(R.id.following_count);
         TextView postsText = findViewById(R.id.total_posts);
         ImageView profilePicture = findViewById(R.id.profile_picture);
-
         postCount = historyFragment.getRecyclerAdapter().getItemCount();
         fullName.setText(currentUser.getName());
         followText.setText(followCount + " following");
         followingText.setText(followersCount + " followers");
         userName.setText("@"+currentUser.getUserName());
-
         updateFeed();
         postCount = historyFragment.getRecyclerAdapter().getItemCount();
 
@@ -134,6 +135,21 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
             @Override
             public void onClick(View view) {
                 finish();
+            }
+        });
+
+        final FloatingActionButton editButton = findViewById(R.id.edit_float_button);
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                //
+            }
+        });
+        filterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                // creates small popup window to filter
+                
             }
         });
     }
@@ -205,7 +221,6 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
                         Log.d("Sample", "Data addition failed" + e.toString());
                     }
                 });
-
     }
 
     /**

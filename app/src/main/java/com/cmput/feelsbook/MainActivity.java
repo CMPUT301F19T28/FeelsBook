@@ -89,7 +89,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         //Sets the document to that of the current user
         cr = db.collection("users").document(currentUser.getUserName())
                 .collection("Moods");
-
         feedFragment = new FeedFragment();
         mapFragment = new MapFragment();
         viewPagerAdapter.AddFragment(feedFragment, "Feed");
@@ -226,7 +225,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
 //        feedFragment.getRecyclerAdapter().removePost(mood);
         feedFragment.getRecyclerAdapter().notifyDataSetChanged();
     }
-
     /**
      * Listens for updates the the database and updates the recyclerView when updates
      */
