@@ -34,6 +34,18 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:layout_editor_absoluteY="4dp"/>
 
+            <ImageButton
+                android:id="@+id/filter_button"
+                android:layout_width="53dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="filter"
+                android:background="00000000"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@android:drawable/ic_menu_sort_by_size" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </TableRow>
@@ -129,6 +141,7 @@
     </TableRow>
 
     <TableRow
+        android:id="@+id/tableRow4"
         android:layout_width="match_parent"
         android:layout_height="524dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -137,7 +150,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="424dp">
 
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/history_pager"
@@ -156,10 +169,23 @@
                     app:tabIndicatorColor="@color/add_post_color"
                     app:tabIndicatorHeight="4dp"
                     app:tabSelectedTextColor="@color/defaultWhite"
-                    app:tabTextColor="@color/defaultGray"/>
+                    app:tabTextColor="@color/defaultGray" />
 
             </androidx.viewpager.widget.ViewPager>
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </TableRow>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/edit_float_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="350dp"
+        android:layout_marginTop="650dp"
+        android:clickable="true"
+        app:backgroundTint="@color/add_post_color"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_edit" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

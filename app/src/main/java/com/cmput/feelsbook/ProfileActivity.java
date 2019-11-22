@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -11,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import com.cmput.feelsbook.post.Post;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -40,6 +42,7 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
     private FeedFragment historyFragment;
     private MapFragment mapFragment;
     private FirebaseFirestore db;
+    private ImageButton filterButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +89,21 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
             @Override
             public void onClick(View view) {
                 finish();
+            }
+        });
+
+        final FloatingActionButton editButton = findViewById(R.id.edit_float_button);
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                //
+            }
+        });
+        filterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                // creates small popup window to filter
+                
             }
         });
     }
