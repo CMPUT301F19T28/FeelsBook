@@ -2,6 +2,9 @@ package com.cmput.feelsbook.post;
 
 import com.cmput.feelsbook.R;
 
+/**
+ * Contains the emoticon used by each MoodType.
+ */
 public enum MoodType {
 
 
@@ -27,5 +30,27 @@ public enum MoodType {
 
     public int getEmoticon() {
         return emoticon;
+    }
+
+    public static MoodType getMoodType(String moodtype){
+
+        if(moodtype.toLowerCase().equals("happy"))
+            return MoodType.HAPPY;
+
+        else if(moodtype.toLowerCase().equals("sad"))
+            return MoodType.SAD;
+
+        else if(moodtype.toLowerCase().equals("angry"))
+            return MoodType.ANGRY;
+
+        else if(moodtype.toLowerCase().equals("sleepy"))
+            return MoodType.SLEEPY;
+
+        else if(moodtype.toLowerCase().equals("annoyed"))
+            return MoodType.ANNOYED;
+
+        else
+            return MoodType.SEXY;
+
     }
 }

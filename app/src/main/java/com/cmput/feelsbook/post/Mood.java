@@ -16,6 +16,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * Object that contains information about a mood.
+ * MoodType moodType - specifies which mood to be displayed as an emoticon
+ * String reason - additional information about the mood added by the user
+ * SocialSituation situation - specifies the social situation regarding the mood
+ * Bitmap photo - additional context image added to the mood
+ * Location location - contextual information about the place the mood was experienced
+ * DateFormat dateFormatter - specifies the date format used when displaying the mood
+ */
+
 public class Mood extends Post implements Serializable {
 
     private final static DateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.CANADA);
@@ -160,6 +170,7 @@ public class Mood extends Post implements Serializable {
     public boolean hasSituation(){
         return situation != null;
     }
+
     public boolean hasPhoto(){
         return photo != null;
     }

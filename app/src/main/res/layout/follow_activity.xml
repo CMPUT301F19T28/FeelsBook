@@ -30,6 +30,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_margin="4dp"
+                android:paddingStart="15dp"
+                android:paddingEnd="20dp"
                 android:background="@drawable/circle"
                 android:drawableStart="@drawable/ic_arrow_back_black_24dp"
                 app:layout_constraintDimensionRatio="1:1"
@@ -41,6 +43,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_margin="4dp"
+                android:paddingStart="17dp"
+                android:paddingEnd="20dp"
                 app:layout_constraintDimensionRatio="1:1"
                 android:background="@null"
                 android:drawableStart="@drawable/ic_search_black_24dp"
@@ -56,7 +60,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/feed_map_bar_color"
-        app:layout_constraintTop_toBottomOf="@id/topBar">
+        app:tabIndicatorColor="@color/add_post_color"
+        app:tabIndicatorHeight="4dp"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:tabSelectedTextColor="@color/defaultWhite"
+        app:tabTextColor="@color/defaultGray">
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/follow_request_tab"
@@ -87,5 +95,8 @@
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/followPager"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
