@@ -154,6 +154,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         if (locationPermisisionsGranted) {
             getDeviceLocation();
+
+            //googleMap.setMyLocationEnabled(true);
         }
     }
 
