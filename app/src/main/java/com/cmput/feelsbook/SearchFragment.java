@@ -12,6 +12,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
+/**
+ * Handles search function where a user can search for another user to send a follow request.
+ */
 public class SearchFragment extends DialogFragment {
 
     @NonNull

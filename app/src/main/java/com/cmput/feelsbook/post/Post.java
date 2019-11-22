@@ -9,6 +9,12 @@ import com.cmput.feelsbook.Feed;
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * Interface used to implement a Mood object. Provides additional methods when creating a Mood
+ * object.
+ * Bitmap profilePic - profile picture of the user who created the Post object
+ * Date dateTime - date and time used to display the Post
+ */
 public abstract class Post implements Serializable{
 
     protected Bitmap profilePic;
@@ -30,5 +36,10 @@ public abstract class Post implements Serializable{
 
     public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
+    }
+
+    @Override
+    public String toString(){
+        return getClass().getName()+"@"+Integer.toHexString(dateTime.hashCode());
     }
 }
