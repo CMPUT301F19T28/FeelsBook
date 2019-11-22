@@ -206,6 +206,22 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
                     }
                 });
 
+        db.collection("mostRecent")
+                .document(currentUser.getUserName())
+                .set(data)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("Sample", "Data addition successful");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("Sample", "Data addition failed" + e.toString());
+                    }
+                });
+
     }
 
     /**
