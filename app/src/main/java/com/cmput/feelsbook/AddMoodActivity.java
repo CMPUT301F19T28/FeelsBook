@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.cmput.feelsbook.AddMoodFragment;
@@ -31,12 +32,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class AddMoodActivity extends AppCompatActivity {
+public class AddMoodActivity extends AppCompatActivity{
 
     private EditText input;
     private Bitmap picture;
     private Bitmap dp;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private User currentUser;
+    private Feed historyAdapter;
+    private FirebaseFirestore db;
 
 
 
@@ -52,7 +56,7 @@ public class AddMoodActivity extends AppCompatActivity {
         Spinner spinner = findViewById(R.id.mood_spinner);
         Spinner socialSpinner = findViewById(R.id.social_spinner);
 
-        MoodType moodTypes[] = {MoodType.HAPPY, MoodType.SAD,MoodType.ANGRY, MoodType.ANNOYED,MoodType.SLEEPY, MoodType.SEXY};
+        MoodType moodTypes[] = {MoodType.HAPPY, MoodType.SAD, MoodType.ANGRY, MoodType.ANNOYED, MoodType.SLEEPY, MoodType.SEXY};
         ArrayList<MoodType> moodList = new ArrayList<MoodType>();
         moodList.addAll(Arrays.asList(moodTypes));
         ArrayAdapter<MoodType> moodTypeAdapter = new ArrayAdapter<MoodType>(this, android.R.layout.simple_spinner_item, moodList);
@@ -60,7 +64,7 @@ public class AddMoodActivity extends AppCompatActivity {
         spinner.setAdapter(moodTypeAdapter);
 
         //creates social situation spinner drop down menu
-        SocialSituation socialSits[] = {SocialSituation.ALONE, SocialSituation.ONEPERSON, SocialSituation.SEVERAL, SocialSituation.CROWD };
+        SocialSituation socialSits[] = {SocialSituation.ALONE, SocialSituation.ONEPERSON, SocialSituation.SEVERAL, SocialSituation.CROWD};
         ArrayList<SocialSituation> socialSitList = new ArrayList<SocialSituation>();
         socialSitList.addAll(Arrays.asList(socialSits));
         ArrayAdapter<SocialSituation> socialAdapter = new ArrayAdapter<SocialSituation>(this, android.R.layout.simple_spinner_item, socialSitList);
@@ -68,18 +72,25 @@ public class AddMoodActivity extends AppCompatActivity {
         socialSpinner.setAdapter(socialAdapter);
         socialSpinner.setVisibility(View.GONE); //sets the view to be gone because it is optional
 
+        Bundle bundle = getIntent().getExtras();
+        db = FirebaseFirestore.getInstance();
+
+        if (bundle != null) {
+            currentUser = (User) bundle.get("User");
+            historyAdapter = (Feed) bundle.get("Post_list");
+        }
+
 
         //if the social situatiion button is pressed then shows the drop down
         Button socialBttn = findViewById(R.id.social_situation_button);
-        socialBttn.setOnClickListener(new View.OnClickListener(){
+        socialBttn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 if (socialSpinner.getVisibility() == View.VISIBLE) {
                     socialSpinner.setVisibility(View.INVISIBLE);
-                }
-                else {
+                } else {
                     socialSpinner.setVisibility(View.VISIBLE);
-                    }
+                }
             }
         });
 
@@ -96,7 +107,6 @@ public class AddMoodActivity extends AppCompatActivity {
             }
         });
 
-//This post button shiet aint workin yet lul 
 
         Button postButton = findViewById(R.id.post_button);
         postButton.setOnClickListener(new View.OnClickListener() {
@@ -106,33 +116,17 @@ public class AddMoodActivity extends AppCompatActivity {
                 Object selectedMood = spinner.getSelectedItem();
                 MoodType selected_type = MoodType.class.cast(selectedMood);
 
-                if (!moodText.isEmpty()) {
-                    Mood newMood = new Mood(selected_type, null).withReason(moodText).withPhoto(picture);
+                if (socialSpinner.getVisibility() == View.VISIBLE) {
+                    SocialSituation selectedSocial = SocialSituation.class.cast(socialSpinner.getSelectedItem());
+                    onSubmit(new Mood(selected_type, null).withReason(moodText).withPhoto(picture).withSituation(selectedSocial));
 
                 } else {
-
-                    SocialSituation selectedSocial = SocialSituation.class.cast(socialSpinner.getSelectedItem());
-
-                    if (!moodText.isEmpty()) {
-
-                        if (socialSpinner.getVisibility() == View.VISIBLE) {
-                            new Mood(selected_type, null).withReason(moodText).withSituation(selectedSocial);
-                        } else {
-                            new Mood(selected_type, null).withReason(moodText);
-                        }
-                    } else {
-                        Toast.makeText(AddMoodActivity.this, "Must fill required text",
-                                Toast.LENGTH_SHORT).show();
-                    }
+                    onSubmit(new Mood(selected_type, null).withPhoto(picture).withReason(moodText));
                 }
+                finish();
             }
         });
-
-
-
-
     }
-
 
     /**
      * Activity result for Camera activity, gets bitmap photo taken during activity and attaches to bitmap variable 'picture'
@@ -149,5 +143,33 @@ public class AddMoodActivity extends AppCompatActivity {
             }
         }
     }
+
+    /**
+     * Adds a post/mood object to the feed list.
+     * @param newMood
+     * New mood object to be added
+     */
+    public void onSubmit(Post newMood){
+        historyAdapter.addPost(newMood);
+        historyAdapter.notifyDataSetChanged();
+    }
+//    /**
+//     * notifies the adapter that the data set has changed
+//     */
+//    public void edited(){
+//        //Code for editing mood
+//        feedFragment.getRecyclerAdapter().notifyDataSetChanged();
+//    }
+//
+//    /**
+//     * will be used to delete passed in mood once implemented
+//     * @param mood
+//     *      mood to be deleted
+//     */
+//    public void deleted(Post mood){
+//        //For deleting mood
+//        feedFragment.getRecyclerAdapter().removePost(mood);
+//        feedFragment.getRecyclerAdapter().notifyDataSetChanged();
+//    }
 
 }

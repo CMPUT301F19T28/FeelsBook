@@ -75,11 +75,11 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
 //                new AddMoodFragment().show(getSupportFragmentManager(), "ADD_MOOD");
 
                 Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
-//                Bundle userBundle = new Bundle();
-//                userBundle.putSerializable("User", currentUser);
-//                feedFragment.getRecyclerAdapter().setOnItemClickListener(null);
-//                userBundle.putSerializable("Post_list",feedFragment.getRecyclerAdapter());
-//                intent.putExtras(userBundle);
+                Bundle userBundle = new Bundle();
+                userBundle.putSerializable("User", currentUser);
+                feedFragment.getRecyclerAdapter().setOnItemClickListener(null);
+                userBundle.putSerializable("Post_list",feedFragment.getRecyclerAdapter());
+                intent.putExtras(userBundle);
                 startActivity(intent);
             }
         });
