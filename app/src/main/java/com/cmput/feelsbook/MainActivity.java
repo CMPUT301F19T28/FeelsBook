@@ -127,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
             }
         });
 
+        System.out.println("test");
         updateFeed();
 
     }
@@ -252,7 +253,11 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     public void updateFeed(){
         CollectionReference cRef = db.collection("mostRecent");
         List<User> followingList = currentUser.getFollowingList();
+        System.out.println("test 22222");
+        System.out.println(currentUser.getUserName());
         for (int i = 0; i < followingList.size(); i++){
+            System.out.println(followingList.get(i));
+            System.out.println(followingList.get(i).getUserName());
             cRef
                     // Get the username of the i user that current user is following
                     .document(followingList.get(i).getUserName())
