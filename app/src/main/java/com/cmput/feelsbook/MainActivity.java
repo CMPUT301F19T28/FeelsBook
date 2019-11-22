@@ -7,6 +7,8 @@ import android.widget.ImageButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
+
+import com.cmput.feelsbook.AddMoodActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.cmput.feelsbook.post.Post;
@@ -65,15 +67,20 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
-        final FloatingActionButton addPostBttn = findViewById(R.id.addPostButton);
+        FloatingActionButton addPostBttn = findViewById(R.id.addPostButton);
         addPostBttn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //when floating action button is pressed instantiates the fragment so a Ride can be
-                // added to the list
-                // add post activity:
+//                this was with the add mood fragment
+//                new AddMoodFragment().show(getSupportFragmentManager(), "ADD_MOOD");
 
-                new AddMoodFragment().show(getSupportFragmentManager(), "ADD_MOOD");
+                Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
+//                Bundle userBundle = new Bundle();
+//                userBundle.putSerializable("User", currentUser);
+//                feedFragment.getRecyclerAdapter().setOnItemClickListener(null);
+//                userBundle.putSerializable("Post_list",feedFragment.getRecyclerAdapter());
+//                intent.putExtras(userBundle);
+                startActivity(intent);
             }
         });
 
