@@ -40,6 +40,8 @@ public class FollowActivity extends AppCompatActivity {
         followingRequests = new FollowingRequests(user);
         follow_requests.setAdapter(followingRequests);
 
+
+
         Button back = findViewById(R.id.follow_back_button);
         back.setOnClickListener(new View.OnClickListener() {
             @Override

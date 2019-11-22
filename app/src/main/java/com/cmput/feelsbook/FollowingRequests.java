@@ -1,6 +1,8 @@
 package com.cmput.feelsbook;
 
 
+import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,12 +14,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +36,12 @@ public class FollowingRequests extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private List<String> list;
     private User user;
+    FirebaseFirestore db;
+    CollectionReference cr;
 
     public FollowingRequests(User user) {
+        db = FirebaseFirestore.getInstance();
+        cr = db.collection("users").document(user.getUserName()).collection("FollowRequests");
         list = new ArrayList<>();
         this.user = user;
         fillList();
