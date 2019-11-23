@@ -41,20 +41,20 @@
         android:id="@+id/AcceptButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="16dp"
         android:layout_marginTop="8dp"
         android:text="Accept"
-        app:layout_constraintStart_toEndOf="@+id/DenyButton"
+        app:layout_constraintStart_toEndOf="@+id/full_name"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/DenyButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Deny"
-        android:layout_marginLeft="16dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintStart_toEndOf="@+id/full_name"
+        android:text="Deny"
+        app:layout_constraintStart_toEndOf="@+id/AcceptButton"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -76,6 +76,15 @@ public class User implements Serializable {
                 });
     }
 
+    public void declineFollowRequest(String userId) {
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(getUserName())
+                .collection("followRequests")
+                .document(userId)
+                .delete();
+    }
+
     public void moveFirestoreDoc (DocumentReference fromCollection, DocumentReference toCollection){
             fromCollection.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
@@ -149,7 +158,6 @@ public class User implements Serializable {
                                                     data.put("photo", null);
                                                 }
                                                 data.put("fullname", getName());
-                                                data.put("username", getUserName());
                                                 task.getResult().getReference()
                                                         .collection("followRequests")
                                                         .document(getUserName())
