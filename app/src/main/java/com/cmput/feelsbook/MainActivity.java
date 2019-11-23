@@ -45,21 +45,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         profileButton = findViewById(R.id.profileButton);
 
 
-
-//        listener = new Feed.OnItemClickListener(){
-//            /**
-//             * Sets onItemClick to open a fragment in which the mood will be edited
-//             * @param post
-//             *          Post to be edited
-//             */
-//
-//            @Override
-//            public void onItemClick(Post post){
-//                new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
-//            }
-//        };
-
-
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
@@ -72,6 +57,27 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
+
+
+        listener = new Feed.OnItemClickListener(){
+            /**
+             * Sets onItemClick to open a fragment in which the mood will be edited
+             * @param post
+             *          Post to be edited
+             */
+
+            @Override
+            public void onItemClick(Post post){
+//                new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
+                Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
+                Bundle userBundle = new Bundle();
+                userBundle.putSerializable("User", currentUser);
+                feedFragment.getRecyclerAdapter().setOnItemClickListener(null);
+                userBundle.putSerializable("Post_list",feedFragment.getRecyclerAdapter());
+                intent.putExtras(userBundle);
+                startActivityForResult(intent, 1);
+            }
+        };
 
         FloatingActionButton addPostBttn = findViewById(R.id.addPostButton);
         addPostBttn.setOnClickListener(new View.OnClickListener() {
