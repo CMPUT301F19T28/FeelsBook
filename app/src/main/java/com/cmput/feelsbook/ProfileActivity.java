@@ -411,19 +411,20 @@ FilterFragment.OnMoodSelectListener{
     public void onSelect(MoodType moodType){
         Log.d("Filter","Filter pressed");
         ArrayList<Post> historyList = historyFragment.getRecyclerAdapter().getFeed();
-        // currently causes ConcurrentModificationException
         Iterator<Post> it = historyList.iterator();
         while (it.hasNext()){
             Mood m = (Mood) it.next();
             if(m.getMoodType() == moodType){
-                historyList.remove(m);
+                it.remove();
             }
         }
-        updateFeed();
+        historyFragment.getRecyclerAdapter().notifyDataSetChanged();
+
     }
 
     public void onDeselect(){
         Log.d("Filter","Filter unpressed");
+        updateFeed();
     }
 }
 
