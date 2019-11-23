@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput.feelsbook.Feed;
+import com.cmput.feelsbook.ProxyBitmap;
 import com.cmput.feelsbook.R;
 
 import java.io.Serializable;
@@ -33,6 +34,7 @@ public class Mood extends Post implements Serializable {
     private MoodType moodType;
     private String reason;
     private SocialSituation situation;
+    private ProxyBitmap serilizable_photo;
     private Bitmap photo;
     private Location location;
 
@@ -95,12 +97,22 @@ public class Mood extends Post implements Serializable {
      * A photo to show something about their Mood
      * @return
      * The mood with a Photo added
+     * Uses class ProxyBitmap to make bitmap photo serializable
      */
-    public Mood withPhoto(Bitmap photo) {
-        this.photo = photo;
+    public Mood withPhoto(ProxyBitmap photo) {
+        this.serilizable_photo = photo;
         return this;
     }
 
+    /**
+     * @param photo
+     * @return
+     * Converts the serializable class ProxyBitmap back into a bitmap
+     */
+    public Bitmap photoToBitmap(ProxyBitmap photo){
+        Bitmap Bphoto = photo.getBitmap();
+        return Bphoto;
+    }
     /**
      * Builder style to add a location to the Mood
      * @param location
@@ -127,7 +139,10 @@ public class Mood extends Post implements Serializable {
 
         dateTimeText.setText(dateFormatter.format(dateTime));
         moodText.setText(moodType.getEmoticon());
-        profile_pic_feed.setImageBitmap(photo);
+        // temporarily sets the photo as profile pic
+        if (serilizable_photo != null) {
+            profile_pic_feed.setImageBitmap(photoToBitmap(serilizable_photo));
+        }
         reasonText.setText(reason);
 
 //        TODO: Implemented but out of scope for sprint 1

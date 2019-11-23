@@ -43,18 +43,23 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         viewPager = findViewById(R.id.view_pager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         profileButton = findViewById(R.id.profileButton);
-        listener = new Feed.OnItemClickListener(){
-            /**
-             * Sets onItemClick to open a fragment in which the mood will be edited
-             * @param post
-             *          Post to be edited
-             */
 
-            @Override
-            public void onItemClick(Post post){
-                new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
-            }
-        };
+
+
+//        listener = new Feed.OnItemClickListener(){
+//            /**
+//             * Sets onItemClick to open a fragment in which the mood will be edited
+//             * @param post
+//             *          Post to be edited
+//             */
+//
+//            @Override
+//            public void onItemClick(Post post){
+//                new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
+//            }
+//        };
+
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
@@ -72,9 +77,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         addPostBttn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                this was with the add mood fragment
-//                new AddMoodFragment().show(getSupportFragmentManager(), "ADD_MOOD");
-
                 Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
@@ -92,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this,ProfileActivity.class);
                 Bundle userBundle = new Bundle();
-                userBundle.putSerializable("User", currentUser);-
+                userBundle.putSerializable("User", currentUser);
                 feedFragment.getRecyclerAdapter().setOnItemClickListener(null);
                 userBundle.putSerializable("Post_list",feedFragment.getRecyclerAdapter());
                 intent.putExtras(userBundle);

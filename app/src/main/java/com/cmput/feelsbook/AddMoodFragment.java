@@ -198,7 +198,7 @@ public class AddMoodFragment extends DialogFragment {
                                 editMood.setReason(newMoodReason);
                                 editMood.setMoodType(newSelectedType);
                                 if (!editMood.hasPhoto()){
-                                    editMood.withPhoto(picture);
+//                                    editMood.withPhoto(picture);
                                 }
                                 listener.edited();
 
@@ -237,8 +237,8 @@ public class AddMoodFragment extends DialogFragment {
                             MoodType selected_type = MoodType.class.cast(selectedMood);
 
                             if (!moodText.isEmpty()) {
-                                Mood newMood = new Mood(selected_type, null).withReason(moodText).withPhoto(picture);
-                                listener.onSubmit(newMood);
+//                                Mood newMood = new Mood(selected_type, null).withReason(moodText).withPhoto(picture);
+//                                listener.onSubmit(newMood);
 
                             } else {
 

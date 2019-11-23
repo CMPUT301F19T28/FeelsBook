@@ -1,5 +1,6 @@
 package com.cmput.feelsbook;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
@@ -29,6 +31,7 @@ import com.cmput.feelsbook.post.SocialSituation;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -41,6 +44,7 @@ public class AddMoodActivity extends AppCompatActivity{
     private User currentUser;
     private Feed historyAdapter;
     private FirebaseFirestore db;
+    private Bitmap BitmapProfilePicture;
 
 
 
@@ -79,7 +83,10 @@ public class AddMoodActivity extends AppCompatActivity{
             currentUser = (User) bundle.get("User");
             historyAdapter = (Feed) bundle.get("Post_list");
         }
-
+        // sets users profile picture
+        BitmapProfilePicture = currentUser.getProfilePic();
+        ImageView profilePicture = findViewById(R.id.profile_picture);
+        profilePicture.setImageBitmap(BitmapProfilePicture);
 
         //if the social situatiion button is pressed then shows the drop down
         Button socialBttn = findViewById(R.id.social_situation_button);
@@ -107,6 +114,13 @@ public class AddMoodActivity extends AppCompatActivity{
             }
         });
 
+        Button backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         Button postButton = findViewById(R.id.post_button);
         postButton.setOnClickListener(new View.OnClickListener() {
@@ -118,7 +132,14 @@ public class AddMoodActivity extends AppCompatActivity{
                 if (socialSpinner.getVisibility() == View.VISIBLE)
                     selectedSocial = (SocialSituation) socialSpinner.getSelectedItem();
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("Mood", new Mood(selected_type, null).withPhoto(picture).withReason(moodText).withSituation(selectedSocial));
+                if (picture == null) {
+                    bundle.putSerializable("Mood", new Mood(selected_type, null).withReason(moodText).withSituation(selectedSocial));
+                }
+                else{
+                    ProxyBitmap proxyBitmap = new ProxyBitmap(picture);
+                    Mood newMood = new Mood(selected_type, null).withPhoto(proxyBitmap).withReason(moodText).withSituation(selectedSocial);
+                    bundle.putSerializable("Mood",newMood);
+                }
                 Intent intent = new Intent().putExtras(bundle);
                 setResult(RESULT_OK, intent);
                 finish();
