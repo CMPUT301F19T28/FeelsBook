@@ -108,6 +108,7 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
+        postCount = 0;
         Button backButton = findViewById(R.id.exit_profile);
         TextView fullName = findViewById(R.id.full_name);
         TextView userName = findViewById(R.id.username);
@@ -115,13 +116,11 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         TextView followingText = findViewById(R.id.following_count);
         TextView postsText = findViewById(R.id.total_posts);
         ImageView profilePicture = findViewById(R.id.profile_picture);
-        postCount = historyFragment.getRecyclerAdapter().getItemCount();
         fullName.setText(currentUser.getName());
         followText.setText(followCount + " following");
         followingText.setText(followersCount + " followers");
         userName.setText("@"+currentUser.getUserName());
         updateFeed();
-        postCount = historyFragment.getRecyclerAdapter().getItemCount();
 
         if (postCount > 1 || postCount == 0){postsText.setText(postCount + " total posts");}
         else if (postCount == 1){postsText.setText(postCount + " total post");}
