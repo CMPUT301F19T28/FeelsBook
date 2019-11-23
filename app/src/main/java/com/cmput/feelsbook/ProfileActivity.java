@@ -29,6 +29,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -269,7 +270,7 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
                     String reason = null;
                     SocialSituation situation = null;
                     Bitmap photo = null;
-                    Location location = null;
+                    GeoPoint location = null;
                     Bitmap profilePic = null;
                     Date dateTime = null;
 
@@ -279,7 +280,7 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
                             dateTime = ((Timestamp) doc.get("datetime")).toDate();
 
                         if (doc.contains("location"))
-                            location = (Location) doc.get("location");
+                            location = (GeoPoint) doc.get("location");
 
                         if (doc.contains("photo")) {
 

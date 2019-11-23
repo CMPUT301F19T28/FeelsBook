@@ -1,11 +1,16 @@
 package com.cmput.feelsbook;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,8 +27,14 @@ import androidx.viewpager.widget.ViewPager;
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.SocialSituation;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.cmput.feelsbook.post.Post;
@@ -32,6 +43,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -40,6 +52,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 
+import static android.content.ContentValues.TAG;
 
 
 /**
@@ -57,6 +70,15 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     Feed.OnItemClickListener listener;
     FirebaseFirestore db;
     CollectionReference cr;
+
+    //Location permission vars
+
+    private static final int ERROR_DIALOG_REQUEST = 9001;
+    private static final int PERMISSIONS_REQUEST_ENABLE_GPS = 9002;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9003;
+    private Boolean locationPermissionGranted = false;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -250,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                     String reason = null;
                     SocialSituation situation = null;
                     Bitmap photo = null;
-                    Location location = null;
+                    GeoPoint location = null;
                     Bitmap profilePic = null;
                     Date dateTime = null;
 
@@ -260,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                             dateTime = ((Timestamp) doc.get("datetime")).toDate();
 
                         if (doc.contains("location"))
-                            location = (Location) doc.get("location");
+                            location = (GeoPoint) doc.get("location");
 
                         if (doc.contains("photo")) {
 
@@ -333,4 +355,140 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
             }
         });
     }
+//
+    private boolean checkMapServices(){
+        if(isServicesOK()){
+            if(isMapsEnabled()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("This application requires GPS to work properly, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        Intent enableGpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivityForResult(enableGpsIntent, PERMISSIONS_REQUEST_ENABLE_GPS);
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    public boolean isMapsEnabled(){
+        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            buildAlertMessageNoGps();
+            return false;
+        }
+        return true;
+    }
+
+    private void getLocationPermission() {
+        /*
+         * Request location permission, so that we can get the location of the
+         * device. The result of the permission request is handled by a callback,
+         * onRequestPermissionsResult.
+         */
+        if (ContextCompat.checkSelfPermission(getApplicationContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            locationPermissionGranted = true;
+            getLastKnownLocation();
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+    }
+
+    public boolean isServicesOK(){
+        Log.d(TAG, "isServicesOK: checking google services version");
+
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
+
+        if(available == ConnectionResult.SUCCESS){
+            //everything is fine and the user can make map requests
+            Log.d(TAG, "isServicesOK: Google Play Services is working");
+            return true;
+        }
+        else if(GoogleApiAvailability.getInstance().isUserResolvableError(available)){
+            //an error occured but we can resolve it
+            Log.d(TAG, "isServicesOK: an error occured but we can fix it");
+            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(this, available, ERROR_DIALOG_REQUEST);
+            dialog.show();
+        }else{
+            Toast.makeText(this, "You can't make map requests", Toast.LENGTH_SHORT).show();
+        }
+        return false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        locationPermissionGranted = false;
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    locationPermissionGranted = true;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult: called.");
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_ENABLE_GPS: {
+                if(locationPermissionGranted){
+                    getLastKnownLocation();
+                }
+                else{
+                    getLocationPermission();
+                }
+            }
+        }
+    }
+    public void getLastKnownLocation() {
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(@NonNull Task<Location> task) {
+                Location location = task.getResult();
+                GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                Log.d(TAG, "onComplete: latitude: " + geoPoint.getLatitude());
+                Log.d(TAG, "onComplete: longitude: " + geoPoint.getLongitude());
+            }
+        });
+
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(checkMapServices()) {
+            if(locationPermissionGranted) {
+                getLastKnownLocation();
+            }
+            else {
+                getLocationPermission();
+            }
+        }
+    }
+
+    //
 }

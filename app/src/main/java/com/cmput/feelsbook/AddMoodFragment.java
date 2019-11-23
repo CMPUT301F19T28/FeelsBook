@@ -1,29 +1,44 @@
 package com.cmput.feelsbook;
 import com.cmput.feelsbook.post.MoodType;
+
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.Post;
 import com.cmput.feelsbook.post.SocialSituation;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.GeoPoint;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Fragment for adding or editing a Mood
@@ -33,6 +48,9 @@ public class AddMoodFragment extends DialogFragment {
     private EditText input;
     private OnFragmentInteractionListener listener;
     private Bitmap picture;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private GeoPoint geoPoint;
+
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
 
@@ -94,6 +112,8 @@ public class AddMoodFragment extends DialogFragment {
         input = view.findViewById(R.id.editText);
         Spinner spinner = view.findViewById(R.id.mood_spinner);
         Spinner socialSpinner = view.findViewById(R.id.social_spinner);
+        TextView locationText = view.findViewById(R.id.location_text);
+
 
         MoodType moodTypes[] = {MoodType.HAPPY, MoodType.SAD,MoodType.ANGRY, MoodType.ANNOYED,MoodType.SLEEPY, MoodType.SEXY};
         ArrayList<MoodType> moodList = new ArrayList<MoodType>();
@@ -111,6 +131,10 @@ public class AddMoodFragment extends DialogFragment {
         socialSpinner.setAdapter(socialAdapter);
         socialSpinner.setVisibility(View.GONE); //sets the view to be gone because it is optional
 
+        //gets current location and sets location view
+        getLastKnownLocation();
+        locationText.setText("big yeet");
+        locationText.setVisibility(View.GONE); //sets the location view to be gone because it is optional
 
         //if the social situatiion button is pressed then shows the drop down
         final Button socialBttn = view.findViewById(R.id.social_situation_button);
@@ -118,6 +142,15 @@ public class AddMoodFragment extends DialogFragment {
             @Override
             public void onClick(View v){
                 socialSpinner.setVisibility(View.VISIBLE);
+            }
+        });
+
+        //if the location button is pressed then show the location text
+        final Button locationBttn = view.findViewById(R.id.add_location_button);
+        locationBttn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                locationText.setVisibility(View.VISIBLE);
             }
         });
 
@@ -142,6 +175,12 @@ public class AddMoodFragment extends DialogFragment {
                         socialSpinner.setSelection(i);
                     }
                 }
+            }
+
+            //checks to see if the editmood has a location
+            // if it does makes location view visible and sets the social situation
+            if(editMood.hasLocation()) {
+                locationText.setVisibility(View.VISIBLE);
             }
             /**
              *  Camera button in case of edit mood, if there is a picture already attached to mood then
@@ -233,11 +272,17 @@ public class AddMoodFragment extends DialogFragment {
                             Object selectedMood = spinner.getSelectedItem();
                             MoodType selected_type = MoodType.class.cast(selectedMood);
                             SocialSituation selectedSocial = SocialSituation.class.cast(socialSpinner.getSelectedItem());
+                            GeoPoint currentLocation = geoPoint;
+
 
                             if (!moodText.isEmpty()) {
 
-                                if (socialSpinner.getVisibility() == View.VISIBLE) {
+                                if (socialSpinner.getVisibility() == View.VISIBLE && locationText.getVisibility() == View.VISIBLE) {
+                                    listener.onSubmit(new Mood(selected_type, null).withReason(moodText).withSituation(selectedSocial).withPhoto(picture).withLocation(currentLocation));
+                                } else if (socialSpinner.getVisibility() == View.VISIBLE) {
                                     listener.onSubmit(new Mood(selected_type, null).withReason(moodText).withSituation(selectedSocial).withPhoto(picture));
+                                } else if (locationText.getVisibility() == View.VISIBLE) {
+                                    listener.onSubmit(new Mood(selected_type, null).withReason(moodText).withLocation(currentLocation).withPhoto(picture));
                                 } else {
                                     listener.onSubmit(new Mood(selected_type, null).withReason(moodText).withPhoto(picture));
                                 }
@@ -265,5 +310,21 @@ public class AddMoodFragment extends DialogFragment {
                     picture = (Bitmap) data.getExtras().get("data");
             }
         }
+    }
+
+    public void getLastKnownLocation() {
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(@NonNull Task<Location> task) {
+                Location location = task.getResult();
+                geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+            }
+        });
     }
 }

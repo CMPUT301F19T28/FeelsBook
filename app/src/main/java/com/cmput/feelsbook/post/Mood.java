@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput.feelsbook.Feed;
 import com.cmput.feelsbook.R;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -34,7 +35,7 @@ public class Mood extends Post implements Serializable {
     private String reason;
     private SocialSituation situation;
     private Bitmap photo;
-    private Location location;
+    private GeoPoint location;
 
 
     /**
@@ -108,7 +109,7 @@ public class Mood extends Post implements Serializable {
      * @return
      * The mood with a Location added
      */
-    public Mood withLocation(Location location) {
+    public Mood withLocation(GeoPoint location) {
         this.location = location;
         return this;
     }
@@ -175,6 +176,8 @@ public class Mood extends Post implements Serializable {
         return photo != null;
     }
 
+    public boolean hasLocation() {return location != null;}
+
     public void setSituation(SocialSituation situation) {
         this.situation = situation;
     }
@@ -187,11 +190,11 @@ public class Mood extends Post implements Serializable {
         this.photo = photo;
     }
 
-    public Location getLocation() {
+    public GeoPoint getLocation() {
         return location;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(GeoPoint location) {
         this.location = location;
     }
 }
