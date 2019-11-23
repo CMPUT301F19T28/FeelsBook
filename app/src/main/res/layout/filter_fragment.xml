@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_pointed_rectangle">
+
+
+    <TextView
+        android:id="@+id/mood_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="TextView"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Filter by mood: " />
+
+    <ToggleButton
+        android:id="@+id/happy_mood"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/filter_button"
+        android:textOn="@string/happy"
+        android:textOff="@string/happy"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@+id/sleepy_mood"
+        app:layout_constraintEnd_toStartOf="@+id/sad_mood"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mood_title"
+        tools:text="@string/happy" />
+
+    <ToggleButton
+        android:id="@+id/sad_mood"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:background="@drawable/filter_button"
+        android:textOn="@string/sad"
+        android:textOff="@string/sad"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@+id/annoyed_mood"
+        app:layout_constraintEnd_toStartOf="@+id/angry_mood"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/happy_mood"
+        app:layout_constraintTop_toBottomOf="@+id/mood_title"
+        tools:text="@string/sad" />
+
+    <ToggleButton
+        android:id="@+id/angry_mood"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/filter_button"
+        android:textOn="@string/angry"
+        android:textOff="@string/angry"
+        android:textSize="15sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/sad_mood"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/sad_mood"
+        tools:text="@string/angry" />
+
+    <ToggleButton
+        android:id="@+id/sleepy_mood"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/filter_button"
+        android:textOn="@string/sleepy"
+        android:textOff="@string/sleepy"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/annoyed_mood"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/happy_mood"
+        tools:text="@string/sleepy" />
+
+    <ToggleButton
+        android:id="@+id/annoyed_mood"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:background="@drawable/filter_button"
+        android:textOn="@string/annoyed"
+        android:textOff="@string/annoyed"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/sexy_mood"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/sleepy_mood"
+        app:layout_constraintTop_toBottomOf="@+id/sad_mood"
+        tools:text="@string/annoyed" />
+
+    <ToggleButton
+        android:id="@+id/sexy_mood"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/filter_button"
+        android:textOn="@string/sexy"
+        android:textOff="@string/sexy"
+        android:textSize="15sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/annoyed_mood"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/annoyed_mood"
+        tools:text="@string/sexy" />
+</androidx.constraintlayout.widget.ConstraintLayout>

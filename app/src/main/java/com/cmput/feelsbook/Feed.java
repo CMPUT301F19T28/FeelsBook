@@ -51,7 +51,7 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
         return feedList.get(pos);
     }
 
-    public Serializable getFeed(){ return (Serializable)this.feedList; }
+    public ArrayList<Post> getFeed(){ return this.feedList; }
 
     public void setOnItemClickListener(OnItemClickListener listener){
         this.listener = listener;

@@ -39,9 +39,11 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Handles the profile activities and displays the user profile information.
@@ -56,7 +58,8 @@ import java.util.HashMap;
  * FeedFragment feedFragment - contains the feed activity to be displayed
  * FirebaseFirestore db - created instance of the database where data is being pulled from
  */
-public class ProfileActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener{
+public class ProfileActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener,
+FilterFragment.OnMoodSelectListener{
     private int followCount = 0;
     private int followersCount = 0;
     private int postCount;
@@ -173,7 +176,7 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
             public void onClick(View v){
                 // creates small popup window to filter
                 Log.d("message","Clicked filter");
-                finish();
+                new FilterFragment().show(getSupportFragmentManager(),"FILTER");
             }
         });
     }
@@ -405,5 +408,22 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         });
     }
 
+    public void onSelect(MoodType moodType){
+        Log.d("Filter","Filter pressed");
+        ArrayList<Post> historyList = historyFragment.getRecyclerAdapter().getFeed();
+        // currently causes ConcurrentModificationException
+        Iterator<Post> it = historyList.iterator();
+        while (it.hasNext()){
+            Mood m = (Mood) it.next();
+            if(m.getMoodType() == moodType){
+                historyList.remove(m);
+            }
+        }
+        updateFeed();
+    }
+
+    public void onDeselect(){
+        Log.d("Filter","Filter unpressed");
+    }
 }
 
