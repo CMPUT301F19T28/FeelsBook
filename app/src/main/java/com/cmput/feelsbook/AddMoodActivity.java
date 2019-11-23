@@ -133,12 +133,15 @@ public class AddMoodActivity extends AppCompatActivity{
                     selectedSocial = (SocialSituation) socialSpinner.getSelectedItem();
                 Bundle bundle = new Bundle();
                 if (picture == null) {
-                    bundle.putSerializable("Mood", new Mood(selected_type, null).withReason(moodText).withSituation(selectedSocial));
+                    Mood newMood = new Mood(selected_type, null).withReason(moodText).withSituation(selectedSocial);
+                    bundle.putSerializable("Mood", newMood);
+                    onSubmit(newMood);
                 }
                 else{
                     ProxyBitmap proxyBitmap = new ProxyBitmap(picture);
                     Mood newMood = new Mood(selected_type, null).withPhoto(proxyBitmap).withReason(moodText).withSituation(selectedSocial);
                     bundle.putSerializable("Mood",newMood);
+                    onSubmit(newMood);
                 }
                 Intent intent = new Intent().putExtras(bundle);
                 setResult(RESULT_OK, intent);
