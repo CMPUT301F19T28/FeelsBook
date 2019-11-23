@@ -18,6 +18,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
@@ -28,6 +30,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -108,10 +112,6 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
-        updateFeed();
-        System.out.println("post count after update: "+historyFragment.getRecyclerAdapter().getItemCount());
-
-
         Button backButton = findViewById(R.id.exit_profile);
         TextView fullName = findViewById(R.id.full_name);
         TextView userName = findViewById(R.id.username);
@@ -123,9 +123,33 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         followText.setText(followCount + " following");
         followingText.setText(followersCount + " followers");
         userName.setText("@"+currentUser.getUserName());
-        postsText.setText(Integer.toString(postCount));
-        //if (postCount > 1 || postCount ==0){postsText.setText(postCount + " total posts");}
-        //else if (postCount == 1){postsText.setText(postCount + " total post");}
+
+        updateFeed();
+
+        // document reference used to fetch total number of posts field inside of the database
+        DocumentReference dr = db.collection("users")
+                .document(currentUser.getUserName());
+
+        dr.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    DocumentSnapshot doc = task.getResult();
+                    if (doc.exists()){
+                        postCount = Integer.valueOf(doc.getString("total_posts"));
+                        if (postCount > 1 || postCount ==0){postsText.setText(postCount + " total posts");}
+                        else if (postCount == 1){postsText.setText(postCount + " total post");}
+                        Log.d("Profile","Total posts retrieved: "+postCount);
+                    }
+                    else {
+                        Log.d("Profile","No document found");
+                    }
+                }
+                else{
+                    Log.d("Profile","Document retrieval failed: "+task.getException());
+                }
+            }
+        });
 
 
 
@@ -136,11 +160,11 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
             }
         });
 
-        final FloatingActionButton editButton = findViewById(R.id.edit_float_button);
-        editButton.setOnClickListener(new View.OnClickListener() {
+        final FloatingActionButton profileButton = findViewById(R.id.profile_float_button);
+        profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                new AddMoodFragment().show(getSupportFragmentManager(), "ADD_MOOD");
             }
         });
         final ImageButton filterButton = findViewById(R.id.profile_filter_button);
@@ -154,18 +178,12 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         });
     }
 
-    public void setPostCount(int count){
-        this.postCount = count;
-        System.out.println("post count: "+postCount);
-    }
-
     /**
      * Takes a mood from the implemented fragment and adds it to the feedAdapter
      * @param newMood
      *          mood that will be added to the feed
      */
     public void onSubmit(Post newMood){
-
         HashMap<String, Object> data = new HashMap<>();
 
         /*
@@ -364,6 +382,25 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
                     }
                 }
                 historyFragment.getRecyclerAdapter().notifyDataSetChanged();
+                int postListCount = historyFragment.getRecyclerAdapter().getItemCount();
+
+                // update total number of posts
+                HashMap<String,Object> userUpdate = new HashMap<>();
+                userUpdate.put("total_posts",String.valueOf(postListCount));
+                db.collection("users").document(currentUser.getUserName())
+                        .update(userUpdate)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d("Profile", "Counter update successful");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w("Profile", "Counter update failed: " + e);
+                            }
+                        });
             }
         });
     }
