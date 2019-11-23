@@ -8,12 +8,12 @@ import com.cmput.feelsbook.R;
 public enum MoodType {
 
 
-    HAPPY(R.string.happy,"yellow"),
-    SAD(R.string.sad,"blue"),
-    ANGRY(R.string.angry, "red"),
-    SLEEPY(R.string.sleepy,"purple"),
-    ANNOYED(R.string.annoyed, "orange"),
-    SEXY(R.string.sexy,"pink");
+    HAPPY(R.string.happy,"#FFFF80"),
+    SAD(R.string.sad,"#80B3FF"),
+    ANGRY(R.string.angry,"#FF6666"),
+    SLEEPY(R.string.sleepy,"#DF80FF"),
+    ANNOYED(R.string.annoyed,"#FFB380"),
+    SEXY(R.string.sexy,"#FFCCF2");
 
 
     private final String color;

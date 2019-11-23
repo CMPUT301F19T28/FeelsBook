@@ -2,7 +2,6 @@ package com.cmput.feelsbook;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,7 +15,6 @@ import com.google.firebase.firestore.SetOptions;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Used to represent the individual using the application. Contains personal information and

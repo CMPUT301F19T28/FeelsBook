@@ -55,7 +55,7 @@ import java.util.HashMap;
 public class ProfileActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener{
     private int followCount = 0;
     private int followersCount = 0;
-    private int postCount = 0;
+    private int postCount;
     private ImageView profilePicture;
     private User currentUser;
     private TabLayout tabLayout;
@@ -108,7 +108,10 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
-        postCount = 0;
+        updateFeed();
+        System.out.println("post count after update: "+historyFragment.getRecyclerAdapter().getItemCount());
+
+
         Button backButton = findViewById(R.id.exit_profile);
         TextView fullName = findViewById(R.id.full_name);
         TextView userName = findViewById(R.id.username);
@@ -120,10 +123,11 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         followText.setText(followCount + " following");
         followingText.setText(followersCount + " followers");
         userName.setText("@"+currentUser.getUserName());
-        updateFeed();
+        postsText.setText(Integer.toString(postCount));
+        //if (postCount > 1 || postCount ==0){postsText.setText(postCount + " total posts");}
+        //else if (postCount == 1){postsText.setText(postCount + " total post");}
 
-        if (postCount > 1 || postCount == 0){postsText.setText(postCount + " total posts");}
-        else if (postCount == 1){postsText.setText(postCount + " total post");}
+
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,6 +152,11 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
                 finish();
             }
         });
+    }
+
+    public void setPostCount(int count){
+        this.postCount = count;
+        System.out.println("post count: "+postCount);
     }
 
     /**
@@ -201,7 +210,6 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         data.put("reason", ((Mood) newMood).getReason());
         data.put("situation", ((Mood) newMood).getSituation());
         data.put("moodType", ((Mood) newMood).getMoodType());
-
         cr.document(newMood.toString())
                 .set(data)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -242,7 +250,6 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
                                 "Data removal failed" + e.toString());
                     }
                 });
-//        feedFragment.getRecyclerAdapter().removePost(mood);
         historyFragment.getRecyclerAdapter().notifyDataSetChanged();
     }
 
@@ -349,7 +356,6 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
                             mood.withLocation(location);
 
                         historyFragment.getRecyclerAdapter().addPost(mood);
-                        postCount+=1;
 
 
                     }catch(Exception error){
@@ -357,7 +363,6 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
                                 "****MOOD DOWNLOAD FAILED: " + error);
                     }
                 }
-
                 historyFragment.getRecyclerAdapter().notifyDataSetChanged();
             }
         });

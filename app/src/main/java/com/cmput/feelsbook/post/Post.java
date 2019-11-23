@@ -10,8 +10,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Interface used to implement a Mood object. Provides additional methods when creating a Mood
- * object.
+ * Base for displaying a post on the user's feed.
  * Bitmap profilePic - profile picture of the user who created the Post object
  * Date dateTime - date and time used to display the Post
  */

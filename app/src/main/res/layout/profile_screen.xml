@@ -149,16 +149,16 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="424dp">
+            android:layout_height="423dp">
 
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/history_pager"
-                android:layout_width="match_parent"
+                android:layout_width="410dp"
                 android:layout_height="match_parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                tools:layout_editor_absoluteY="88dp">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <com.google.android.material.tabs.TabLayout
                     android:id="@+id/profile_tab"
@@ -179,12 +179,12 @@
         android:id="@+id/edit_float_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="350dp"
-        android:layout_marginTop="650dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:clickable="true"
         app:backgroundTint="@color/add_post_color"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@android:drawable/ic_menu_edit" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

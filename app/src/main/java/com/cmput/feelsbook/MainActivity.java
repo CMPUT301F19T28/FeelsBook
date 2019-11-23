@@ -57,10 +57,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        /**
-         * TO BE IMPLEMENTED:
-         * - pass in Feed to be displayed and personalized in ProfileActivity
-         */
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         db = FirebaseFirestore.getInstance();
