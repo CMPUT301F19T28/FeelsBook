@@ -146,12 +146,12 @@ public class LoginActivity extends AppCompatActivity {
     /**
      * Passes a valid user if login was successful
      * @param document
-     * Document context used to create a User object to pass to MainActivity
+     * Document context used to create a User object to pass to PermissionsActivity
      */
     private void successfulLogin(DocumentSnapshot document){
         Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
         User user = new User(document.getId(), document.getString("name"), new Feed(), new FollowList());
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        Intent intent = new Intent(LoginActivity.this, PermissionsActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("User",user);
         intent.putExtras(bundle);

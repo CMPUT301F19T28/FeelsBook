@@ -70,15 +70,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     Feed.OnItemClickListener listener;
     FirebaseFirestore db;
     CollectionReference cr;
-
-    //Location permission vars
-
-    private static final int ERROR_DIALOG_REQUEST = 9001;
-    private static final int PERMISSIONS_REQUEST_ENABLE_GPS = 9002;
-    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9003;
-    private Boolean locationPermissionGranted = false;
-    private FusedLocationProviderClient fusedLocationProviderClient;
-
+    private Boolean locationPermissionGranted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
+            locationPermissionGranted = bundle.getBoolean("locationPermission");
         }
 
         //Sets the document to that of the current user
@@ -116,9 +109,15 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 .collection("Moods");
 
         feedFragment = new FeedFragment();
-        mapFragment = new MapFragment();
         viewPagerAdapter.AddFragment(feedFragment, "Feed");
-        viewPagerAdapter.AddFragment(mapFragment,"Map");
+
+        if (locationPermissionGranted) {
+            mapFragment = new MapFragment();
+            Bundle args = new Bundle();
+            args.putBoolean("locationPermission", locationPermissionGranted);
+            mapFragment.setArguments(args);
+            viewPagerAdapter.AddFragment(mapFragment,"Map");
+        }
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -141,9 +140,10 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this,ProfileActivity.class);
-                Bundle userBundle = new Bundle();
-                userBundle.putSerializable("User", currentUser);
-                intent.putExtras(userBundle);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("User", currentUser);
+                bundle.putBoolean("locationPermission", locationPermissionGranted);
+                intent.putExtras(bundle);
                 startActivity(intent);
             }
         });
@@ -355,140 +355,4 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
             }
         });
     }
-//
-    private boolean checkMapServices(){
-        if(isServicesOK()){
-            if(isMapsEnabled()){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void buildAlertMessageNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("This application requires GPS to work properly, do you want to enable it?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        Intent enableGpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        startActivityForResult(enableGpsIntent, PERMISSIONS_REQUEST_ENABLE_GPS);
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
-    }
-
-    public boolean isMapsEnabled(){
-        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-
-        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-            buildAlertMessageNoGps();
-            return false;
-        }
-        return true;
-    }
-
-    private void getLocationPermission() {
-        /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
-         */
-        if (ContextCompat.checkSelfPermission(getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            locationPermissionGranted = true;
-            getLastKnownLocation();
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-        }
-    }
-
-    public boolean isServicesOK(){
-        Log.d(TAG, "isServicesOK: checking google services version");
-
-        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
-
-        if(available == ConnectionResult.SUCCESS){
-            //everything is fine and the user can make map requests
-            Log.d(TAG, "isServicesOK: Google Play Services is working");
-            return true;
-        }
-        else if(GoogleApiAvailability.getInstance().isUserResolvableError(available)){
-            //an error occured but we can resolve it
-            Log.d(TAG, "isServicesOK: an error occured but we can fix it");
-            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(this, available, ERROR_DIALOG_REQUEST);
-            dialog.show();
-        }else{
-            Toast.makeText(this, "You can't make map requests", Toast.LENGTH_SHORT).show();
-        }
-        return false;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[],
-                                           @NonNull int[] grantResults) {
-        locationPermissionGranted = false;
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    locationPermissionGranted = true;
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult: called.");
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_ENABLE_GPS: {
-                if(locationPermissionGranted){
-                    getLastKnownLocation();
-                }
-                else{
-                    getLocationPermission();
-                }
-            }
-        }
-    }
-    public void getLastKnownLocation() {
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
-        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-            @Override
-            public void onComplete(@NonNull Task<Location> task) {
-                Location location = task.getResult();
-                GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                Log.d(TAG, "onComplete: latitude: " + geoPoint.getLatitude());
-                Log.d(TAG, "onComplete: longitude: " + geoPoint.getLongitude());
-            }
-        });
-
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if(checkMapServices()) {
-            if(locationPermissionGranted) {
-                getLastKnownLocation();
-            }
-            else {
-                getLocationPermission();
-            }
-        }
-    }
-
-    //
 }

@@ -31,6 +31,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -56,24 +57,34 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
-
     private GoogleMap googleMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private static final float DEFAULT_ZOOM = 15f;
+
+    private Boolean locationPermissionGranted = false;
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            locationPermissionGranted = getArguments().getBoolean("locationPermission");
+        }
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.map_fragment, container, false);
         mapView = (MapView) view.findViewById(R.id.map_view);
+
         initGoogleMap(savedInstanceState);
-
-
+        getDeviceLocation();
         return view;
 
     }
 
-/*
+
     public void getDeviceLocation() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
@@ -86,7 +97,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         if (task.isSuccessful()) {
                             Location currentLocation = (Location) task.getResult();
                             GeoPoint geoPoint = new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
-                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM);
+                            setCameraView(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM);
                         }
                         else {
                             Toast.makeText(getActivity(), "unable to get current location", Toast.LENGTH_SHORT).show();
@@ -100,10 +111,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    private void moveCamera(LatLng latLng, float zoom) {
+    private void setCameraView(LatLng latLng, float zoom) {
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
     }
-*/
+
     private void initGoogleMap(Bundle savedInstanceState) {
         // *** IMPORTANT ***
         // MapView requires that the Bundle you pass contain _ONLY_ MapView SDK
@@ -121,10 +132,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap map) {
         Toast.makeText(getActivity(), "Map is Ready", Toast.LENGTH_SHORT).show();
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        map.setMyLocationEnabled(true);
         googleMap = map;
-        //if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) return;
-        //googleMap.setMyLocationEnabled(true);
-
     }
 
     @Override
@@ -145,7 +167,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         super.onResume();
         mapView.onResume();
 
-        onMapReady(googleMap);
     }
 
     @Override

@@ -65,6 +65,7 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
     private FirebaseFirestore db;
     private CollectionReference cr;
     private Feed.OnItemClickListener listener;
+    private Boolean locationPermissionGranted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +96,7 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
 
         if (bundle != null){
             currentUser = (User)bundle.get("User");
+            locationPermissionGranted = bundle.getBoolean("locationPermission");
         }
 
         //Sets the document to that of the current user
@@ -103,9 +105,15 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
 
         historyFragment = new FeedFragment();
         historyFragment.getRecyclerAdapter().setOnItemClickListener(listener);
-        mapFragment = new MapFragment();
         viewPagerAdapter.AddFragment(historyFragment, "History");
-        viewPagerAdapter.AddFragment(mapFragment,"Map");
+
+        if (locationPermissionGranted) {
+            mapFragment = new MapFragment();
+            Bundle args = new Bundle();
+            args.putBoolean("locationPermission", locationPermissionGranted);
+            mapFragment.setArguments(args);
+            viewPagerAdapter.AddFragment(mapFragment,"Map");
+        }
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
