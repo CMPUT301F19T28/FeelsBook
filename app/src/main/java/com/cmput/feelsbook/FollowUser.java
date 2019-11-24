@@ -8,6 +8,10 @@ public class FollowUser {
     private String name;
     private Bitmap profilePic;
 
+    public FollowUser() {
+
+    }
+
     public FollowUser(String userName, String name, Bitmap profilePic) {
         this.userName = userName;
         this.name = name;

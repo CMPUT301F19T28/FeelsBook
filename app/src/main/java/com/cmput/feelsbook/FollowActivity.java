@@ -24,6 +24,8 @@ public class FollowActivity extends AppCompatActivity {
 
     private User user;
     private FollowFragment followFragment;
+    private FollowersFragment followersFragment;
+    private FollowingFragment followingFragment;
     private FollowList followingList;
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -41,7 +43,11 @@ public class FollowActivity extends AppCompatActivity {
         viewPager = findViewById(R.id.followPager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         followFragment = new FollowFragment(user);
+        followersFragment = new FollowersFragment(user);
+        followingFragment = new FollowingFragment(user);
         viewPagerAdapter.AddFragment(followFragment,"Follow Requests");
+        viewPagerAdapter.AddFragment(followersFragment, "Followers");
+        viewPagerAdapter.AddFragment(followingFragment, "Following");
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 

@@ -11,18 +11,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import javax.annotation.Nullable;
 
-public class FollowFragment extends Fragment {
+public class FollowingFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private FollowingRequests recyclerAdapter;
+    private Following recyclerAdapter;
 
-    public FollowFragment(FollowingRequests adapter) {
+    public FollowingFragment(Following adapter) {
         this.recyclerAdapter = adapter;
     }
 
-    public FollowFragment(User user){
+    public FollowingFragment(User user){
         // default constructor
-        recyclerAdapter = new FollowingRequests(user);
+        recyclerAdapter = new Following(user);
     }
 
     @Nullable
@@ -42,7 +42,7 @@ public class FollowFragment extends Fragment {
         return recyclerView;
     }
 
-    public FollowingRequests getRecyclerAdapter() {
+    public Following getRecyclerAdapter() {
         return recyclerAdapter;
     }
 }

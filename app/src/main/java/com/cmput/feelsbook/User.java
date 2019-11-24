@@ -56,24 +56,24 @@ public class User implements Serializable {
      */
     public void acceptFollowRequest(String userId) {
         DocumentReference fromRequest = FirebaseFirestore.getInstance().collection("users").document(getUserName()).collection("followRequests").document(userId);
-        DocumentReference toFollowers = FirebaseFirestore.getInstance().collection("users").document(getUserName()).collection("followers").document(userId);
-        moveFirestoreDoc(fromRequest, toFollowers);
-        DocumentReference toFollowing = FirebaseFirestore.getInstance().collection("users").document(userId).collection("following").document(getUserName());
-        moveFirestoreDoc(fromRequest, toFollowing);
-
-        fromRequest.delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+        fromRequest.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                CollectionReference toFollowing = FirebaseFirestore.getInstance().collection("users").document(userId).collection("following");
+                CollectionReference toFollowers = FirebaseFirestore.getInstance().collection("users").document(getUserName()).collection("followers");
+                FirebaseFirestore.getInstance().collection("users").document(getUserName()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "Doc deleted successfully");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Doc failed to delete successfully", e);
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if(documentSnapshot.exists()) {
+                            toFollowing.document(getUserName()).set(new FollowUser(documentSnapshot.getId(),(String) documentSnapshot.getData().get("name"), null));
+                        }
                     }
                 });
+                toFollowers.document(userId).set(documentSnapshot.getData());
+                fromRequest.delete();
+
+            }
+        });
     }
 
     public void declineFollowRequest(String userId) {
@@ -83,34 +83,6 @@ public class User implements Serializable {
                 .collection("followRequests")
                 .document(userId)
                 .delete();
-    }
-
-    public void moveFirestoreDoc (DocumentReference fromCollection, DocumentReference toCollection){
-            fromCollection.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot doc = task.getResult();
-                        if (doc != null) {
-                            toCollection.set(doc.getData())
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Log.d(TAG, "Doc successfully written");
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.w(TAG, "Failure writing Doc", e);
-                                        }
-                                    });
-                        }
-                    } else {
-                        Log.d(TAG, "get failed with ", task.getException());
-                    }
-                }
-            });
     }
 
     /**
@@ -144,24 +116,10 @@ public class User implements Serializable {
                                         @Override
                                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                             if (task.isSuccessful() && task.getResult().exists()) {
-                                                Map<String, Object> data = new HashMap<>();
-                                                try{
-                                                    Bitmap bitmap = getProfilePic();
-                                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                                                    byte[] picData = baos.toByteArray();
-                                                    data.put("photo", Base64.getEncoder().encodeToString(picData));
-
-                                                } catch (Exception e){
-                                                    Log.d("-----UPLOAD PHOTO-----",
-                                                            "****NO PHOTO UPLOADED: " + e);
-                                                    data.put("photo", null);
-                                                }
-                                                data.put("fullname", getName());
                                                 task.getResult().getReference()
                                                         .collection("followRequests")
                                                         .document(getUserName())
-                                                        .set(data)
+                                                        .set(new FollowUser(getUserName(), getName(), getProfilePic()))
                                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                             @Override
                                                             public void onSuccess(Void aVoid) {
@@ -189,6 +147,21 @@ public class User implements Serializable {
                 });
 
 
+    }
+
+    public void removeFollower(String  userId) {
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(getUserName())
+                .collection("followers")
+                .document(userId)
+                .delete();
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(userId)
+                .collection("following")
+                .document(getUserName())
+                .delete();
     }
 
     public User(String name){
