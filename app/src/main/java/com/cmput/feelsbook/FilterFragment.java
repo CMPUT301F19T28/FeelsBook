@@ -3,6 +3,7 @@ package com.cmput.feelsbook;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -24,10 +25,17 @@ import com.cmput.feelsbook.post.MoodType;
 public class FilterFragment extends DialogFragment {
     private int width = 300;
     private int height = 300;
-    private int pos_x = 30;
-    private int pos_y = 30;
+    private int posX = 30;
+    private int posY = 30;
 
     private OnMoodSelectListener listener;
+
+    private static boolean happyPressed = false;
+    private static boolean sadPressed = false;
+    private static boolean angryPressed = false;
+    private static boolean sleepyPressed = false;
+    private static boolean annoyedPressed = false;
+    private static boolean sexyPressed = false;
 
     public interface OnMoodSelectListener{
         void onSelect(MoodType moodType);
@@ -52,19 +60,28 @@ public class FilterFragment extends DialogFragment {
         TextView filterTitle = view.findViewById(R.id.mood_title);
 
         ToggleButton filterHappy   = view.findViewById(R.id.happy_mood);
+        filterHappy.setChecked(happyPressed);
+        filterHappy.setBackgroundColor(happyPressed ? ContextCompat.getColor(getContext(),R.color.yellow)
+                : Color.parseColor("#F2F2F2"));
         filterHappy.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked){
                     filterHappy.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.yellow));
+                    happyPressed = true;
                     listener.onSelect(MoodType.HAPPY);
                 }
                 else {
                     filterHappy.setBackgroundColor(Color.parseColor("#F2F2F2"));
+                    happyPressed = false;
                     listener.onDeselect();
                 }
             }
         });
+
         ToggleButton filterSad     = view.findViewById(R.id.sad_mood);
+        filterSad.setChecked(sadPressed);
+        filterSad.setBackgroundColor(sadPressed ? ContextCompat.getColor(getContext(),R.color.blue)
+                : Color.parseColor("#F2F2F2"));
         filterSad.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -78,7 +95,11 @@ public class FilterFragment extends DialogFragment {
                 }
             }
         });
+
         ToggleButton filterAngry   = view.findViewById(R.id.angry_mood);
+        filterAngry.setChecked(angryPressed);
+        filterAngry.setBackgroundColor(angryPressed ? ContextCompat.getColor(getContext(),R.color.red)
+                : Color.parseColor("#F2F2F2"));
         filterAngry.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -92,7 +113,11 @@ public class FilterFragment extends DialogFragment {
                 }
             }
         });
+
         ToggleButton filterSleepy  = view.findViewById(R.id.sleepy_mood);
+        filterSleepy.setChecked(sleepyPressed);
+        filterSleepy.setBackgroundColor(sleepyPressed ? ContextCompat.getColor(getContext(),R.color.purple)
+                : Color.parseColor("#F2F2F2"));
         filterSleepy.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -106,7 +131,11 @@ public class FilterFragment extends DialogFragment {
                 }
             }
         });
+
         ToggleButton filterAnnoyed = view.findViewById(R.id.annoyed_mood);
+        filterAnnoyed.setChecked(annoyedPressed);
+        filterAnnoyed.setBackgroundColor(annoyedPressed ? ContextCompat.getColor(getContext(),R.color.orange)
+                : Color.parseColor("#F2F2F2"));
         filterAnnoyed.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -120,7 +149,11 @@ public class FilterFragment extends DialogFragment {
                 }
             }
         });
+
         ToggleButton filterSexy    = view.findViewById(R.id.sexy_mood);
+        filterSexy.setChecked(sexyPressed);
+        filterSexy.setBackgroundColor(sexyPressed ? ContextCompat.getColor(getContext(),R.color.pink)
+                : Color.parseColor("#F2F2F2"));
         filterSexy.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -140,18 +173,17 @@ public class FilterFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(view);
 
-        AlertDialog filter_window = builder.create();
-        filter_window.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        filter_window.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-        filter_window.getWindow().setLayout(width,height);
-        WindowManager.LayoutParams wlp = filter_window.getWindow().getAttributes();
+        AlertDialog filterWindow = builder.create();
+        filterWindow.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        filterWindow.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        filterWindow.getWindow().setLayout(width,height);
+        WindowManager.LayoutParams wlp = filterWindow.getWindow().getAttributes();
         wlp.gravity = Gravity.TOP | Gravity.LEFT;
-        wlp.x = pos_x;
-        wlp.y = pos_y;
-        filter_window.show();
-        return filter_window;
+        wlp.x = posX;
+        wlp.y = posY;
+        filterWindow.show();
 
+        return filterWindow;
     }
-
 
 }

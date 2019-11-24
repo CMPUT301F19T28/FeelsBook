@@ -409,21 +409,19 @@ FilterFragment.OnMoodSelectListener{
     }
 
     public void onSelect(MoodType moodType){
-        Log.d("Filter","Filter pressed");
-        ArrayList<Post> historyList = historyFragment.getRecyclerAdapter().getFeed();
-        Iterator<Post> it = historyList.iterator();
+        // need to fix
+        ArrayList<Post> copyList = historyFragment.getRecyclerAdapter().getFeed();
+        Iterator<Post> it = historyFragment.getRecyclerAdapter().getFeed().iterator();
         while (it.hasNext()){
-            Mood m = (Mood) it.next();
-            if(m.getMoodType() == moodType){
-                it.remove();
+            Mood m = (Mood)it.next();
+            if (m.getMoodType() != moodType){
+                m.setHidden(true);
             }
+            else {m.setHidden(false);}
         }
-        historyFragment.getRecyclerAdapter().notifyDataSetChanged();
-
     }
 
     public void onDeselect(){
-        Log.d("Filter","Filter unpressed");
         updateFeed();
     }
 }

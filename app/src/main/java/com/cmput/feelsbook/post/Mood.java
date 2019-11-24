@@ -120,16 +120,17 @@ public class Mood extends Post implements Serializable {
      */
     @Override
     public void displayPost(RecyclerView.ViewHolder viewHolder) {
-        TextView dateTimeText = viewHolder.itemView.findViewById(R.id.dateText);
-        TextView moodText = viewHolder.itemView.findViewById(R.id.moodText);
-        ImageView profile_pic_feed = viewHolder.itemView.findViewById(R.id.profileImage);
-        TextView reasonText = viewHolder.itemView.findViewById(R.id.reasonText);
+        if (!isHidden()){
+            TextView dateTimeText = viewHolder.itemView.findViewById(R.id.dateText);
+            TextView moodText = viewHolder.itemView.findViewById(R.id.moodText);
+            ImageView profile_pic_feed = viewHolder.itemView.findViewById(R.id.profileImage);
+            TextView reasonText = viewHolder.itemView.findViewById(R.id.reasonText);
 
-        viewHolder.itemView.setBackgroundColor(Color.parseColor(moodType.getColor()));
-        dateTimeText.setText(dateFormatter.format(dateTime));
-        moodText.setText(moodType.getEmoticon());
-        profile_pic_feed.setImageBitmap(photo);
-        reasonText.setText(reason);
+            viewHolder.itemView.setBackgroundColor(Color.parseColor(moodType.getColor()));
+            dateTimeText.setText(dateFormatter.format(dateTime));
+            moodText.setText(moodType.getEmoticon());
+            profile_pic_feed.setImageBitmap(photo);
+            reasonText.setText(reason);
 
 //        TODO: Implemented but out of scope for sprint 1
 //
@@ -145,6 +146,7 @@ public class Mood extends Post implements Serializable {
 //            ImageView photoFeed = viewHolder.itemView.findViewById(R.id.photo_feed);
 //            photoFeed.setImageBitmap(photo);
 //        }
+        }
     }
 
     public MoodType getMoodType() {
