@@ -410,15 +410,16 @@ FilterFragment.OnMoodSelectListener{
 
     public void onSelect(MoodType moodType){
         // need to fix
-        ArrayList<Post> copyList = historyFragment.getRecyclerAdapter().getFeed();
         Iterator<Post> it = historyFragment.getRecyclerAdapter().getFeed().iterator();
+        ArrayList<Post> result = new ArrayList<>();
         while (it.hasNext()){
             Mood m = (Mood)it.next();
-            if (m.getMoodType() != moodType){
-                m.setHidden(true);
+            if (m.getMoodType() == moodType){
+                result.add(m);
             }
-            else {m.setHidden(false);}
         }
+        historyFragment.getRecyclerAdapter().setFeed(result);
+        historyFragment.getRecyclerAdapter().notifyDataSetChanged();
     }
 
     public void onDeselect(){

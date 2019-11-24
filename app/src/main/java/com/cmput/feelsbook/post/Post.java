@@ -18,7 +18,6 @@ public abstract class Post implements Serializable{
 
     protected Bitmap profilePic;
     protected Date dateTime;
-    protected boolean hidden = false;
 
     public abstract void displayPost(RecyclerView.ViewHolder viewHolder);
 
@@ -37,10 +36,6 @@ public abstract class Post implements Serializable{
     public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
     }
-
-    public boolean isHidden() { return hidden;}
-
-    public void setHidden(boolean hidden) { this.hidden = hidden;}
 
     @Override
     public String toString(){
