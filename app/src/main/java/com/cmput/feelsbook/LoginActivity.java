@@ -167,7 +167,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private void getFollowing(DocumentSnapshot doc){
         List<FollowUser> following = new ArrayList<FollowUser>();
-
         FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(doc.getId())
@@ -199,8 +198,8 @@ public class LoginActivity extends AppCompatActivity {
                                 FollowUser newFollowUser = new FollowUser(doc.getId(), doc.get("name").toString(), photo);
                                 following.add(newFollowUser);
                             }
-                            successfulLogin(doc, following);
                         }
+                        successfulLogin(doc, following);
                     }
                 });
     }
