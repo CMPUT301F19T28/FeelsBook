@@ -3,7 +3,6 @@ package com.cmput.feelsbook;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -110,6 +109,7 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
         if (locationPermissionGranted) {
             mapFragment = new MapFragment();
             Bundle args = new Bundle();
+            args.putSerializable("user", currentUser);
             args.putBoolean("locationPermission", locationPermissionGranted);
             mapFragment.setArguments(args);
             viewPagerAdapter.AddFragment(mapFragment,"Map");
@@ -259,7 +259,7 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
     }
 
     /**
-     * Listens for updates the the database and updates the recyclerView when updates
+     * Listens for updates from the database and updates the recyclerView when updates
      */
     public void updateFeed(){
         cr.addSnapshotListener(new EventListener<QuerySnapshot>() {

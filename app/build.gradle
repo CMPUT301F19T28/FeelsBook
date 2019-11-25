@@ -39,6 +39,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'com.google.android.gms:play-services-location:15.0.1'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'com.google.maps.android:android-maps-utils:0.5+'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.0.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.0.1'

@@ -8,10 +8,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +27,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.cmput.feelsbook.post.Mood;
+import com.cmput.feelsbook.post.MoodType;
+import com.cmput.feelsbook.post.SocialSituation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -38,7 +44,22 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterItem;
+import com.google.maps.android.clustering.ClusterManager;
+
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Date;
 
 import javax.annotation.Nullable;
 
@@ -53,23 +74,28 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private MapView mapView;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
-    //Location permission vars
-    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
-    private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
+    private Boolean locationPermissionGranted = false;
     private GoogleMap googleMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private static final float DEFAULT_ZOOM = 15f;
-
-    private Boolean locationPermissionGranted = false;
-
+    private ClusterManager clusterManager;
+    private ClusterManagerRenderer clusterManagerRenderer;
+    private ArrayList<ClusterMarker> clusterMarkers = new ArrayList<>();
+    private User currentUser;
+    private CollectionReference cr;
+    private FirebaseFirestore db;
+    private Boolean firstRun = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+            currentUser = (User) getArguments().getSerializable("user");
             locationPermissionGranted = getArguments().getBoolean("locationPermission");
         }
+        db = FirebaseFirestore.getInstance();
+        cr = db.collection("users").document(currentUser.getUserName())
+                .collection("Moods");
     }
 
     @Nullable
@@ -84,8 +110,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
+    private void initGoogleMap(Bundle savedInstanceState) {
+        // *** IMPORTANT ***
+        // MapView requires that the Bundle you pass contain _ONLY_ MapView SDK
+        // objects or sub-Bundles.
+        Bundle mapViewBundle = null;
+        if (savedInstanceState != null) {
+            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
+        }
 
-    public void getDeviceLocation() {
+        mapView.onCreate(mapViewBundle);
+    }
+
+    private void getDeviceLocation() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
         try {
@@ -115,18 +152,146 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
     }
 
-    private void initGoogleMap(Bundle savedInstanceState) {
-        // *** IMPORTANT ***
-        // MapView requires that the Bundle you pass contain _ONLY_ MapView SDK
-        // objects or sub-Bundles.
-        Bundle mapViewBundle = null;
-        if (savedInstanceState != null) {
-            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
+    public void addMapMarker(Mood mood){
+
+        if(googleMap != null){
+
+            if(clusterManager == null){
+                clusterManager = new ClusterManager<ClusterMarker>(getActivity().getApplicationContext(), googleMap);
+
+            }
+            if(clusterManagerRenderer == null){
+                clusterManagerRenderer = new ClusterManagerRenderer(
+                        getActivity(),
+                        googleMap,
+                        clusterManager
+                );
+                clusterManager.setRenderer(clusterManagerRenderer);
+                firstRun = true;
+
+            }
+
+            clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterItem>() {
+                        @Override
+                        public boolean onClusterClick(final Cluster<ClusterItem> cluster) {
+                            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                                    cluster.getPosition(), (float) Math.floor(googleMap
+                                            .getCameraPosition().zoom + 1)), 300,
+                                    null);
+                            return true;
+                        }
+                    });
+            clusterManager.setOnClusterItemInfoWindowClickListener(
+                    new ClusterManager.OnClusterItemInfoWindowClickListener<ClusterItem>() {
+                        @Override public void onClusterItemInfoWindowClick(ClusterItem clusterItem) {
+                            Toast.makeText(getContext(), "Clicked info window: make this goto view/edit activity" + firstRun.toString(),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+            googleMap.setOnInfoWindowClickListener(clusterManager);
+
+            LatLng position = new LatLng(mood.getLocation().getLatitude(), mood.getLocation().getLongitude());
+            String title = "TODO: Put username here";
+            String snippet = "emoji @ " + mood.getDateTime().toString();
+            Bitmap avatar = mood.getPhoto();
+            ClusterMarker clusterMarker = new ClusterMarker(position, title, snippet, avatar);
+            clusterManager.addItem(clusterMarker);
+            clusterMarkers.add(clusterMarker);
         }
+    }
 
-        mapView.onCreate(mapViewBundle);
+    public void updateMapMarkers(){
+        cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@androidx.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @androidx.annotation.Nullable FirebaseFirestoreException e) {
 
-        mapView.getMapAsync(this);
+                for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
+
+                    MoodType moodType = null;
+                    String reason = null;
+                    SocialSituation situation = null;
+                    Bitmap photo = null;
+                    GeoPoint location = null;
+                    Bitmap profilePic = null;
+                    Date dateTime = null;
+
+
+                    try {
+                        if (doc.contains("datetime"))
+                            dateTime = ((Timestamp) doc.get("datetime")).toDate();
+
+                        if (doc.contains("location"))
+                            location = (GeoPoint) doc.get("location");
+
+                        if (doc.contains("photo")) {
+
+                            /*
+                            converts the photo is present converts from a base64 string to a byte[]
+                            and then into a bitmap if no photo is present sets photo to null
+                             */
+                            try {
+                                byte[] decoded = Base64.getDecoder()
+                                        .decode((String)  doc.get("photo"));
+                                photo = BitmapFactory.decodeByteArray(decoded
+                                        , 0, decoded.length);
+                            }catch(Exception error) {
+                                Log.d("-----UPLOAD PHOTO-----",
+                                        "****NO PHOTO DOWNLOADED: " + e);
+                                photo = null;
+                            }
+                        }
+
+                        if (doc.contains("profilePic")) {
+
+                            /*
+                            converts the profilePic is present converts from a base64 string to a byte[]
+                            and then into a bitmap if no photo is present sets profilePic to null
+                             */
+                            try {
+                                byte[] decoded = Base64.getDecoder()
+                                        .decode((String)  doc.get("profilePic"));
+                                profilePic = BitmapFactory.decodeByteArray(decoded
+                                        , 0, decoded.length);
+                            }catch(Exception error) {
+                                Log.d("-----UPLOAD PHOTO-----",
+                                        "****NO PHOTO DOWNLOADED: " + e);
+                                profilePic = null;
+                            }
+                        }
+
+                        if (doc.contains("reason"))
+                            reason = (String) doc.get("reason");
+
+                        if (doc.contains("situation") & (doc.get("situation") != null)) {
+                            situation = SocialSituation.getSocialSituation((String) doc.get("situation"));
+                        }
+
+                        if (doc.contains("moodType") & (doc.get("moodType") != null)) {
+                            moodType = MoodType.getMoodType((String) doc.get("moodType"));
+                        }
+
+                        Mood mood = new Mood(dateTime, moodType, profilePic);
+
+                        if(reason != null)
+                            mood = mood.withReason(reason);
+                        if(situation != null)
+                            mood = mood.withSituation(situation);
+                        if(photo != null)
+                            mood = mood.withPhoto(photo);
+                        if(location != null)
+                            mood.withLocation(location);
+                            addMapMarker(mood);
+
+
+
+                    }catch(Exception error){
+                        Log.d("-----UPLOAD SAMPLE-----",
+                                "****MOOD DOWNLOAD FAILED: " + error);
+                    }
+                }
+
+            }
+        });
     }
 
     @Override
@@ -136,17 +301,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         map.setMyLocationEnabled(true);
         googleMap = map;
+        if (firstRun) {
+            googleMap.clear();
+            clusterManager.clearItems();
+            clusterMarkers.clear();
+        }
+        updateMapMarkers();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                clusterManager.cluster();
+            }
+        }, 100);
     }
 
     @Override
@@ -166,7 +336,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onResume() {
         super.onResume();
         mapView.onResume();
-
+        mapView.getMapAsync(this);
     }
 
     @Override

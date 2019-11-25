@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         if (locationPermissionGranted) {
             mapFragment = new MapFragment();
             Bundle args = new Bundle();
+            args.putSerializable("user", currentUser);
             args.putBoolean("locationPermission", locationPermissionGranted);
             mapFragment.setArguments(args);
             viewPagerAdapter.AddFragment(mapFragment,"Map");
@@ -149,7 +150,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         });
 
         updateFeed();
-
     }
 
     /**
@@ -343,6 +343,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                             mood.withLocation(location);
 
                         feedFragment.getRecyclerAdapter().addPost(mood);
+
 
 
                     }catch(Exception error){
