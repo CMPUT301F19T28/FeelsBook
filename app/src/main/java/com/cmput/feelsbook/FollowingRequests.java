@@ -1,10 +1,14 @@
 package com.cmput.feelsbook;
 
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,12 +16,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,10 +38,14 @@ import java.util.Map;
  */
 public class FollowingRequests extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<String> list;
+    private List<FollowUser> list;
     private User user;
+    FirebaseFirestore db;
+    CollectionReference cr;
 
     public FollowingRequests(User user) {
+        db = FirebaseFirestore.getInstance();
+        cr = db.collection("users").document(user.getUserName()).collection("followRequests");
         list = new ArrayList<>();
         this.user = user;
         fillList();
@@ -43,20 +56,22 @@ public class FollowingRequests extends RecyclerView.Adapter<RecyclerView.ViewHol
      * user's database
      */
     public void fillList() {
-        FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(user.getUserName())
-                .collection("info")
-                .document("followingRequests")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        cr.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if(task.isSuccessful()) {
-                    if(task.getResult().exists()) {
-                        list.addAll(task.getResult().getData().keySet());
-                        notifyDataSetChanged();
+                    for(QueryDocumentSnapshot document: task.getResult()) {
+                        Map<String, Object> data = document.getData();
+                        String photoString = (String) data.get("photo");
+                        if(photoString != null) {
+                            byte[] photo = Base64.getDecoder().decode(photoString);
+                            list.add(new FollowUser(document.getId(), (String) data.get("fullname"), BitmapFactory.decodeByteArray(photo, 0, photo.length)));
+                        }
+                        else {
+                            list.add(new FollowUser(document.getId(), (String) data.get("fullname"), null));
+                        }
                     }
+                    notifyDataSetChanged();
                 }
             }
         });
@@ -65,48 +80,38 @@ public class FollowingRequests extends RecyclerView.Adapter<RecyclerView.ViewHol
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_follow_request, parent, false);
+        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.follow_request_item, parent, false);
         return new RecyclerView.ViewHolder(view){};
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        TextView textView = holder.itemView.findViewById(R.id.user_name);
-        textView.setText(list.get(position));
+        TextView userName = holder.itemView.findViewById(R.id.username);
+        TextView fullName = holder.itemView.findViewById(R.id.full_name);
+        ImageView profilePic = holder.itemView.findViewById(R.id.profileImage);
 
-        Button button = holder.itemView.findViewById(R.id.follow_button);
-        button.setOnClickListener(new View.OnClickListener() {
+        userName.setText(list.get(position).getUserName());
+        fullName.setText(list.get(position).getName());
+
+        Button accept = holder.itemView.findViewById(R.id.AcceptButton);
+        accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Map<String, Object> data = new HashMap<>();
-                data.put(list.get(position),"temp");
-                FirebaseFirestore.getInstance()
-                        .collection("users")
-                        .document(user.getUserName())
-                        .collection("info")
-                        .document("followers")
-                        .set(data, SetOptions.merge());
-                data = new HashMap<>();
-                data.put(user.getUserName(),"temp");
-                FirebaseFirestore.getInstance()
-                        .collection("users")
-                        .document(list.get(position))
-                        .collection("info")
-                        .document("following")
-                        .set(data, SetOptions.merge());
-                data = new HashMap<>();
-                data.put(list.get(position), FieldValue.delete());
-                FirebaseFirestore.getInstance()
-                        .collection("users")
-                        .document(user.getUserName())
-                        .collection("info")
-                        .document("followingRequests")
-                        .update(data);
+                user.acceptFollowRequest(list.get(position).getUserName());
                 list.remove(position);
                 notifyItemRemoved(position);
             }
         });
 
+        Button decline = holder.itemView.findViewById(R.id.DenyButton);
+        decline.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                user.declineFollowRequest(list.get(position).getUserName());
+                list.remove(position);
+                notifyItemRemoved(position);
+            }
+        });
     }
 
     @Override
