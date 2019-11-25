@@ -127,7 +127,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
             }
         });
 
-        System.out.println("test");
         updateFeed();
 
     }
@@ -218,6 +217,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 });
     }
 
+
     /**
      * will be used to delete passed in mood once implemented
      * @param mood
@@ -254,8 +254,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         CollectionReference cRef = db.collection("mostRecent");
         List<User> followingList = currentUser.getFollowingList();
         for (int i = 0; i < followingList.size(); i++){
-            System.out.println(followingList.get(i));
-            System.out.println(followingList.get(i).getUserName());
             cRef
                     // Get the username of the i user that current user is following
                     .document(followingList.get(i).getUserName())
@@ -347,13 +345,9 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                                             "****MOOD DOWNLOAD FAILED: " + error);
                                 }
                             }
+                            feedFragment.getRecyclerAdapter().notifyDataSetChanged();
                         }
                     });
         }
-    }
-
-    public Mood getMood(DocumentSnapshot doc){
-
-        return null;
     }
 }
