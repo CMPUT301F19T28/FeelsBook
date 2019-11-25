@@ -4,9 +4,11 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,13 +42,14 @@ public class FilterFragment extends DialogFragment {
     private int posY = 135;
 
     private OnMoodSelectListener listener;
+    private SharedPreferences prefs;
 
-    private static boolean happyPressed = false;
-    private static boolean sadPressed = false;
-    private static boolean angryPressed = false;
-    private static boolean sleepyPressed = false;
-    private static boolean annoyedPressed = false;
-    private static boolean sexyPressed = false;
+    private boolean happyPressed = false;
+    private boolean sadPressed = false;
+    private boolean angryPressed = false;
+    private boolean sleepyPressed = false;
+    private boolean annoyedPressed = false;
+    private boolean sexyPressed = false;
 
     public interface OnMoodSelectListener{
         void onSelect(MoodType moodType);
@@ -81,9 +84,10 @@ public class FilterFragment extends DialogFragment {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.filter_fragment, null);
         TextView filterTitle = view.findViewById(R.id.mood_title);
 
-
+        prefs = getActivity().getSharedPreferences("filterKey", Context.MODE_PRIVATE);
 
         ToggleButton filterHappy   = view.findViewById(R.id.happy_mood);
+        happyPressed = prefs.getBoolean("happy",false);
         filterHappy.setChecked(happyPressed);
         filterHappy.setBackgroundColor(happyPressed ? ContextCompat.getColor(getContext(),R.color.yellow)
                 : Color.parseColor("#F2F2F2"));
@@ -99,10 +103,12 @@ public class FilterFragment extends DialogFragment {
                     happyPressed = false;
                     listener.onDeselect(MoodType.HAPPY);
                 }
+                prefs.edit().putBoolean("happy",happyPressed).apply();
             }
         });
 
         ToggleButton filterSad     = view.findViewById(R.id.sad_mood);
+        sadPressed = prefs.getBoolean("sad",false);
         filterSad.setChecked(sadPressed);
         filterSad.setBackgroundColor(sadPressed ? ContextCompat.getColor(getContext(),R.color.blue)
                 : Color.parseColor("#F2F2F2"));
@@ -119,10 +125,12 @@ public class FilterFragment extends DialogFragment {
                     sadPressed = false;
                     listener.onDeselect(MoodType.SAD);
                 }
+                prefs.edit().putBoolean("sad",sadPressed).apply();
             }
         });
 
         ToggleButton filterAngry   = view.findViewById(R.id.angry_mood);
+        angryPressed = prefs.getBoolean("angry",false);
         filterAngry.setChecked(angryPressed);
         filterAngry.setBackgroundColor(angryPressed ? ContextCompat.getColor(getContext(),R.color.red)
                 : Color.parseColor("#F2F2F2"));
@@ -139,10 +147,12 @@ public class FilterFragment extends DialogFragment {
                     angryPressed = false;
                     listener.onDeselect(MoodType.ANGRY);
                 }
+                prefs.edit().putBoolean("angry",angryPressed).apply();
             }
         });
 
         ToggleButton filterSleepy  = view.findViewById(R.id.sleepy_mood);
+        sleepyPressed = prefs.getBoolean("sleepy",false);
         filterSleepy.setChecked(sleepyPressed);
         filterSleepy.setBackgroundColor(sleepyPressed ? ContextCompat.getColor(getContext(),R.color.purple)
                 : Color.parseColor("#F2F2F2"));
@@ -159,10 +169,12 @@ public class FilterFragment extends DialogFragment {
                     sleepyPressed = false;
                     listener.onDeselect(MoodType.SLEEPY);
                 }
+                prefs.edit().putBoolean("sleepy",sleepyPressed).apply();
             }
         });
 
         ToggleButton filterAnnoyed = view.findViewById(R.id.annoyed_mood);
+        annoyedPressed = prefs.getBoolean("annoyed",false);
         filterAnnoyed.setChecked(annoyedPressed);
         filterAnnoyed.setBackgroundColor(annoyedPressed ? ContextCompat.getColor(getContext(),R.color.orange)
                 : Color.parseColor("#F2F2F2"));
@@ -179,10 +191,12 @@ public class FilterFragment extends DialogFragment {
                     annoyedPressed = false;
                     listener.onDeselect(MoodType.ANNOYED);
                 }
+                prefs.edit().putBoolean("annoyed",annoyedPressed).apply();
             }
         });
 
         ToggleButton filterSexy    = view.findViewById(R.id.sexy_mood);
+        sexyPressed = prefs.getBoolean("sexy",false);
         filterSexy.setChecked(sexyPressed);
         filterSexy.setBackgroundColor(sexyPressed ? ContextCompat.getColor(getContext(),R.color.pink)
                 : Color.parseColor("#F2F2F2"));
@@ -199,6 +213,7 @@ public class FilterFragment extends DialogFragment {
                     sexyPressed = false;
                     listener.onDeselect(MoodType.SEXY);
                 }
+                prefs.edit().putBoolean("sexy",sexyPressed).apply();
             }
         });
 
@@ -221,6 +236,7 @@ public class FilterFragment extends DialogFragment {
     @Override
     public void onResume(){
         super.onResume();
+
         Window window = getDialog().getWindow();
         WindowManager.LayoutParams wlp = window.getAttributes();
         wlp.gravity = Gravity.TOP | Gravity.START;
@@ -231,4 +247,14 @@ public class FilterFragment extends DialogFragment {
         window.setAttributes(wlp);
     }
 
+    public void resetFilterButtons(){
+        //SharedPreferences p = getActivity().getSharedPreferences("filterKey", Context.MODE_PRIVATE);
+        prefs.edit().clear().apply();
+        this.happyPressed = false;
+        this.sadPressed = false;
+        this.angryPressed = false;
+        this.sleepyPressed = false;
+        this.annoyedPressed = false;
+        this.sexyPressed = false;
+    }
 }

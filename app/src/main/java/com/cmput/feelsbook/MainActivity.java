@@ -58,7 +58,8 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
     private CollectionReference cr;
     private ArrayList<Post> feedCopy;
     private ArrayList<MoodType> filteredMoods;
-
+    private FilterFragment filter;
+    private boolean filterClicked = false;
 
 
     @Override
@@ -104,10 +105,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         addPostBttn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //when floating action button is pressed instantiates the fragment so a Ride can be
-                // added to the list
-                // add post activity:
-
+                // creates a new add mood activity
                 new AddMoodFragment().show(getSupportFragmentManager(), "ADD_MOOD");
             }
         });
@@ -117,7 +115,9 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
             @Override
             public void onClick(View v){
                 // creates filter window
-                new FilterFragment().show(getSupportFragmentManager(),"FILTER");
+                filterClicked = true;
+                filter = new FilterFragment();
+                filter.show(getSupportFragmentManager(),"MAIN_FILTER");
             }
         });
 
@@ -126,6 +126,11 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (filterClicked){
+                    // reset filtered feed if filter was clicked at least once
+                    filter.resetFilterButtons();
+                    updateFeed();
+                }
                 Intent intent = new Intent(MainActivity.this,ProfileActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
@@ -349,7 +354,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
      */
     public void onSelect(MoodType moodType){
         filteredMoods.add(moodType);
-        Log.d("Filter","(SELECT)Current filtered mood size: "+filteredMoods.size());
+        Log.d("Filter","(SELECT-Main)Current filtered mood size: "+filteredMoods.size());
         Iterator<Post> it = feedCopy.iterator();
         ArrayList<Post> result = new ArrayList<>();
         while (it.hasNext()){
@@ -371,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
      */
     public void onDeselect(MoodType moodType){
         filteredMoods.remove(moodType);
-        Log.d("Filter","(DESELECT)Current filtered mood size: "+filteredMoods.size());
+        Log.d("Filter","(DESELECT-Main)Current filtered mood size: "+filteredMoods.size());
         if (filteredMoods.size() > 0){
             Iterator<Post> it = feedCopy.iterator();
             ArrayList<Post> result = new ArrayList<>();

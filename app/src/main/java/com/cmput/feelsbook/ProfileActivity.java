@@ -75,6 +75,8 @@ FilterFragment.OnMoodSelectListener{
     private Feed.OnItemClickListener listener;
     private ArrayList<MoodType> filteredMoods;
     private ArrayList<Post> historyCopy;
+    private FilterFragment filter;
+    private boolean filterClicked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,6 +164,11 @@ FilterFragment.OnMoodSelectListener{
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (filterClicked){
+                    // reset filtered feed if filter was clicked at least once
+                    filter.resetFilterButtons();
+                    updateFeed();
+                }
                 finish();
             }
         });
@@ -178,7 +185,9 @@ FilterFragment.OnMoodSelectListener{
             @Override
             public void onClick(View v){
                 // creates filter window
-                new FilterFragment().show(getSupportFragmentManager(),"FILTER");
+                filterClicked = true;
+                filter = new FilterFragment();
+                filter.show(getSupportFragmentManager(),"MAIN_FILTER");
             }
         });
     }
@@ -418,7 +427,8 @@ FilterFragment.OnMoodSelectListener{
      */
     public void onSelect(MoodType moodType){
         filteredMoods.add(moodType);
-        Log.d("Filter","(SELECT)Current filtered mood size: "+filteredMoods.size());
+        // log used for debugging
+        Log.d("Filter","(SELECT-Profile)Current filtered mood size: "+filteredMoods.size());
         Iterator<Post> it = historyCopy.iterator();
         ArrayList<Post> result = new ArrayList<>();
         while (it.hasNext()){
@@ -440,7 +450,8 @@ FilterFragment.OnMoodSelectListener{
      */
     public void onDeselect(MoodType moodType){
         filteredMoods.remove(moodType);
-        Log.d("Filter","(DESELECT)Current filtered mood size: "+filteredMoods.size());
+        // log used for debugging
+        Log.d("Filter","(DESELECT-Profile)Current filtered mood size: "+filteredMoods.size());
         if (filteredMoods.size() > 0){
             Iterator<Post> it = historyCopy.iterator();
             ArrayList<Post> result = new ArrayList<>();
