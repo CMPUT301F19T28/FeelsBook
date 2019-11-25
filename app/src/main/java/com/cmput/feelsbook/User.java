@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,14 +39,14 @@ public class User implements Serializable {
     private String userName;
     private String name;
     private Feed posts;
-    private FollowList followList;
+    private List<FollowUser> following;
     private Bitmap profilePicture;
 
-    public User(String userName, String name, Feed posts, FollowList followsList){
+    public User(String userName, String name, Feed posts, List<FollowUser> following){
         this.userName = userName;
         this.name = name;
         this.posts = posts;
-        followList = followsList;
+        this.following = following;
     }
 
 
@@ -182,12 +183,12 @@ public class User implements Serializable {
 
     public void setPosts(Feed posts) {this.posts = posts;}
 
-    public FollowList getFollowsList() {
-        return followList;
+    public List<FollowUser> getFollowingList() {
+        return following;
     }
 
-    public void setFollowsList(FollowList followsList) {
-        followList = followsList;
+    public void setFollowingList(List<FollowUser> followsList) {
+        following = followsList;
     }
 
     public Bitmap getProfilePic(){

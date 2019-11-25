@@ -2,6 +2,7 @@ package com.cmput.feelsbook;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -32,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -153,7 +155,7 @@ public class LoginActivity extends AppCompatActivity {
      * @param document
      * Document context used to create a User object to pass to MainActivity
      */
-    private void successfulLogin(DocumentSnapshot document, List<User> following){
+    private void successfulLogin(DocumentSnapshot document, List<FollowUser> following){
         Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
         User user = new User(document.getId(), document.getString("name"), new Feed(), following);
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -164,7 +166,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void getFollowing(DocumentSnapshot doc){
-        List<User> following = new ArrayList<User>();
+        List<FollowUser> following = new ArrayList<FollowUser>();
 
         FirebaseFirestore.getInstance()
                 .collection("users")
@@ -178,9 +180,24 @@ public class LoginActivity extends AppCompatActivity {
                         if (list.size() != 0){
                             for (int i = 0; i < list.size(); i++){
                                 DocumentSnapshot doc = list.get(i);
-                                User newUser = new User(doc.getId(), doc.get("name").toString(),
-                                        null,null);
-                                following.add(newUser);
+                                Bitmap photo;
+
+                                /*
+                                converts the photo is present converts from a base64 string to a byte[]
+                                and then into a bitmap if no photo is present sets photo to null
+                                 */
+                                try {
+                                    byte[] decoded = Base64.getDecoder()
+                                            .decode((String)  doc.get("photo"));
+                                    photo = BitmapFactory.decodeByteArray(decoded
+                                            , 0, decoded.length);
+                                }catch(Exception e) {
+                                    Log.d("-----UPLOAD PHOTO-----",
+                                            "****NO PHOTO DOWNLOADED: " + e);
+                                    photo = null;
+                                }
+                                FollowUser newFollowUser = new FollowUser(doc.getId(), doc.get("name").toString(), photo);
+                                following.add(newFollowUser);
                             }
                             successfulLogin(doc, following);
                         }

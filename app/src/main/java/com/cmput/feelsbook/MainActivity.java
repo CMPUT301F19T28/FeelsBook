@@ -252,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
      */
     public void updateFeed(){
         CollectionReference cRef = db.collection("mostRecent");
-        List<User> followingList = currentUser.getFollowingList();
+        List<FollowUser> followingList = currentUser.getFollowingList();
         for (int i = 0; i < followingList.size(); i++){
             cRef
                     // Get the username of the i user that current user is following

@@ -2,7 +2,9 @@ package com.cmput.feelsbook;
 
 import android.graphics.Bitmap;
 
-public class FollowUser {
+import java.io.Serializable;
+
+public class FollowUser implements Serializable {
 
     private String userName;
     private String name;
