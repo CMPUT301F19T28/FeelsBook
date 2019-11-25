@@ -200,6 +200,7 @@ public class AddMoodActivity extends AppCompatActivity{
         data.put("reason", ((Mood) newMood).getReason());
         data.put("situation", ((Mood) newMood).getSituation());
         data.put("moodType", ((Mood) newMood).getMoodType());
+        data.put("User", currentUser.getUserName());
 
         MoodCollection
                 .document(newMood.toString())
@@ -265,10 +266,12 @@ public class AddMoodActivity extends AppCompatActivity{
 
 
         if (picture == null) {
-            return new Mood(selected_type, null).withReason(moodText).withSituation(selectedSocial);
+            return new Mood(selected_type, null).withReason(moodText)
+                    .withSituation(selectedSocial).withUser(currentUser.getUserName());
         }
         else{
-            return new Mood(selected_type, null).withPhoto(picture).withReason(moodText).withSituation(selectedSocial);
+            return new Mood(selected_type, null).withPhoto(picture).withReason(moodText)
+                    .withSituation(selectedSocial).withUser(currentUser.getUserName());
         }
 
     }

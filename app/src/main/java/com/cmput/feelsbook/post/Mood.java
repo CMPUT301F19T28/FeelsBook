@@ -37,6 +37,7 @@ public class Mood extends Post implements Serializable {
     private ProxyBitmap serilizable_photo;
     private Bitmap photo;
     private Location location;
+    private String user;
 
 
     /**
@@ -116,12 +117,22 @@ public class Mood extends Post implements Serializable {
         return this;
     }
 
+    /**
+     * To make the Mood object serializable convert Bitmap photo to Proxybitmap
+     * @param change
+     * @return
+     */
     public Mood Serialize(boolean change){
         if(change) {
             this.photo = null;
         }else if(serilizable_photo != null){
             this.photo = serilizable_photo.getBitmap();
         }
+        return this;
+    }
+
+    public Mood withUser(String username){
+        this.user = username;
         return this;
     }
 
@@ -135,12 +146,14 @@ public class Mood extends Post implements Serializable {
         TextView moodText = viewHolder.itemView.findViewById(R.id.moodText);
         ImageView profile_pic_feed = viewHolder.itemView.findViewById(R.id.profileImage);
         TextView reasonText = viewHolder.itemView.findViewById(R.id.reasonText);
+        TextView username = viewHolder.itemView.findViewById(R.id.user_name);
 
 
         dateTimeText.setText(dateFormatter.format(dateTime));
         moodText.setText(moodType.getEmoticon());
         profile_pic_feed.setImageBitmap(photo);
         reasonText.setText(reason);
+        username.setText(user);
 
 //        TODO: Implemented but out of scope for sprint 1
 //
