@@ -1,5 +1,6 @@
 package com.cmput.feelsbook;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -32,27 +33,32 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
-
+import java.util.Iterator;
 
 
 /**
  * Homepage where a feed of moods/posts will be seen.
  * Comprised of a scrollable RecyclerView
  */
-public class MainActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener,
+        FilterFragment.OnMoodSelectListener{
     private ImageButton profileButton;
-    User currentUser;
-    TabLayout tabLayout;
-    ViewPager viewPager;
-    ViewPagerAdapter viewPagerAdapter;
-    FeedFragment feedFragment;
-    MapFragment mapFragment;
-    Feed.OnItemClickListener listener;
-    FirebaseFirestore db;
-    CollectionReference cr;
+    private User currentUser;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+    private ViewPagerAdapter viewPagerAdapter;
+    private FeedFragment feedFragment;
+    private MapFragment mapFragment;
+    private Feed.OnItemClickListener listener;
+    private FirebaseFirestore db;
+    private CollectionReference cr;
+    private ArrayList<Post> feedCopy;
+    private ArrayList<MoodType> filteredMoods;
+
 
 
     @Override
@@ -64,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         tabLayout = findViewById(R.id.tab_layout);
         viewPager = findViewById(R.id.view_pager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        profileButton = findViewById(R.id.profileButton);
+        profileButton = findViewById(R.id.profile_button);
         listener = new Feed.OnItemClickListener(){
             /**
              * Sets onItemClick to open a fragment in which the mood will be edited
@@ -87,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 .collection("Moods");
         feedFragment = new FeedFragment();
         mapFragment = new MapFragment();
+        filteredMoods = new ArrayList<>();
         viewPagerAdapter.AddFragment(feedFragment, "Feed");
         viewPagerAdapter.AddFragment(mapFragment,"Map");
 
@@ -102,6 +109,15 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 // add post activity:
 
                 new AddMoodFragment().show(getSupportFragmentManager(), "ADD_MOOD");
+            }
+        });
+
+        final ImageButton filterButton = findViewById(R.id.filter_button);
+        filterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                // creates filter window
+                new FilterFragment().show(getSupportFragmentManager(),"FILTER");
             }
         });
 
@@ -319,9 +335,57 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                                 "****MOOD DOWNLOAD FAILED: " + error);
                     }
                 }
-
                 feedFragment.getRecyclerAdapter().notifyDataSetChanged();
+                feedCopy = new ArrayList<>(feedFragment.getRecyclerAdapter().getFeed());
             }
         });
+    }
+
+    /**
+     * Handles when a filter button is pressed.
+     * Note that when a filter button is pressed, this means that all moods EXCEPT the currently
+     * pressed mood/s will be shown in the feed.
+     * @param moodType - the MoodType to be filtered
+     */
+    public void onSelect(MoodType moodType){
+        filteredMoods.add(moodType);
+        Log.d("Filter","(SELECT)Current filtered mood size: "+filteredMoods.size());
+        Iterator<Post> it = feedCopy.iterator();
+        ArrayList<Post> result = new ArrayList<>();
+        while (it.hasNext()){
+            Mood m = (Mood)it.next();
+            if (filteredMoods.contains(m.getMoodType())){
+                result.add(m);
+            }
+        }
+        feedFragment.getRecyclerAdapter().setFeed(result);
+        feedFragment.getRecyclerAdapter().notifyDataSetChanged();
+    }
+
+    /**
+     * Handles when a filter button is unpressed.
+     * When a filter button is unpressed, all moods that are currently unpressed will be hidden
+     * in the feed. If there is one mood left to be unpressed, when that same mood is unpressed,
+     * the feed will be restored to show all moods.
+     * @param moodType - the MoodType to be unfiltered.
+     */
+    public void onDeselect(MoodType moodType){
+        filteredMoods.remove(moodType);
+        Log.d("Filter","(DESELECT)Current filtered mood size: "+filteredMoods.size());
+        if (filteredMoods.size() > 0){
+            Iterator<Post> it = feedCopy.iterator();
+            ArrayList<Post> result = new ArrayList<>();
+            while (it.hasNext()){
+                Mood m = (Mood)it.next();
+                if (filteredMoods.contains(m.getMoodType())){
+                    result.add(m);
+                }
+            }
+            feedFragment.getRecyclerAdapter().setFeed(result);
+            feedFragment.getRecyclerAdapter().notifyDataSetChanged();
+        }
+        else {
+            updateFeed();
+        }
     }
 }

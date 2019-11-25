@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:background="@drawable/shape_pointed_rectangle">
+    android:layout_height="wrap_content">
 
 
     <TextView
@@ -21,13 +20,13 @@
 
     <ToggleButton
         android:id="@+id/happy_mood"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/filter_button"
-        android:textOn="@string/happy"
         android:textOff="@string/happy"
+        android:textOn="@string/happy"
         android:textSize="15sp"
         app:layout_constraintBottom_toTopOf="@+id/sleepy_mood"
         app:layout_constraintEnd_toStartOf="@+id/sad_mood"
@@ -38,12 +37,12 @@
 
     <ToggleButton
         android:id="@+id/sad_mood"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:background="@drawable/filter_button"
-        android:textOn="@string/sad"
         android:textOff="@string/sad"
+        android:textOn="@string/sad"
         android:textSize="15sp"
         app:layout_constraintBottom_toTopOf="@+id/annoyed_mood"
         app:layout_constraintEnd_toStartOf="@+id/angry_mood"
@@ -54,13 +53,13 @@
 
     <ToggleButton
         android:id="@+id/angry_mood"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/filter_button"
-        android:textOn="@string/angry"
         android:textOff="@string/angry"
+        android:textOn="@string/angry"
         android:textSize="15sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/sad_mood"
         app:layout_constraintEnd_toEndOf="parent"
@@ -70,14 +69,14 @@
 
     <ToggleButton
         android:id="@+id/sleepy_mood"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
         android:background="@drawable/filter_button"
-        android:textOn="@string/sleepy"
         android:textOff="@string/sleepy"
+        android:textOn="@string/sleepy"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/annoyed_mood"
@@ -88,12 +87,12 @@
 
     <ToggleButton
         android:id="@+id/annoyed_mood"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:background="@drawable/filter_button"
-        android:textOn="@string/annoyed"
         android:textOff="@string/annoyed"
+        android:textOn="@string/annoyed"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/sexy_mood"
@@ -104,13 +103,13 @@
 
     <ToggleButton
         android:id="@+id/sexy_mood"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/filter_button"
-        android:textOn="@string/sexy"
         android:textOff="@string/sexy"
+        android:textOn="@string/sexy"
         android:textSize="15sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/annoyed_mood"
         app:layout_constraintEnd_toEndOf="parent"

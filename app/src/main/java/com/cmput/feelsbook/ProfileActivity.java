@@ -73,6 +73,8 @@ FilterFragment.OnMoodSelectListener{
     private FirebaseFirestore db;
     private CollectionReference cr;
     private Feed.OnItemClickListener listener;
+    private ArrayList<MoodType> filteredMoods;
+    private ArrayList<Post> historyCopy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +87,7 @@ FilterFragment.OnMoodSelectListener{
         //profilePicture = findViewById(R.drawable.);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         db = FirebaseFirestore.getInstance();
+        filteredMoods = new ArrayList<>();
         listener = new Feed.OnItemClickListener(){
             /**
              * Sets onItemClick to open a fragment in which the mood will be edited
@@ -174,8 +177,7 @@ FilterFragment.OnMoodSelectListener{
         filterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                // creates small popup window to filter
-                Log.d("message","Clicked filter");
+                // creates filter window
                 new FilterFragment().show(getSupportFragmentManager(),"FILTER");
             }
         });
@@ -183,8 +185,7 @@ FilterFragment.OnMoodSelectListener{
 
     /**
      * Takes a mood from the implemented fragment and adds it to the feedAdapter
-     * @param newMood
-     *          mood that will be added to the feed
+     * @param newMood - Mood that will be added to the feed.
      */
     public void onSubmit(Post newMood){
         HashMap<String, Object> data = new HashMap<>();
@@ -385,6 +386,7 @@ FilterFragment.OnMoodSelectListener{
                     }
                 }
                 historyFragment.getRecyclerAdapter().notifyDataSetChanged();
+                historyCopy = new ArrayList<>(historyFragment.getRecyclerAdapter().getFeed());
                 int postListCount = historyFragment.getRecyclerAdapter().getItemCount();
 
                 // update total number of posts
@@ -408,13 +410,20 @@ FilterFragment.OnMoodSelectListener{
         });
     }
 
+    /**
+     * Handles when a filter button is pressed.
+     * Note that when a filter button is pressed, this means that all moods EXCEPT the currently
+     * pressed mood/s will be shown in the feed.
+     * @param moodType - the MoodType to be filtered
+     */
     public void onSelect(MoodType moodType){
-        // need to fix
-        Iterator<Post> it = historyFragment.getRecyclerAdapter().getFeed().iterator();
+        filteredMoods.add(moodType);
+        Log.d("Filter","(SELECT)Current filtered mood size: "+filteredMoods.size());
+        Iterator<Post> it = historyCopy.iterator();
         ArrayList<Post> result = new ArrayList<>();
         while (it.hasNext()){
             Mood m = (Mood)it.next();
-            if (m.getMoodType() == moodType){
+            if (filteredMoods.contains(m.getMoodType())){
                 result.add(m);
             }
         }
@@ -422,8 +431,31 @@ FilterFragment.OnMoodSelectListener{
         historyFragment.getRecyclerAdapter().notifyDataSetChanged();
     }
 
-    public void onDeselect(){
-        updateFeed();
+    /**
+     * Handles when a filter button is unpressed.
+     * When a filter button is unpressed, all moods that are currently unpressed will be hidden
+     * in the feed. If there is one mood left to be unpressed, when that same mood is unpressed,
+     * the feed will be restored to show all moods.
+     * @param moodType - the MoodType to be unfiltered.
+     */
+    public void onDeselect(MoodType moodType){
+        filteredMoods.remove(moodType);
+        Log.d("Filter","(DESELECT)Current filtered mood size: "+filteredMoods.size());
+        if (filteredMoods.size() > 0){
+            Iterator<Post> it = historyCopy.iterator();
+            ArrayList<Post> result = new ArrayList<>();
+            while (it.hasNext()){
+                Mood m = (Mood)it.next();
+                if (filteredMoods.contains(m.getMoodType())){
+                    result.add(m);
+                }
+            }
+            historyFragment.getRecyclerAdapter().setFeed(result);
+            historyFragment.getRecyclerAdapter().notifyDataSetChanged();
+        }
+        else {
+            updateFeed();
+        }
     }
 }
 
