@@ -93,7 +93,7 @@ public class LoginActivity extends AppCompatActivity {
                                     String hashedPassword = bytesToHex(encodedHash);
 
                                     if (hashedPassword.equals(saved_pass)) {
-                                        getFollowing(document);
+                                        successfulLogin(document);
                                     } else {
                                         Toast.makeText(LoginActivity.this, "Invalid Username or Password", Toast.LENGTH_SHORT).show();
                                     }
@@ -155,9 +155,9 @@ public class LoginActivity extends AppCompatActivity {
      * @param document
      * Document context used to create a User object to pass to MainActivity
      */
-    private void successfulLogin(DocumentSnapshot document, List<FollowUser> following){
+    private void successfulLogin(DocumentSnapshot document){
         Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
-        User user = new User(document.getId(), document.getString("name"), new Feed(), following);
+        User user = new User(document.getId(), document.getString("name"), new Feed());
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("User",user);
@@ -165,43 +165,5 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void getFollowing(DocumentSnapshot doc){
-        List<FollowUser> following = new ArrayList<FollowUser>();
-        FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(doc.getId())
-                .collection("following")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        List<DocumentSnapshot> list =  task.getResult().getDocuments();
-                        if (list.size() != 0){
-                            for (int i = 0; i < list.size(); i++){
-                                DocumentSnapshot doc = list.get(i);
-                                Bitmap photo;
-
-                                /*
-                                converts the photo is present converts from a base64 string to a byte[]
-                                and then into a bitmap if no photo is present sets photo to null
-                                 */
-                                try {
-                                    byte[] decoded = Base64.getDecoder()
-                                            .decode((String)  doc.get("photo"));
-                                    photo = BitmapFactory.decodeByteArray(decoded
-                                            , 0, decoded.length);
-                                }catch(Exception e) {
-                                    Log.d("-----UPLOAD PHOTO-----",
-                                            "****NO PHOTO DOWNLOADED: " + e);
-                                    photo = null;
-                                }
-                                FollowUser newFollowUser = new FollowUser(doc.getId(), doc.get("name").toString(), photo);
-                                following.add(newFollowUser);
-                            }
-                        }
-                        successfulLogin(doc, following);
-                    }
-                });
-    }
 
 }

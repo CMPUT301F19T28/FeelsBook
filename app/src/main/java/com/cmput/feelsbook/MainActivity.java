@@ -127,8 +127,48 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
             }
         });
 
-        updateFeed();
+        //setLoading()
+        getFollowing();
+    }
 
+    private void getFollowing(){
+        List<FollowUser> following = new ArrayList<FollowUser>();
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(currentUser.getUserName())
+                .collection("following")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        List<DocumentSnapshot> list =  task.getResult().getDocuments();
+                        if (list.size() != 0){
+                            for (int i = 0; i < list.size(); i++){
+                                DocumentSnapshot doc = list.get(i);
+                                Bitmap photo;
+
+                                /*
+                                converts the photo is present converts from a base64 string to a byte[]
+                                and then into a bitmap if no photo is present sets photo to null
+                                 */
+                                try {
+                                    byte[] decoded = Base64.getDecoder()
+                                            .decode((String)  doc.get("photo"));
+                                    photo = BitmapFactory.decodeByteArray(decoded
+                                            , 0, decoded.length);
+                                }catch(Exception e) {
+                                    Log.d("-----UPLOAD PHOTO-----",
+                                            "****NO PHOTO DOWNLOADED: " + e);
+                                    photo = null;
+                                }
+                                FollowUser newFollowUser = new FollowUser(doc.getId(), doc.get("name").toString(), photo);
+                                following.add(newFollowUser);
+                            }
+                        }
+                        currentUser.setFollowingList(following);
+                        updateFeed();
+                    }
+                });
     }
 
     /**

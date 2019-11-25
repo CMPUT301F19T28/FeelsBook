@@ -42,11 +42,11 @@ public class User implements Serializable {
     private List<FollowUser> following;
     private Bitmap profilePicture;
 
-    public User(String userName, String name, Feed posts, List<FollowUser> following){
+    public User(String userName, String name, Feed posts){
         this.userName = userName;
         this.name = name;
         this.posts = posts;
-        this.following = following;
+        //this.following = following;
     }
 
 
