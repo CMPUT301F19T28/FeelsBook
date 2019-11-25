@@ -75,7 +75,8 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 feedFragment.getRecyclerAdapter().setOnItemClickListener(null);
                 userBundle.putSerializable("Post_list",feedFragment.getRecyclerAdapter());
                 intent.putExtras(userBundle);
-                startActivityForResult(intent, 1);
+                startActivity(intent);
+//                startActivityForResult(intent, 1);
             }
         };
 
