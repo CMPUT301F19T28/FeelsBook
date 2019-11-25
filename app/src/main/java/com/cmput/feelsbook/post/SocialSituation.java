@@ -23,4 +23,19 @@ public enum SocialSituation {
         String temp = this.name();
         return temp.substring(0,1) + temp.substring(1).toLowerCase();
     }
+
+    public static SocialSituation getSocialSituation(String social){
+
+        if(social.toLowerCase().equals("alone"))
+            return SocialSituation.ALONE;
+
+        else if(social.toLowerCase().equals("oneperson"))
+            return SocialSituation.ONEPERSON;
+
+        else if(social.toLowerCase().equals("several"))
+            return SocialSituation.SEVERAL;
+
+        else
+            return SocialSituation.CROWD;
+    }
 }

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -15,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -28,12 +30,19 @@ import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.Post;
 import com.cmput.feelsbook.post.SocialSituation;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
 
 public class AddMoodActivity extends AppCompatActivity{
 
@@ -45,6 +54,8 @@ public class AddMoodActivity extends AppCompatActivity{
     private Feed historyAdapter;
     private FirebaseFirestore db;
     private Bitmap BitmapProfilePicture;
+    CollectionReference MoodCollection;
+    DocumentReference UserDocument;
 
 
 
@@ -60,7 +71,7 @@ public class AddMoodActivity extends AppCompatActivity{
         Spinner spinner = findViewById(R.id.mood_spinner);
         Spinner socialSpinner = findViewById(R.id.social_spinner);
 
-        MoodType moodTypes[] = {MoodType.HAPPY, MoodType.SAD, MoodType.ANGRY, MoodType.ANNOYED, MoodType.SLEEPY, MoodType.SEXY};
+        MoodType moodTypes[] = { MoodType.HAPPY, MoodType.SAD, MoodType.ANGRY, MoodType.ANNOYED, MoodType.SLEEPY, MoodType.SEXY};
         ArrayList<MoodType> moodList = new ArrayList<MoodType>();
         moodList.addAll(Arrays.asList(moodTypes));
         ArrayAdapter<MoodType> moodTypeAdapter = new ArrayAdapter<MoodType>(this, android.R.layout.simple_spinner_item, moodList);
@@ -68,7 +79,7 @@ public class AddMoodActivity extends AppCompatActivity{
         spinner.setAdapter(moodTypeAdapter);
 
         //creates social situation spinner drop down menu
-        SocialSituation socialSits[] = {SocialSituation.ALONE, SocialSituation.ONEPERSON, SocialSituation.SEVERAL, SocialSituation.CROWD};
+        SocialSituation socialSits[] = { SocialSituation.ALONE, SocialSituation.ONEPERSON, SocialSituation.SEVERAL, SocialSituation.CROWD};
         ArrayList<SocialSituation> socialSitList = new ArrayList<SocialSituation>();
         socialSitList.addAll(Arrays.asList(socialSits));
         ArrayAdapter<SocialSituation> socialAdapter = new ArrayAdapter<SocialSituation>(this, android.R.layout.simple_spinner_item, socialSitList);
@@ -81,8 +92,15 @@ public class AddMoodActivity extends AppCompatActivity{
 
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
-            historyAdapter = (Feed) bundle.get("Post_list");
+//            historyAdapter = (Feed) bundle.get("Post_list");
         }
+
+        //Sets the document to that of the current user
+        UserDocument = db.collection("users").document(currentUser.getUserName());
+
+        //Sets the collectionReference to that of the current users moods
+        MoodCollection = UserDocument.collection("Moods");
+
         // sets users profile picture
         BitmapProfilePicture = currentUser.getProfilePic();
         ImageView profilePicture = findViewById(R.id.profile_picture);
@@ -129,22 +147,25 @@ public class AddMoodActivity extends AppCompatActivity{
                 String moodText = input.getText().toString();
                 MoodType selected_type = (MoodType) spinner.getSelectedItem();
                 SocialSituation selectedSocial = null;
+
                 if (socialSpinner.getVisibility() == View.VISIBLE)
                     selectedSocial = (SocialSituation) socialSpinner.getSelectedItem();
-                Bundle bundle = new Bundle();
+
+//                Bundle bundle = new Bundle();
+
                 if (picture == null) {
                     Mood newMood = new Mood(selected_type, null).withReason(moodText).withSituation(selectedSocial);
-                    bundle.putSerializable("Mood", newMood);
+//                    bundle.putSerializable("Mood", newMood);
                     onSubmit(newMood);
                 }
                 else{
-                    ProxyBitmap proxyBitmap = new ProxyBitmap(picture);
-                    Mood newMood = new Mood(selected_type, null).withPhoto(proxyBitmap).withReason(moodText).withSituation(selectedSocial);
-                    bundle.putSerializable("Mood",newMood);
+//                    ProxyBitmap proxyBitmap = new ProxyBitmap(picture);
+                    Mood newMood = new Mood(selected_type, null).withPhoto(picture).withReason(moodText).withSituation(selectedSocial);
+//                    bundle.putSerializable("Mood",newMood);
                     onSubmit(newMood);
                 }
-                Intent intent = new Intent().putExtras(bundle);
-                setResult(RESULT_OK, intent);
+                Intent intent = new Intent(); //.putExtras(bundle);
+//                setResult(RESULT_OK, intent);
                 finish();
             }
         });
@@ -167,13 +188,74 @@ public class AddMoodActivity extends AppCompatActivity{
     }
 
     /**
-     * Adds a post/mood object to the feed list.
+     * takes a mood and puts it in the database. If the mood is new will create a new mood in the
+     * database else will edit the mood in the database with the new parameters
      * @param newMood
-     * New mood object to be added
+     *      New mood object to be added or edited
      */
     public void onSubmit(Post newMood){
-        historyAdapter.addPost(newMood);
-        historyAdapter.notifyDataSetChanged();
+
+        HashMap<String, Object> data = new HashMap<>();
+
+        /*
+        If the newMood contains a photo will convert it into a Base64 String to be stored in the
+        database if no photo is present sets the field to null
+         */
+        try {
+            //puts photo into hashmap
+            Bitmap bitmap = ((Mood) newMood).getPhoto();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] picData = baos.toByteArray();
+            data.put("photo", Base64.getEncoder().encodeToString(picData));
+        }catch (Exception e) {
+            Log.d("-----UPLOAD PHOTO-----",
+                    "****NO PHOTO UPLOADED: " + e);
+            data.put("photo", null);
+        }
+
+        /*
+        If the newMood contains a profilePic will convert it into a Base64 String to be stored in the
+        database if no profilePic is present sets the field to null
+         */
+        try {
+            //puts profilePic into hashmap
+            Bitmap bitmap = ((Mood) newMood).getProfilePic();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] picData = baos.toByteArray();
+            data.put("profilePic", Base64.getEncoder().encodeToString(picData));
+        }catch (Exception e) {
+            Log.d("-----UPLOAD PHOTO-----",
+                    "****NO profilepic UPLOADED: " + e);
+            data.put("profilePic", null);
+        }
+
+        /*
+        puts the other parameters into the hashmap to be sent to the database
+         */
+        data.put("datetime", newMood.getDateTime());
+        data.put("location", ((Mood) newMood).getLocation());
+        data.put("reason", ((Mood) newMood).getReason());
+        data.put("situation", ((Mood) newMood).getSituation());
+        data.put("moodType", ((Mood) newMood).getMoodType());
+
+        MoodCollection
+                .document(newMood.toString())
+                .set(data)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("Sample", "Data addition successful");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("Sample", "Data addition failed" + e.toString());
+                    }
+                });
+
     }
 //    /**
 //     * notifies the adapter that the data set has changed
