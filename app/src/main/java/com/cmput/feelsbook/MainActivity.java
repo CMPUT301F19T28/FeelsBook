@@ -1,7 +1,8 @@
 package com.cmput.feelsbook;
 
-import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
             currentUser = (User) bundle.get("User");
         }
 
+
         //Sets the document to that of the current user
         cr = db.collection("users").document(currentUser.getUserName())
                 .collection("Moods");
@@ -100,6 +102,8 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
+
+        updateFeed();
 
         final FloatingActionButton addPostBttn = findViewById(R.id.addPostButton);
         addPostBttn.setOnClickListener(new View.OnClickListener() {
@@ -114,10 +118,20 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
         filterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                // creates filter window
-                filterClicked = true;
+                // before creating a window, clears the toggle button saved states if the
+                // filter button is clicked for the first time
+                if (!filterClicked){
+                    SharedPreferences prefs = getSharedPreferences("filterKey", Context.MODE_PRIVATE);
+                    if((prefs.contains("happy")) || prefs.contains("sad") || prefs.contains("angry")
+                            || prefs.contains("sleepy") || prefs.contains("annoyed") || prefs.contains("sexy")){
+                        prefs.edit().clear().apply();
+                    }
+                }
+
+                // display filter window
                 filter = new FilterFragment();
                 filter.show(getSupportFragmentManager(),"MAIN_FILTER");
+                filterClicked = true;
             }
         });
 
@@ -129,8 +143,10 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 if (filterClicked){
                     // reset filtered feed if filter was clicked at least once
                     filter.resetFilterButtons();
+                    filteredMoods.clear();
                     updateFeed();
                 }
+
                 Intent intent = new Intent(MainActivity.this,ProfileActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
@@ -138,9 +154,6 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 startActivity(intent);
             }
         });
-
-        updateFeed();
-
     }
 
     /**

@@ -167,6 +167,7 @@ FilterFragment.OnMoodSelectListener{
                 if (filterClicked){
                     // reset filtered feed if filter was clicked at least once
                     filter.resetFilterButtons();
+                    filteredMoods.clear();
                     updateFeed();
                 }
                 finish();
@@ -185,9 +186,9 @@ FilterFragment.OnMoodSelectListener{
             @Override
             public void onClick(View v){
                 // creates filter window
-                filterClicked = true;
                 filter = new FilterFragment();
                 filter.show(getSupportFragmentManager(),"MAIN_FILTER");
+                filterClicked = true;
             }
         });
     }
