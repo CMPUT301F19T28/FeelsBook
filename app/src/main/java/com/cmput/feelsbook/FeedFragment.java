@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -34,7 +35,10 @@ public class FeedFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.feed_fragment, container, false);
         recyclerView = view.findViewById(R.id.feed_list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        LinearLayoutManager lm = (new LinearLayoutManager(getActivity()));
+        lm.setReverseLayout(true);
+        lm.setStackFromEnd(true);
+        recyclerView.setLayoutManager(lm);
         recyclerView.setAdapter(recyclerAdapter);
         return view;
     }
