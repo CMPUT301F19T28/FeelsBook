@@ -117,6 +117,9 @@ public class MainActivity extends AppCompatActivity{
         updateFeed();
     }
 
+    /**
+     * This method updates the FeedFragment whenever the remote database is updated
+     */
     private void updateFeed(){
         MoodCollection.addSnapshotListener((queryDocumentSnapshots, e) -> {
 
