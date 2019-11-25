@@ -22,7 +22,6 @@ public class ClusterManagerRenderer extends DefaultClusterRenderer<ClusterMarker
     private final int markerWidth;
     private final int markerHeight;
 
-
     public ClusterManagerRenderer(Context context, GoogleMap map, ClusterManager<ClusterMarker> clusterManager) {
         super(context, map, clusterManager);
 

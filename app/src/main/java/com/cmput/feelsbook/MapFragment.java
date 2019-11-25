@@ -110,6 +110,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
+    /**
+     * Initializes the GoogleMap
+     */
     private void initGoogleMap(Bundle savedInstanceState) {
         // *** IMPORTANT ***
         // MapView requires that the Bundle you pass contain _ONLY_ MapView SDK
@@ -122,6 +125,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapView.onCreate(mapViewBundle);
     }
 
+    /**
+     * Retrieves the DeviceLocation and sets the camera to it.
+     */
     private void getDeviceLocation() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
@@ -148,10 +154,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    /**
+     * Moves the camera to the given lat/lon and to the given zoom level.
+     * @param latLng
+     * @param zoom
+     */
     private void setCameraView(LatLng latLng, float zoom) {
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
     }
 
+    /**
+     * Initializes clusterManager and clusterManagerRenderer as well as adds a marker
+     * to the map based on the given mood.
+     * @param mood
+     * Mood scanned from firebase
+     */
     public void addMapMarker(Mood mood){
 
         if(googleMap != null){
@@ -200,6 +217,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    /**
+     * Scans firebase for moods with a location and adds map markers based on Moods.
+     */
     public void updateMapMarkers(){
         cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override

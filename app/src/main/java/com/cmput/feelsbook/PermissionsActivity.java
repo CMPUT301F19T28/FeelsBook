@@ -40,6 +40,9 @@ public class PermissionsActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Prepare the MainActivity args and start it.
+     */
     private void finishPermissions() {
         Intent intent = new Intent(PermissionsActivity.this, MainActivity.class);
         Bundle bundle = new Bundle();
@@ -63,6 +66,11 @@ public class PermissionsActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Checks if Google Services and if GPS is enabled.
+     * @return
+     * Returns true if Google Services and GPS is enabled, false otherwise
+     */
     private boolean checkMapServices(){
         if(isServicesOK()){
             if(isMapsEnabled()){
@@ -90,8 +98,9 @@ public class PermissionsActivity extends AppCompatActivity {
     }
 
     /**
-     * Check if GPS is enabled on the device
+     * Check if GPS is enabled on the device. If it isn't display a prompt helping the user enable it.
      * @return
+     * Returns true if GPS is enabled and false if it is not
      */
     public boolean isMapsEnabled(){
         final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
@@ -103,12 +112,10 @@ public class PermissionsActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Explicitly requests location permission.
+     */
     private void getLocationPermission() {
-        /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
-         */
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -124,7 +131,7 @@ public class PermissionsActivity extends AppCompatActivity {
     /**
      * Determine whether or not the device is able to use Google Services
      * @return
-     * True if services is available False if not
+     * Returns true if services is available false if not
      */
     public boolean isServicesOK(){
         Log.d(TAG, "isServicesOK: checking google services version");
@@ -147,10 +154,11 @@ public class PermissionsActivity extends AppCompatActivity {
         return false;
     }
 
+    /**
+     * On result of permissions request, if result is permission granted change locationPermissionGranted to true, else finish the PermissionsActivity
+     */
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[],
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         locationPermissionGranted = false;
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
@@ -158,11 +166,17 @@ public class PermissionsActivity extends AppCompatActivity {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     locationPermissionGranted = true;
+                } else {
+                    finishPermissions();
                 }
             }
         }
     }
 
+    /**
+     * On result of GPS request, if GPS is enabled and location permission is granted finish PermissionsActivity.
+     * Else get location permission.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
