@@ -209,6 +209,15 @@ public class AddMoodActivity extends AppCompatActivity{
 
     }
 
+    /**
+     * Sets Edittext and spinner values  to that of the passed in mood
+     * @param editMood
+     *     Mood who's values are to taken
+     * @param moodTypes
+     *     array of moodtypes that corresponds to the spinner values
+     * @param socialSits
+     *     array of social situations that corresponds to the spinner values
+     */
     private void setValues(Mood editMood, MoodType[] moodTypes, SocialSituation[] socialSits){
         input.setText(editMood.getReason());
         for(int i = 0; i < moodTypes.length; i++){
