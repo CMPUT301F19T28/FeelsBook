@@ -98,7 +98,7 @@ public class AddMoodActivity extends AppCompatActivity{
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
             if((boolean) bundle.get("editMood")){
-                setValues((Mood) bundle.getSerializable("Mood"), moodTypes, socialSits);
+                setValues(((Mood) bundle.getSerializable("Mood")).Serialize(false), moodTypes, socialSits);
             }
         }
 

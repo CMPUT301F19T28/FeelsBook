@@ -100,7 +100,8 @@ public class MainActivity extends AppCompatActivity{
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
                 userBundle.putBoolean("editMood", true);
-                userBundle.putSerializable("Mood", post);
+                Mood editMood = (Mood) post;
+                userBundle.putSerializable("Mood", editMood.Serialize(true));
                 intent.putExtras(userBundle);
 //                startActivity(intent);
                 startActivityForResult(intent, 1);

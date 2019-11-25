@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput.feelsbook.Feed;
+import com.cmput.feelsbook.ProxyBitmap;
 import com.cmput.feelsbook.R;
 
 import java.io.Serializable;
@@ -33,6 +34,7 @@ public class Mood extends Post implements Serializable {
     private MoodType moodType;
     private String reason;
     private SocialSituation situation;
+    private ProxyBitmap serilizable_photo;
     private Bitmap photo;
     private Location location;
 
@@ -98,6 +100,7 @@ public class Mood extends Post implements Serializable {
      */
     public Mood withPhoto(Bitmap photo) {
         this.photo = photo;
+        this.serilizable_photo = new ProxyBitmap(photo);
         return this;
     }
 
@@ -110,6 +113,15 @@ public class Mood extends Post implements Serializable {
      */
     public Mood withLocation(Location location) {
         this.location = location;
+        return this;
+    }
+
+    public Mood Serialize(boolean change){
+        if(change) {
+            this.photo = null;
+        }else if(serilizable_photo != null){
+            this.photo = serilizable_photo.getBitmap();
+        }
         return this;
     }
 
