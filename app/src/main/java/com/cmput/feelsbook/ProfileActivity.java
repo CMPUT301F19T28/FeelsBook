@@ -256,7 +256,15 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
 //        feedFragment.getRecyclerAdapter().removePost(mood);
         historyFragment.getRecyclerAdapter().notifyDataSetChanged();
 
-        cr.orderBy("datetime", Query.Direction.ASCENDING).limit(1)
+        updateMostRecent();
+    }
+
+    /**
+     * Updates the users document in the collection "mostRecent" with the users
+     * next most recent mood.
+     */
+    public void updateMostRecent(){
+        cr.orderBy("datetime", Query.Direction.DESCENDING).limit(1)
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -279,6 +287,8 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
                                             }
                                         });
                             }
+                        } else {
+                            FirebaseFirestore.getInstance().collection("mostRecent").document(currentUser.getUserName()).delete();
                         }
                     }
                 });

@@ -178,7 +178,7 @@ public class LoginActivity extends AppCompatActivity {
                         if (list.size() != 0){
                             for (int i = 0; i < list.size(); i++){
                                 DocumentSnapshot doc = list.get(i);
-                                User newUser = new User(doc.getId(), doc.get("fullname").toString(),
+                                User newUser = new User(doc.getId(), doc.get("name").toString(),
                                         null,null);
                                 following.add(newUser);
                             }
