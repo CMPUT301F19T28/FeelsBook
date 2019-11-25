@@ -58,6 +58,7 @@ public class AddMoodActivity extends AppCompatActivity{
     DocumentReference UserDocument;
     Spinner spinner;
     Spinner socialSpinner;
+    private Button deleteButton;
 
 
 
@@ -95,10 +96,21 @@ public class AddMoodActivity extends AppCompatActivity{
         Bundle bundle = getIntent().getExtras();
         db = FirebaseFirestore.getInstance();
 
+        deleteButton = findViewById(R.id.delete_button);
+
+
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
             if((boolean) bundle.get("editMood")){
                 setValues(((Mood) bundle.getSerializable("Mood")).Serialize(false), moodTypes, socialSits);
+                deleteButton.setVisibility(View.VISIBLE);
+                deleteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        deleted(((Mood) bundle.getSerializable("Mood")).Serialize(false));
+                        finish();
+                    }
+                });
             }
         }
 
@@ -151,28 +163,9 @@ public class AddMoodActivity extends AppCompatActivity{
         postButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String moodText = input.getText().toString();
-                MoodType selected_type = (MoodType) spinner.getSelectedItem();
-                SocialSituation selectedSocial = null;
+                onSubmit(getValues());
+                Intent intent = new Intent();
 
-                if (socialSpinner.getVisibility() == View.VISIBLE)
-                    selectedSocial = (SocialSituation) socialSpinner.getSelectedItem();
-
-//                Bundle bundle = new Bundle();
-
-                if (picture == null) {
-                    Mood newMood = new Mood(selected_type, null).withReason(moodText).withSituation(selectedSocial);
-//                    bundle.putSerializable("Mood", newMood);
-                    onSubmit(newMood);
-                }
-                else{
-//                    ProxyBitmap proxyBitmap = new ProxyBitmap(picture);
-                    Mood newMood = new Mood(selected_type, null).withPhoto(picture).withReason(moodText).withSituation(selectedSocial);
-//                    bundle.putSerializable("Mood",newMood);
-                    onSubmit(newMood);
-                }
-                Intent intent = new Intent(); //.putExtras(bundle);
-//                setResult(RESULT_OK, intent);
                 finish();
             }
         });
@@ -284,23 +277,51 @@ public class AddMoodActivity extends AppCompatActivity{
             }
         }
     }
-//    /**
-//     * notifies the adapter that the data set has changed
-//     */
-//    public void edited(){
-//        //Code for editing mood
-//        feedFragment.getRecyclerAdapter().notifyDataSetChanged();
-//    }
-//
-//    /**
-//     * will be used to delete passed in mood once implemented
-//     * @param mood
-//     *      mood to be deleted
-//     */
-//    public void deleted(Post mood){
-//        //For deleting mood
-//        feedFragment.getRecyclerAdapter().removePost(mood);
-//        feedFragment.getRecyclerAdapter().notifyDataSetChanged();
-//    }
+
+    /**
+     * will be used to delete passed in mood once implemented
+     * @param mood
+     *      mood to be deleted
+     */
+    public void deleted(Post mood){
+        Toast.makeText(getApplicationContext(), "Mood Deleted: " + mood.toString(), Toast.LENGTH_SHORT).show();
+        MoodCollection
+                .document(mood.toString())
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("--DELETE OPERATION---: ",
+                                "Data removal successful");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("--DELETE OPERATION---: ",
+                                "Data removal failed" + e.toString());
+                    }
+                });
+
+    }
+
+    public Mood getValues(){
+        String moodText = input.getText().toString();
+        MoodType selected_type = (MoodType) spinner.getSelectedItem();
+        SocialSituation selectedSocial = null;
+
+        if (socialSpinner.getVisibility() == View.VISIBLE)
+            selectedSocial = (SocialSituation) socialSpinner.getSelectedItem();
+
+
+        if (picture == null) {
+            return new Mood(selected_type, null).withReason(moodText).withSituation(selectedSocial);
+        }
+        else{
+            return new Mood(selected_type, null).withPhoto(picture).withReason(moodText).withSituation(selectedSocial);
+        }
+
+    }
+
 
 }
