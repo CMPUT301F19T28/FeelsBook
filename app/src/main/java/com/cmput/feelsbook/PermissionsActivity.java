@@ -44,6 +44,7 @@ public class PermissionsActivity extends AppCompatActivity {
      * Prepare the MainActivity args and start it.
      */
     private void finishPermissions() {
+        finish();
         Intent intent = new Intent(PermissionsActivity.this, MainActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("User", currentUser);
