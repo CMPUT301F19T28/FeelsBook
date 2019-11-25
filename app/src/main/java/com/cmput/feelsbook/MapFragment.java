@@ -187,7 +187,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 firstRun = true;
 
             }
-
             clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterItem>() {
                         @Override
                         public boolean onClusterClick(final Cluster<ClusterItem> cluster) {
@@ -323,8 +322,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        map.setMyLocationEnabled(true);
         googleMap = map;
+        googleMap.setMyLocationEnabled(true);
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
         if (firstRun) {
             googleMap.clear();
             clusterManager.clearItems();
