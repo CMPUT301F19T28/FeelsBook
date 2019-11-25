@@ -93,18 +93,17 @@ public class MainActivity extends AppCompatActivity{
              * @param post
              *          Post to be edited
              */
-
             @Override
             public void onItemClick(Post post){
 //                new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
                 Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
-//                feedFragment.getRecyclerAdapter().setOnItemClickListener(null);
-//                userBundle.putSerializable("Post_list",feedFragment.getRecyclerAdapter());
+                userBundle.putBoolean("editMood", true);
+                userBundle.putSerializable("Mood", post);
                 intent.putExtras(userBundle);
-                startActivity(intent);
-//                startActivityForResult(intent, 1);
+//                startActivity(intent);
+                startActivityForResult(intent, 1);
             }
         };
         feedFragment.getRecyclerAdapter().setOnItemClickListener(listener);
@@ -116,8 +115,7 @@ public class MainActivity extends AppCompatActivity{
                 Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
-//                feedFragment.getRecyclerAdapter().setOnItemClickListener(null);
-//                userBundle.putSerializable("Post_list",feedFragment.getRecyclerAdapter());
+                userBundle.putBoolean("editMood", false);
                 intent.putExtras(userBundle);
                 startActivityForResult(intent, 1);
             }

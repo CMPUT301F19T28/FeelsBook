@@ -56,6 +56,9 @@ public class AddMoodActivity extends AppCompatActivity{
     private Bitmap BitmapProfilePicture;
     CollectionReference MoodCollection;
     DocumentReference UserDocument;
+    Spinner spinner;
+    Spinner socialSpinner;
+
 
 
 
@@ -68,13 +71,14 @@ public class AddMoodActivity extends AppCompatActivity{
          * spinner currently displays text for moodtype, want to display emoji
          */
         input = findViewById(R.id.editText);
-        Spinner spinner = findViewById(R.id.mood_spinner);
-        Spinner socialSpinner = findViewById(R.id.social_spinner);
+        spinner = findViewById(R.id.mood_spinner);
+        socialSpinner = findViewById(R.id.social_spinner);
 
         MoodType moodTypes[] = { MoodType.HAPPY, MoodType.SAD, MoodType.ANGRY, MoodType.ANNOYED, MoodType.SLEEPY, MoodType.SEXY};
         ArrayList<MoodType> moodList = new ArrayList<MoodType>();
         moodList.addAll(Arrays.asList(moodTypes));
         ArrayAdapter<MoodType> moodTypeAdapter = new ArrayAdapter<MoodType>(this, android.R.layout.simple_spinner_item, moodList);
+
         moodTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(moodTypeAdapter);
 
@@ -83,6 +87,7 @@ public class AddMoodActivity extends AppCompatActivity{
         ArrayList<SocialSituation> socialSitList = new ArrayList<SocialSituation>();
         socialSitList.addAll(Arrays.asList(socialSits));
         ArrayAdapter<SocialSituation> socialAdapter = new ArrayAdapter<SocialSituation>(this, android.R.layout.simple_spinner_item, socialSitList);
+
         socialAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         socialSpinner.setAdapter(socialAdapter);
         socialSpinner.setVisibility(View.GONE); //sets the view to be gone because it is optional
@@ -92,7 +97,9 @@ public class AddMoodActivity extends AppCompatActivity{
 
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
-//            historyAdapter = (Feed) bundle.get("Post_list");
+            if((boolean) bundle.get("editMood")){
+                setValues((Mood) bundle.getSerializable("Mood"), moodTypes, socialSits);
+            }
         }
 
         //Sets the document to that of the current user
@@ -256,6 +263,26 @@ public class AddMoodActivity extends AppCompatActivity{
                     }
                 });
 
+    }
+
+    public void setValues(Mood editMood, MoodType[] moodTypes, SocialSituation[] socialSits){
+        input.setText(editMood.getReason());
+        for(int i = 0; i < moodTypes.length; i++){
+            if(moodTypes[i] == editMood.getMoodType()){
+                spinner.setSelection(i);
+            }
+        }
+
+        //checks to see if the editmood has a social situation
+        // if makes dropdown visible and sets the social situation
+        if(editMood.hasSituation()){
+            for(int i = 0; i < socialSits.length; i++){
+                if(socialSits[i] == editMood.getSituation()){
+                    socialSpinner.setVisibility(View.VISIBLE);
+                    socialSpinner.setSelection(i);
+                }
+            }
+        }
     }
 //    /**
 //     * notifies the adapter that the data set has changed
