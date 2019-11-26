@@ -349,6 +349,8 @@ public class ProfileActivity extends AppCompatActivity implements AddMoodFragmen
                             mood.withLocation(location);
 
                         historyFragment.getRecyclerAdapter().addPost(mood);
+                        mapFragment.addPost(mood);
+
                         postCount+=1;
 
 

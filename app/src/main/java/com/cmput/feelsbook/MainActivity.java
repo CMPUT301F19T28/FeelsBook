@@ -343,8 +343,7 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                             mood.withLocation(location);
 
                         feedFragment.getRecyclerAdapter().addPost(mood);
-
-
+                        mapFragment.addPost(mood);
 
                     }catch(Exception error){
                         Log.d("-----UPLOAD SAMPLE-----",
@@ -352,7 +351,9 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                     }
                 }
 
+
                 feedFragment.getRecyclerAdapter().notifyDataSetChanged();
+
             }
         });
     }

@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
+import com.cmput.feelsbook.post.Post;
 import com.cmput.feelsbook.post.SocialSituation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -60,6 +61,7 @@ import com.google.maps.android.clustering.ClusterManager;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -85,6 +87,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private CollectionReference cr;
     private FirebaseFirestore db;
     private Boolean firstRun = false;
+    private List<Mood> feed;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -93,6 +96,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             currentUser = (User) getArguments().getSerializable("user");
             locationPermissionGranted = getArguments().getBoolean("locationPermission");
         }
+        this.feed = new ArrayList<>();
         db = FirebaseFirestore.getInstance();
         cr = db.collection("users").document(currentUser.getUserName())
                 .collection("Moods");
@@ -164,12 +168,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     /**
-     * Initializes clusterManager and clusterManagerRenderer as well as adds a marker
-     * to the map based on the given mood.
-     * @param mood
-     * Mood scanned from firebase
+     * Initializes clusterManager and clusterManagerRenderer
      */
-    public void addMapMarker(Mood mood){
+    public void initClusterManager(){
 
         if(googleMap != null){
 
@@ -194,9 +195,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                     cluster.getPosition(), (float) Math.floor(googleMap
                                             .getCameraPosition().zoom + 1)), 300,
                                     null);
+                            clusterManager.cluster();
                             return true;
                         }
                     });
+            googleMap.setOnMarkerClickListener(clusterManager);
             clusterManager.setOnClusterItemInfoWindowClickListener(
                     new ClusterManager.OnClusterItemInfoWindowClickListener<ClusterItem>() {
                         @Override public void onClusterItemInfoWindowClick(ClusterItem clusterItem) {
@@ -205,14 +208,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         }
                     });
             googleMap.setOnInfoWindowClickListener(clusterManager);
-
-            LatLng position = new LatLng(mood.getLocation().getLatitude(), mood.getLocation().getLongitude());
-            String title = "TODO: Put username here";
-            String snippet = "emoji @ " + mood.getDateTime().toString();
-            Bitmap avatar = mood.getPhoto();
-            ClusterMarker clusterMarker = new ClusterMarker(position, title, snippet, avatar);
-            clusterManager.addItem(clusterMarker);
-            clusterMarkers.add(clusterMarker);
         }
     }
 
@@ -220,97 +215,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      * Scans firebase for moods with a location and adds map markers based on Moods.
      */
     public void updateMapMarkers(){
-        cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@androidx.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @androidx.annotation.Nullable FirebaseFirestoreException e) {
-
-                for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
-
-                    MoodType moodType = null;
-                    String reason = null;
-                    SocialSituation situation = null;
-                    Bitmap photo = null;
-                    GeoPoint location = null;
-                    Bitmap profilePic = null;
-                    Date dateTime = null;
-
-
-                    try {
-                        if (doc.contains("datetime"))
-                            dateTime = ((Timestamp) doc.get("datetime")).toDate();
-
-                        if (doc.contains("location"))
-                            location = (GeoPoint) doc.get("location");
-
-                        if (doc.contains("photo")) {
-
-                            /*
-                            converts the photo is present converts from a base64 string to a byte[]
-                            and then into a bitmap if no photo is present sets photo to null
-                             */
-                            try {
-                                byte[] decoded = Base64.getDecoder()
-                                        .decode((String)  doc.get("photo"));
-                                photo = BitmapFactory.decodeByteArray(decoded
-                                        , 0, decoded.length);
-                            }catch(Exception error) {
-                                Log.d("-----UPLOAD PHOTO-----",
-                                        "****NO PHOTO DOWNLOADED: " + e);
-                                photo = null;
-                            }
-                        }
-
-                        if (doc.contains("profilePic")) {
-
-                            /*
-                            converts the profilePic is present converts from a base64 string to a byte[]
-                            and then into a bitmap if no photo is present sets profilePic to null
-                             */
-                            try {
-                                byte[] decoded = Base64.getDecoder()
-                                        .decode((String)  doc.get("profilePic"));
-                                profilePic = BitmapFactory.decodeByteArray(decoded
-                                        , 0, decoded.length);
-                            }catch(Exception error) {
-                                Log.d("-----UPLOAD PHOTO-----",
-                                        "****NO PHOTO DOWNLOADED: " + e);
-                                profilePic = null;
-                            }
-                        }
-
-                        if (doc.contains("reason"))
-                            reason = (String) doc.get("reason");
-
-                        if (doc.contains("situation") & (doc.get("situation") != null)) {
-                            situation = SocialSituation.getSocialSituation((String) doc.get("situation"));
-                        }
-
-                        if (doc.contains("moodType") & (doc.get("moodType") != null)) {
-                            moodType = MoodType.getMoodType((String) doc.get("moodType"));
-                        }
-
-                        Mood mood = new Mood(dateTime, moodType, profilePic);
-
-                        if(reason != null)
-                            mood = mood.withReason(reason);
-                        if(situation != null)
-                            mood = mood.withSituation(situation);
-                        if(photo != null)
-                            mood = mood.withPhoto(photo);
-                        if(location != null)
-                            mood.withLocation(location);
-                            addMapMarker(mood);
-
-
-
-                    }catch(Exception error){
-                        Log.d("-----UPLOAD SAMPLE-----",
-                                "****MOOD DOWNLOAD FAILED: " + error);
-                    }
-                }
-
+        for (int i = 0; i < feed.size(); i++) {
+            Mood mood = feed.get(i);
+            if(mood.getLocation() != null) {
+                LatLng position = new LatLng(mood.getLocation().getLatitude(), mood.getLocation().getLongitude());
+                String title = "TODO: Put username here";
+                String snippet = "emoji @ " + mood.getDateTime().toString();
+                Bitmap avatar = mood.getPhoto();
+                ClusterMarker clusterMarker = new ClusterMarker(position, title, snippet, avatar);
+                clusterManager.addItem(clusterMarker);
+                clusterMarkers.add(clusterMarker);
             }
-        });
+        }
     }
 
     @Override
@@ -325,11 +241,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         googleMap = map;
         googleMap.setMyLocationEnabled(true);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
+        googleMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+            @Override
+            public void onCameraMove() {
+                Log.d("poop", "hello");
+                clusterManager.cluster();
+            }
+        });
         if (firstRun) {
             googleMap.clear();
             clusterManager.clearItems();
             clusterMarkers.clear();
         }
+        initClusterManager();
         updateMapMarkers();
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -389,4 +313,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapView.onLowMemory();
     }
 
+    public List<Mood> getFeed() {
+        return feed;
+    }
+
+    public void addPost(Mood mood) {
+        feed.add(mood);
+    }
 }
