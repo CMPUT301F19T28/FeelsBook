@@ -60,6 +60,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_screen);
 
+
         db = FirebaseFirestore.getInstance();  // Create an instance to access Cloud Firestore
         userField = findViewById(R.id.user_text);
         passField = findViewById(R.id.password_text);

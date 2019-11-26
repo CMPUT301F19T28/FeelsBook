@@ -88,7 +88,7 @@
     <Spinner
         android:id="@+id/mood_spinner"
         android:layout_width="380dp"
-        android:layout_height="33dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
