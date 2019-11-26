@@ -25,7 +25,7 @@ public class SearchFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         final User user = (User) getArguments().getSerializable("user");
         return builder.setView(view)
-                .setPositiveButton("Search", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Send Request", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         user.sendFollowRequest(getContext(),search.getText().toString());
