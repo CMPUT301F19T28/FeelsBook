@@ -4,7 +4,7 @@
         android:radius="2dp"
         />
     <solid
-        android:color="#F2F2F2"
+        android:color="@color/feed_map_bar_color"
         />
     <padding
         android:left="0dp"

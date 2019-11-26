@@ -41,7 +41,6 @@ public class FilterFragment extends DialogFragment {
 
     private OnMoodSelectListener listener;
     private SharedPreferences prefs;
-    private static String KEY_START = "started";
 
     private boolean happyPressed = false;
     private boolean sadPressed = false;
@@ -254,12 +253,5 @@ public class FilterFragment extends DialogFragment {
         this.sleepyPressed = false;
         this.annoyedPressed = false;
         this.sexyPressed = false;
-    }
-
-    public void checkPreferences(){
-        if(prefs.contains(KEY_START)){
-            Log.d("Filter", "called resetPreferences");
-            prefs.edit().clear().apply();
-        }
     }
 }
