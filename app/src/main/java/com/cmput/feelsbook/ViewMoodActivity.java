@@ -50,7 +50,7 @@ public class ViewMoodActivity extends AppCompatActivity{
         socialSituationText = findViewById(R.id.social_situation_text);
         photo = findViewById((R.id.post_picture));
         profilePicture = findViewById(R.id.profile_picture);
-        final Button editButton = findViewById(R.id.edit_button);
+        Button editButton = findViewById(R.id.edit_button);
 
 
 
@@ -61,7 +61,7 @@ public class ViewMoodActivity extends AppCompatActivity{
             post = ((Mood) bundle.getSerializable("Mood")).Serialize(false);
             setValues((Mood)post);
 
-            if(((Mood) post).getUser() == currentUser.getUserName()){
+            if(((Mood) post).getUser().equals(currentUser.getUserName())){
                 editButton.setVisibility(View.VISIBLE);
             }
         }
@@ -96,6 +96,8 @@ public class ViewMoodActivity extends AppCompatActivity{
 
         if(editMood.hasSituation()){
             socialSituationText.setText(editMood.getSituation().toString());
+        }else{
+            socialSituationText.setText("N/A");
         }
 
         if(editMood.hasPhoto()){

@@ -179,6 +179,7 @@ public class ProfileActivity extends AppCompatActivity{
                 Location location = null;
                 Bitmap profilePic = null;
                 Date dateTime = null;
+                String user = "null";
 
 
                 try {
@@ -207,7 +208,11 @@ public class ProfileActivity extends AppCompatActivity{
                         moodType = MoodType.getMoodType((String) doc.get("moodType"));
                     }
 
-                    Mood mood = new Mood(dateTime, moodType, profilePic);
+                    if(doc.contains("User")){
+                        user = (String) doc.get("User");
+                    }
+
+                    Mood mood = new Mood(dateTime, moodType, profilePic).withUser(user);
 
                     if(reason != null)
                         mood = mood.withReason(reason);
