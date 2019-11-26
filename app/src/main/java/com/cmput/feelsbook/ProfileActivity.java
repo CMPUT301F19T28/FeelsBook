@@ -96,10 +96,10 @@ public class ProfileActivity extends AppCompatActivity{
             @Override
             public void onItemClick(Post post){
 //                new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
-                Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
+                Intent intent = new Intent(getApplicationContext(), ViewMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
-                userBundle.putBoolean("editMood", true);
+//                userBundle.putBoolean("editMood", true);
                 userBundle.putSerializable("Mood", ((Mood) post).Serialize(true));
                 intent.putExtras(userBundle);
                 startActivityForResult(intent, 1);
@@ -127,7 +127,7 @@ public class ProfileActivity extends AppCompatActivity{
         TextView postsText = findViewById(R.id.total_posts);
         ImageView profilePicture = findViewById(R.id.profile_picture);
 
-        postCount = historyFragment.getRecyclerAdapter().getItemCount();
+//        postCount = historyFragment.getRecyclerAdapter().getItemCount();
         fullName.setText(currentUser.getName());
         followText.setText(followCount + " following");
         followingText.setText(followersCount + " followers");
@@ -240,9 +240,10 @@ public class ProfileActivity extends AppCompatActivity{
      * @return
      *      returns bitmap of decoded photo returns null if base64 string was not passed in
      */
+    @SuppressLint("NewApi")
     private Bitmap getPhoto(String photo){
         try {
-            @SuppressLint("NewApi") byte[] decoded = Base64.getDecoder()
+            byte[] decoded = Base64.getDecoder()
                     .decode(photo);
             return BitmapFactory.decodeByteArray(decoded
                     , 0, decoded.length);

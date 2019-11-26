@@ -136,6 +136,10 @@ public class Mood extends Post implements Serializable {
         return this;
     }
 
+    public String getUser(){
+        return user;
+    }
+
     /**
      * Provides context for the fields in a mood feed item.
      * @Param viewHolder Contains the view for the mood feed item which has the other views

@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/colorPrimary">
 
     <LinearLayout
         android:id="@+id/LinearLayout3"
@@ -20,7 +21,7 @@
             android:id="@+id/TopBar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#697969">
+            android:background="@color/colorPrimary">
 
             <Button
                 android:id="@+id/edit_button"
@@ -28,8 +29,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:layout_marginRight="20dp"
-                android:background="#E6FA02"
+                android:background="@color/add_post_color"
                 android:text="EDIT"
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -42,7 +44,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="5dp"
                 android:drawableStart="@drawable/ic_arrow_back_black_24dp"
-                android:shadowColor="#00948E8E"
+                android:shadowColor="@color/add_post_color"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -55,6 +57,7 @@
         android:layout_width="387dp"
         android:layout_height="222dp"
         android:layout_marginBottom="48dp"
+        android:background="#94CE69"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/Image_and_location_layout"
         app:layout_constraintEnd_toEndOf="parent"
@@ -63,39 +66,52 @@
         <TextView
             android:id="@+id/mood_text_header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="#EAF13A"
             android:text="Mood type:" />
 
         <TextView
             android:id="@+id/Mood_text"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:background="#94CE69"
+            android:text="TextView"
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/social_text_header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="#EAF13A"
             android:text="Social Situation:" />
 
         <TextView
             android:id="@+id/social_situation_text"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:background="#94CE69"
+            android:text="TextView"
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/reason_text_header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="1dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="#EAF13A"
             android:text="Reason:" />
 
         <TextView
             android:id="@+id/reason_text"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:text="TextView"
+            android:textSize="15sp" />
 
     </LinearLayout>
 
@@ -139,19 +155,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
     </LinearLayout>
-    <![CDATA[
+    
 
 
-    android:layout_marginEnd="16dp"
-    android:drawablePadding="5dp"
-    android:ems="10"
-    android:hint="How are you feeling?"
-    android:inputType="textPersonName"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toEndOf="@+id/imageButton4"
-    app:layout_constraintTop_toTopOf="parent"/>
-
-    ]]><!--        app:layout_constraintTop_toBottomOf="@+id/tableRow" />-->
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
