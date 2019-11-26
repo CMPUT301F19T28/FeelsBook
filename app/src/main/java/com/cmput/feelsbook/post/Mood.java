@@ -222,4 +222,8 @@ public class Mood extends Post implements Serializable {
     public void setLocation(GeoPoint location) {
         this.location = location;
     }
+
+    public String getUser() { return user; }
+
+    public void setUser(String user) { this.user = user; }
 }

@@ -57,6 +57,7 @@ public class AddMoodActivity extends AppCompatActivity{
     private DocumentReference UserDocument;
     private Spinner spinner;
     private Spinner socialSpinner;
+    private TextView locationText;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private GeoPoint geoPoint;
 
@@ -70,7 +71,7 @@ public class AddMoodActivity extends AppCompatActivity{
         input = findViewById(R.id.editText);
         spinner = findViewById(R.id.mood_spinner);
         socialSpinner = findViewById(R.id.social_spinner);
-        TextView locationText = findViewById(R.id.location_text);
+        locationText = findViewById(R.id.location_text);
 
 
         MoodType[] moodTypes = {MoodType.HAPPY, MoodType.SAD, MoodType.ANGRY, MoodType.ANNOYED, MoodType.SLEEPY, MoodType.SEXY};
@@ -120,7 +121,7 @@ public class AddMoodActivity extends AppCompatActivity{
 
         //gets current location and sets location view
         getLastKnownLocation();
-        locationText.setText("big yeet");
+        locationText.setText("Location will be included.");
         locationText.setVisibility(View.GONE); //sets the location view to be gone because it is optional
 
         //if the social situatiion button is pressed then shows the drop down
@@ -138,7 +139,11 @@ public class AddMoodActivity extends AppCompatActivity{
         locationBttn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                locationText.setVisibility(View.VISIBLE);
+                if (locationText.getVisibility() == View.VISIBLE) {
+                    locationText.setVisibility(View.INVISIBLE);
+                } else {
+                    locationText.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -305,18 +310,22 @@ public class AddMoodActivity extends AppCompatActivity{
         String moodText = input.getText().toString();
         MoodType selected_type = (MoodType) spinner.getSelectedItem();
         SocialSituation selectedSocial = null;
+        GeoPoint location = null;
 
         if (socialSpinner.getVisibility() == View.VISIBLE)
             selectedSocial = (SocialSituation) socialSpinner.getSelectedItem();
+        if (locationText.getVisibility() == View.VISIBLE)
+            location = geoPoint;
+
 
 
         if (picture == null) {
             return new Mood(selected_type, null).withReason(moodText)
-                    .withSituation(selectedSocial).withUser(currentUser.getUserName());
+                    .withSituation(selectedSocial).withLocation(location).withUser(currentUser.getUserName());
         }
         else{
             return new Mood(selected_type, null).withPhoto(picture).withReason(moodText)
-                    .withSituation(selectedSocial).withUser(currentUser.getUserName());
+                    .withSituation(selectedSocial).withLocation(location).withUser(currentUser.getUserName());
         }
 
     }

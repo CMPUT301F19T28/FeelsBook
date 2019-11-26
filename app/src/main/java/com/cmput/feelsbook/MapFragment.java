@@ -188,9 +188,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 firstRun = true;
 
             }
-            clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterItem>() {
+            clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterMarker>() {
                         @Override
-                        public boolean onClusterClick(final Cluster<ClusterItem> cluster) {
+                        public boolean onClusterClick(final Cluster<ClusterMarker> cluster) {
                             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                                     cluster.getPosition(), (float) Math.floor(googleMap
                                             .getCameraPosition().zoom + 1)), 300,
@@ -201,10 +201,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     });
             googleMap.setOnMarkerClickListener(clusterManager);
             clusterManager.setOnClusterItemInfoWindowClickListener(
-                    new ClusterManager.OnClusterItemInfoWindowClickListener<ClusterItem>() {
-                        @Override public void onClusterItemInfoWindowClick(ClusterItem clusterItem) {
-                            Toast.makeText(getContext(), "Clicked info window: make this goto view/edit activity" + firstRun.toString(),
-                                    Toast.LENGTH_SHORT).show();
+                    new ClusterManager.OnClusterItemInfoWindowClickListener<ClusterMarker>() {
+                        @Override public void onClusterItemInfoWindowClick(ClusterMarker clusterMarker) {
+                            //                new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
+                            Intent intent = new Intent(getActivity().getApplicationContext(), AddMoodActivity.class);
+                            Bundle userBundle = new Bundle();
+                            userBundle.putSerializable("User", currentUser);
+                            userBundle.putBoolean("editMood", true);
+                            userBundle.putSerializable("Mood", (clusterMarker.getMood().Serialize(true)));
+                            intent.putExtras(userBundle);
+                            startActivityForResult(intent, 1);
                         }
                     });
             googleMap.setOnInfoWindowClickListener(clusterManager);
@@ -219,10 +225,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             Mood mood = feed.get(i);
             if(mood.getLocation() != null) {
                 LatLng position = new LatLng(mood.getLocation().getLatitude(), mood.getLocation().getLongitude());
-                String title = "TODO: Put username here";
+                String title = mood.getUser();
                 String snippet = "emoji @ " + mood.getDateTime().toString();
                 Bitmap avatar = mood.getPhoto();
-                ClusterMarker clusterMarker = new ClusterMarker(position, title, snippet, avatar);
+                ClusterMarker clusterMarker = new ClusterMarker(position, title, snippet, avatar, mood);
                 clusterManager.addItem(clusterMarker);
                 clusterMarkers.add(clusterMarker);
             }
