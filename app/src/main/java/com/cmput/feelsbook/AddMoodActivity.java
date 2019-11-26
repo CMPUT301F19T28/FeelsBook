@@ -49,6 +49,8 @@ public class AddMoodActivity extends AppCompatActivity{
     private DocumentReference UserDocument;
     private Spinner spinner;
     private Spinner socialSpinner;
+    private boolean edit = false;
+    private Mood edited;
 
 
     @Override
@@ -84,8 +86,10 @@ public class AddMoodActivity extends AppCompatActivity{
 
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
-            if((boolean) bundle.get("editMood")){
+            edit  = (boolean) bundle.get("editMood");
+            if(edit){
                 setValues(((Mood) bundle.getSerializable("Mood")).Serialize(false), moodTypes, socialSits);
+                edited = ((Mood) bundle.getSerializable("Mood")).Serialize(false);
                 deleteButton.setVisibility(View.VISIBLE);
                 deleteButton.setOnClickListener(view -> {
                     deleted(((Mood) bundle.getSerializable("Mood")).Serialize(false));
@@ -321,10 +325,20 @@ public class AddMoodActivity extends AppCompatActivity{
 
 
         if (picture == null) {
+            if(edit){
+                return new Mood(edited.getDateTime(), selected_type, null)
+                        .withReason(moodText).withSituation(selectedSocial)
+                        .withUser(currentUser.getUserName());
+            }
             return new Mood(selected_type, null).withReason(moodText)
                     .withSituation(selectedSocial).withUser(currentUser.getUserName());
         }
         else{
+            if(edit){
+                return new Mood(edited.getDateTime(), selected_type, null)
+                        .withPhoto(picture).withReason(moodText).withSituation(selectedSocial)
+                        .withUser(currentUser.getUserName());
+            }
             return new Mood(selected_type, null).withPhoto(picture).withReason(moodText)
                     .withSituation(selectedSocial).withUser(currentUser.getUserName());
         }

@@ -223,4 +223,8 @@ public class Mood extends Post implements Serializable {
     public void setLocation(Location location) {
         this.location = location;
     }
+
+    public Date getDateTime(){
+        return this.dateTime;
+    }
 }
