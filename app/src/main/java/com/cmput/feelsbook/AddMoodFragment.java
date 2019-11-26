@@ -133,7 +133,7 @@ public class AddMoodFragment extends DialogFragment {
 
         //gets current location and sets location view
         getLastKnownLocation();
-        locationText.setText("big yeet");
+        locationText.setText("Location will be included.");
         locationText.setVisibility(View.GONE); //sets the location view to be gone because it is optional
 
         //if the social situatiion button is pressed then shows the drop down
@@ -150,7 +150,11 @@ public class AddMoodFragment extends DialogFragment {
         locationBttn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                locationText.setVisibility(View.VISIBLE);
+                if (locationText.getVisibility() == View.VISIBLE) {
+                    locationText.setVisibility(View.INVISIBLE);
+                } else {
+                    locationText.setVisibility(View.VISIBLE);
+                }
             }
         });
 

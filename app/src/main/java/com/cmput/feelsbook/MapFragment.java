@@ -238,23 +238,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+
         googleMap = map;
         googleMap.setMyLocationEnabled(true);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
-        googleMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
-            @Override
-            public void onCameraMove() {
-                Log.d("poop", "hello");
-                clusterManager.cluster();
-            }
-        });
+
+        if (googleMap != null) {
+            googleMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+                @Override
+                public void onCameraMove() {
+                    clusterManager.cluster();
+                }
+            });
+        }
+
         if (firstRun) {
             googleMap.clear();
             clusterManager.clearItems();
             clusterMarkers.clear();
         }
+
         initClusterManager();
         updateMapMarkers();
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
