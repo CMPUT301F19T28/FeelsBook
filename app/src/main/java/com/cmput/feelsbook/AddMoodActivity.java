@@ -15,15 +15,21 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.Post;
 import com.cmput.feelsbook.post.SocialSituation;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -38,6 +44,7 @@ public class AddMoodActivity extends AppCompatActivity{
     private Bitmap dp;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private User currentUser;
+    private FirebaseFirestore db;
     private CollectionReference MoodCollection;
     private DocumentReference UserDocument;
     private Spinner spinner;
@@ -70,7 +77,7 @@ public class AddMoodActivity extends AppCompatActivity{
         socialSpinner.setVisibility(View.GONE); //sets the view to be gone because it is optional
 
         Bundle bundle = getIntent().getExtras();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         Button deleteButton = findViewById(R.id.delete_button);
 
@@ -210,6 +217,21 @@ public class AddMoodActivity extends AppCompatActivity{
                 .addOnSuccessListener(aVoid -> Log.d("Sample", "Data addition successful"))
                 .addOnFailureListener(e -> Log.d("Sample", "Data addition failed" + e.toString()));
 
+        db.collection("mostRecent")
+                .document(currentUser.getUserName())
+                .set(data)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("Sample", "Data addition successful");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("Sample", "Data addition failed" + e.toString());
+                    }
+                });
     }
 
     /**
@@ -255,7 +277,38 @@ public class AddMoodActivity extends AppCompatActivity{
                         "Data removal successful"))
                 .addOnFailureListener(e -> Log.d("--DELETE OPERATION---: ",
                         "Data removal failed" + e.toString()));
+        updateMostRecent();
+    }
 
+    public void updateMostRecent(){
+        MoodCollection.orderBy("datetime", Query.Direction.DESCENDING).limit(1)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        if (queryDocumentSnapshots.size() != 0){
+                            for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
+                                db.collection("mostRecent")
+                                        .document(currentUser.getUserName())
+                                        .set(doc.getData())
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Log.d("AddMood", "Most recent successfully set");
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.w("AddMood", "Failure to set most recent document with " + e);
+                                            }
+                                        });
+                            }
+                        } else {
+                            db.collection("mostRecent").document(currentUser.getUserName()).delete();
+                        }
+                    }
+                });
     }
 
     private Mood getValues(){
