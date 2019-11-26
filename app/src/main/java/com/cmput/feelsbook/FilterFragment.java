@@ -245,6 +245,10 @@ public class FilterFragment extends DialogFragment {
         window.setAttributes(wlp);
     }
 
+    /**
+     * Resets the toggled states of the filter buttons by removing the specific
+     * SharedPreferences boolean used.
+     */
     public void resetFilterButtons(){
         SharedPreferences.Editor edit = prefs.edit();
         if(prefs.contains("happy")){ edit.remove("happy").apply(); }
