@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -26,6 +27,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.Post;
 import com.cmput.feelsbook.post.SocialSituation;
@@ -51,12 +53,14 @@ public class AddMoodFragment extends DialogFragment {
     private FusedLocationProviderClient fusedLocationProviderClient;
     private GeoPoint geoPoint;
 
+//    private Bitmap dp;
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
 
 
     public interface OnFragmentInteractionListener{
         void onSubmit(Post newMood);
+        void edited();
         void deleted(Post delete);
     }
 
@@ -233,10 +237,9 @@ public class AddMoodFragment extends DialogFragment {
                                 editMood.setReason(newMoodReason);
                                 editMood.setMoodType(newSelectedType);
                                 if (!editMood.hasPhoto()){
-                                    editMood.withPhoto(picture);
+//                                    editMood.withPhoto(picture);
                                 }
-
-                                listener.onSubmit(editMood);
+                                listener.edited();
 
                             }else{
                                 Toast.makeText(getContext(), "Must fill required text",
@@ -276,6 +279,12 @@ public class AddMoodFragment extends DialogFragment {
 
 
                             if (!moodText.isEmpty()) {
+//                                Mood newMood = new Mood(selected_type, null).withReason(moodText).withPhoto(picture);
+//                                listener.onSubmit(newMood);
+
+                            } else {
+
+                                selectedSocial = SocialSituation.class.cast(socialSpinner.getSelectedItem());
 
                                 if (socialSpinner.getVisibility() == View.VISIBLE && locationText.getVisibility() == View.VISIBLE) {
                                     listener.onSubmit(new Mood(selected_type, null).withReason(moodText).withSituation(selectedSocial).withPhoto(picture).withLocation(currentLocation));
@@ -284,13 +293,10 @@ public class AddMoodFragment extends DialogFragment {
                                 } else if (locationText.getVisibility() == View.VISIBLE) {
                                     listener.onSubmit(new Mood(selected_type, null).withReason(moodText).withLocation(currentLocation).withPhoto(picture));
                                 } else {
-                                    listener.onSubmit(new Mood(selected_type, null).withReason(moodText).withPhoto(picture));
+                                    Toast.makeText(getContext(), "Must fill required text",
+                                            Toast.LENGTH_SHORT).show();
                                 }
-                            } else {
-                                Toast.makeText(getContext(), "Must fill required text",
-                                        Toast.LENGTH_SHORT).show();
                             }
-
                         }
                     }).create();
         }
