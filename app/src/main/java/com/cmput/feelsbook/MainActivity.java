@@ -84,14 +84,14 @@ public class MainActivity extends AppCompatActivity{
              */
             @Override
             public void onItemClick(Post post){
-//                new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
-                Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
+                Intent intent = new Intent(getApplicationContext(), ViewMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
                 userBundle.putBoolean("editMood", true);
                 userBundle.putSerializable("Mood", ((Mood) post).Serialize(true));
                 intent.putExtras(userBundle);
                 startActivityForResult(intent, 1);
+//                startActivity(intent);
             }
         };
         feedFragment.getRecyclerAdapter().setOnItemClickListener(listener);
@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity{
      */
     private Bitmap getPhoto(String photo){
         try {
-            @SuppressLint("NewApi") byte[] decoded = Base64.getDecoder()
+            @SuppressLint({"NewApi", "LocalSuppress"}) byte[] decoded = Base64.getDecoder()
                     .decode(photo);
             return BitmapFactory.decodeByteArray(decoded
                     , 0, decoded.length);

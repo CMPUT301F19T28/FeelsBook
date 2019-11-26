@@ -91,17 +91,17 @@ public class ViewMoodActivity extends AppCompatActivity{
 //        Button deleteButton = findViewById(R.id.delete_button);
 
 
-        if (bundle != null) {
-            currentUser = (User) bundle.get("User");
-            if((boolean) bundle.get("editMood")){
-                setValues(((Mood) bundle.getSerializable("Mood")).Serialize(false), moodTypes, socialSits);
-//                deleteButton.setVisibility(View.VISIBLE);
-//                deleteButton.setOnClickListener(view -> {
-//                    deleted(((Mood) bundle.getSerializable("Mood")).Serialize(false));
-//                    finish();
-//                });
-            }
-        }
+//        if (bundle != null) {
+//            currentUser = (User) bundle.get("User");
+//            if((boolean) bundle.get("editMood")){
+//                setValues(((Mood) bundle.getSerializable("Mood")).Serialize(false), moodTypes, socialSits);
+////                deleteButton.setVisibility(View.VISIBLE);
+////                deleteButton.setOnClickListener(view -> {
+////                    deleted(((Mood) bundle.getSerializable("Mood")).Serialize(false));
+////                    finish();
+////                });
+//            }
+//        }
 
         //Sets the document to that of the current user
         UserDocument = db.collection("users").document(currentUser.getUserName());
@@ -115,26 +115,26 @@ public class ViewMoodActivity extends AppCompatActivity{
         profilePicture.setImageBitmap(bitmapProfilePicture);
 
         //if the social situatiion button is pressed then shows the drop down
-        Button socialBttn = findViewById(R.id.social_situation_button);
-        socialBttn.setOnClickListener(v -> {
-            if (socialSpinner.getVisibility() == View.VISIBLE) {
-                socialSpinner.setVisibility(View.INVISIBLE);
-            } else {
-                socialSpinner.setVisibility(View.VISIBLE);
-            }
-        });
+//        Button socialBttn = findViewById(R.id.social_situation_button);
+//        socialBttn.setOnClickListener(v -> {
+//            if (socialSpinner.getVisibility() == View.VISIBLE) {
+//                socialSpinner.setVisibility(View.INVISIBLE);
+//            } else {
+//                socialSpinner.setVisibility(View.VISIBLE);
+//            }
+//        });
 
 
 
         Button backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> finish());
 
-        Button postButton = findViewById(R.id.edit_button);
-        postButton.setOnClickListener(v -> {
-            onSubmit(getValues());
-//                Intent intent = new Intent();
-            finish();
-        });
+//        Button postButton = findViewById(R.id.edit_button);
+//        postButton.setOnClickListener(v -> {
+//            onSubmit(getValues());
+////                Intent intent = new Intent();
+//            finish();
+//        });
     }
 
 
@@ -201,56 +201,56 @@ public class ViewMoodActivity extends AppCompatActivity{
 
     }
 
-    /**
-     * Sets Edittext and spinner values  to that of the passed in mood
-     * @param editMood
-     *     Mood who's values are to taken
-     * @param moodTypes
-     *     array of moodtypes that corresponds to the spinner values
-     * @param socialSits
-     *     array of social situations that corresponds to the spinner values
-     */
-    private void setValues(Mood editMood, MoodType[] moodTypes, SocialSituation[] socialSits){
-        input.setText(editMood.getReason());
-        for(int i = 0; i < moodTypes.length; i++){
-            if(moodTypes[i] == editMood.getMoodType()){
-                moodText.setText(moodTypes[i].toString());
-            }
-        }
+//    /**
+//     * Sets Edittext and spinner values  to that of the passed in mood
+//     * @param editMood
+//     *     Mood who's values are to taken
+//     * @param moodTypes
+//     *     array of moodtypes that corresponds to the spinner values
+//     * @param socialSits
+//     *     array of social situations that corresponds to the spinner values
+//     */
+//    private void setValues(Mood editMood, MoodType[] moodTypes, SocialSituation[] socialSits){
+//        input.setText(editMood.getReason());
+//        for(int i = 0; i < moodTypes.length; i++){
+//            if(moodTypes[i] == editMood.getMoodType()){
+//                moodText.setText(moodTypes[i].toString());
+//            }
+//        }
+//
+//        //checks to see if the editmood has a social situation
+//        // if makes dropdown visible and sets the social situation
+//        if(editMood.hasSituation()){
+//            for(int i = 0; i < socialSits.length; i++){
+//                if(socialSits[i] == editMood.getSituation()){
+//                    socialSituationText.setVisibility(View.VISIBLE);
+//                    socialSituationText.setText(socialSits[i].toString());
+//                }
+//            }
+//        }
+//    }
 
-        //checks to see if the editmood has a social situation
-        // if makes dropdown visible and sets the social situation
-        if(editMood.hasSituation()){
-            for(int i = 0; i < socialSits.length; i++){
-                if(socialSits[i] == editMood.getSituation()){
-                    socialSituationText.setVisibility(View.VISIBLE);
-                    socialSituationText.setText(socialSits[i].toString());
-                }
-            }
-        }
-    }
 
-
-    private Mood getValues(){
-        String moodText = input.getText().toString();
-        MoodType selected_type = (MoodType) spinner.getSelectedItem();
-        SocialSituation selectedSocial = null;
-
-        if (socialSpinner.getVisibility() == View.VISIBLE) {
-//            selectedSocial = (SocialSituation) socialSpinner.getSelectedItem();
-
-        }
-
-        if (picture == null) {
-            return new Mood(selected_type, null).withReason(moodText)
-                    .withSituation(selectedSocial).withUser(currentUser.getUserName());
-        }
-        else{
-            return new Mood(selected_type, null).withPhoto(picture).withReason(moodText)
-                    .withSituation(selectedSocial).withUser(currentUser.getUserName());
-        }
-
-    }
+//    private Mood getValues(){
+//        String moodText = input.getText().toString();
+//        MoodType selected_type = (MoodType) spinner.getSelectedItem();
+//        SocialSituation selectedSocial = null;
+//
+//        if (socialSpinner.getVisibility() == View.VISIBLE) {
+////            selectedSocial = (SocialSituation) socialSpinner.getSelectedItem();
+//
+//        }
+//
+//        if (picture == null) {
+//            return new Mood(selected_type, null).withReason(moodText)
+//                    .withSituation(selectedSocial).withUser(currentUser.getUserName());
+//        }
+//        else{
+//            return new Mood(selected_type, null).withPhoto(picture).withReason(moodText)
+//                    .withSituation(selectedSocial).withUser(currentUser.getUserName());
+//        }
+//
+//    }
 
 
 }
