@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.Post;
 import com.cmput.feelsbook.post.SocialSituation;
@@ -33,12 +35,14 @@ public class AddMoodFragment extends DialogFragment {
     private EditText input;
     private OnFragmentInteractionListener listener;
     private Bitmap picture;
+//    private Bitmap dp;
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
 
 
     public interface OnFragmentInteractionListener{
         void onSubmit(Post newMood);
+        void edited();
         void deleted(Post delete);
     }
 
@@ -194,10 +198,9 @@ public class AddMoodFragment extends DialogFragment {
                                 editMood.setReason(newMoodReason);
                                 editMood.setMoodType(newSelectedType);
                                 if (!editMood.hasPhoto()){
-                                    editMood.withPhoto(picture);
+//                                    editMood.withPhoto(picture);
                                 }
-
-                                listener.onSubmit(editMood);
+                                listener.edited();
 
                             }else{
                                 Toast.makeText(getContext(), "Must fill required text",
@@ -232,20 +235,27 @@ public class AddMoodFragment extends DialogFragment {
                             String moodText = input.getText().toString();
                             Object selectedMood = spinner.getSelectedItem();
                             MoodType selected_type = MoodType.class.cast(selectedMood);
-                            SocialSituation selectedSocial = SocialSituation.class.cast(socialSpinner.getSelectedItem());
 
                             if (!moodText.isEmpty()) {
+//                                Mood newMood = new Mood(selected_type, null).withReason(moodText).withPhoto(picture);
+//                                listener.onSubmit(newMood);
 
-                                if (socialSpinner.getVisibility() == View.VISIBLE) {
-                                    listener.onSubmit(new Mood(selected_type, null).withReason(moodText).withSituation(selectedSocial).withPhoto(picture));
-                                } else {
-                                    listener.onSubmit(new Mood(selected_type, null).withReason(moodText).withPhoto(picture));
-                                }
                             } else {
-                                Toast.makeText(getContext(), "Must fill required text",
-                                        Toast.LENGTH_SHORT).show();
-                            }
 
+                                SocialSituation selectedSocial = SocialSituation.class.cast(socialSpinner.getSelectedItem());
+
+                                if (!moodText.isEmpty()) {
+
+                                    if (socialSpinner.getVisibility() == View.VISIBLE) {
+                                        listener.onSubmit(new Mood(selected_type, null).withReason(moodText).withSituation(selectedSocial));
+                                    } else {
+                                        listener.onSubmit(new Mood(selected_type, null).withReason(moodText));
+                                    }
+                                } else {
+                                    Toast.makeText(getContext(), "Must fill required text",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            }
                         }
                     }).create();
         }

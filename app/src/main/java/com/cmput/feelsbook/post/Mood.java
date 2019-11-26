@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput.feelsbook.Feed;
+import com.cmput.feelsbook.ProxyBitmap;
 import com.cmput.feelsbook.R;
 
 import java.io.Serializable;
@@ -33,8 +34,10 @@ public class Mood extends Post implements Serializable {
     private MoodType moodType;
     private String reason;
     private SocialSituation situation;
+    private ProxyBitmap serilizable_photo;
     private Bitmap photo;
     private Location location;
+    private String user;
 
 
     /**
@@ -98,6 +101,7 @@ public class Mood extends Post implements Serializable {
      */
     public Mood withPhoto(Bitmap photo) {
         this.photo = photo;
+        this.serilizable_photo = new ProxyBitmap(photo);
         return this;
     }
 
@@ -114,6 +118,25 @@ public class Mood extends Post implements Serializable {
     }
 
     /**
+     * To make the Mood object serializable convert Bitmap photo to Proxybitmap
+     * @param change
+     * @return
+     */
+    public Mood Serialize(boolean change){
+        if(change) {
+            this.photo = null;
+        }else if(serilizable_photo != null){
+            this.photo = serilizable_photo.getBitmap();
+        }
+        return this;
+    }
+
+    public Mood withUser(String username){
+        this.user = username;
+        return this;
+    }
+
+    /**
      * Provides context for the fields in a mood feed item.
      * @Param viewHolder Contains the view for the mood feed item which has the other views
      */
@@ -122,25 +145,30 @@ public class Mood extends Post implements Serializable {
         TextView dateTimeText = viewHolder.itemView.findViewById(R.id.dateText);
         TextView moodText = viewHolder.itemView.findViewById(R.id.moodText);
         ImageView profile_pic_feed = viewHolder.itemView.findViewById(R.id.profileImage);
+        TextView reasonText = viewHolder.itemView.findViewById(R.id.reasonText);
+        TextView username = viewHolder.itemView.findViewById(R.id.user_name);
 
 
         dateTimeText.setText(dateFormatter.format(dateTime));
         moodText.setText(moodType.getEmoticon());
-        profile_pic_feed.setImageBitmap(profilePic);
+        profile_pic_feed.setImageBitmap(photo);
+        reasonText.setText(reason);
+        username.setText(user);
 
-
-        if(reason != null) {
-            TextView reasonText = viewHolder.itemView.findViewById(R.id.reasonText);
-            reasonText.setText(reason);
-        }
-/*        if(situation != null) {
-            TextView situationText = viewHolder.itemView.findViewById(R.id.situation_feed);
-            situationText.setText(situation.toString());
-        }
-        if(photo != null) {
-            ImageView photoFeed = viewHolder.itemView.findViewById(R.id.photo_feed);
-            photoFeed.setImageBitmap(photo);
-        }*/
+//        TODO: Implemented but out of scope for sprint 1
+//
+//        if(reason != null) {
+//            TextView reasonText = viewHolder.itemView.findViewById(R.id.reason_feed);
+//            reasonText.setText(reason);
+//        }
+//        if(situation != null) {
+//            TextView situationText = viewHolder.itemView.findViewById(R.id.situation_feed);
+//            situationText.setText(situation.toString());
+//        }
+//        if(photo != null) {
+//            ImageView photoFeed = viewHolder.itemView.findViewById(R.id.photo_feed);
+//            photoFeed.setImageBitmap(photo);
+//        }
     }
 
     public MoodType getMoodType() {
