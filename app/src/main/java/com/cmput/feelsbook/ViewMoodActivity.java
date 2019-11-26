@@ -1,19 +1,15 @@
 package com.cmput.feelsbook;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -31,59 +27,79 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 
-public class AddMoodActivity extends AppCompatActivity{
+public class ViewMoodActivity extends AppCompatActivity{
 
     private EditText input;
     private Bitmap picture;
     private Bitmap dp;
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
     private User currentUser;
     private CollectionReference MoodCollection;
     private DocumentReference UserDocument;
-    private Spinner spinner;
-    private Spinner socialSpinner;
+//    private Spinner spinner;
+//    private Spinner socialSpinner;
+
+    private TextView moodText;
+    private TextView reasonText;
+    private TextView socialSituationText;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_post);
+        setContentView(R.layout.view_mood_activity);
 
-        input = findViewById(R.id.editText);
-        spinner = findViewById(R.id.mood_spinner);
-        socialSpinner = findViewById(R.id.social_spinner);
 
-        MoodType[] moodTypes = {MoodType.HAPPY, MoodType.SAD, MoodType.ANGRY, MoodType.ANNOYED, MoodType.SLEEPY, MoodType.SEXY};
-        ArrayList<MoodType> moodList = new ArrayList<>(Arrays.asList(moodTypes));
-        ArrayAdapter<MoodType> moodTypeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, moodList);
+        moodText = findViewById(R.id.moodText);
+        reasonText = findViewById(R.id.reason_text);
+        socialSituationText = findViewById(R.id.social_situation_text);
 
-        moodTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(moodTypeAdapter);
+
+        Button editButton = findViewById(R.id.edit_button);
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+
+
+
+//        input = findViewById(R.id.editText);
+//        spinner = findViewById(R.id.mood_spinner);
+//        socialSpinner = findViewById(R.id.social_spinner);
+
+//        MoodType[] moodTypes = {MoodType.HAPPY, MoodType.SAD, MoodType.ANGRY, MoodType.ANNOYED, MoodType.SLEEPY, MoodType.SEXY};
+//        ArrayList<MoodType> moodList = new ArrayList<>(Arrays.asList(moodTypes));
+//        ArrayAdapter<MoodType> moodTypeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, moodList);
+//
+//        moodTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        spinner.setAdapter(moodTypeAdapter);
 
         //creates social situation spinner drop down menu
-        SocialSituation[] socialSits = {SocialSituation.ALONE, SocialSituation.ONEPERSON, SocialSituation.SEVERAL, SocialSituation.CROWD};
-        ArrayList<SocialSituation> socialSitList = new ArrayList<>(Arrays.asList(socialSits));
-        ArrayAdapter<SocialSituation> socialAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, socialSitList);
-
-        socialAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        socialSpinner.setAdapter(socialAdapter);
-        socialSpinner.setVisibility(View.GONE); //sets the view to be gone because it is optional
+//        SocialSituation[] socialSits = {SocialSituation.ALONE, SocialSituation.ONEPERSON, SocialSituation.SEVERAL, SocialSituation.CROWD};
+//        ArrayList<SocialSituation> socialSitList = new ArrayList<>(Arrays.asList(socialSits));
+//        ArrayAdapter<SocialSituation> socialAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, socialSitList);
+//
+//        socialAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        socialSpinner.setAdapter(socialAdapter);
+//        socialSpinner.setVisibility(View.GONE); //sets the view to be gone because it is optional
 
         Bundle bundle = getIntent().getExtras();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        Button deleteButton = findViewById(R.id.delete_button);
+//        Button deleteButton = findViewById(R.id.delete_button);
 
 
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
             if((boolean) bundle.get("editMood")){
                 setValues(((Mood) bundle.getSerializable("Mood")).Serialize(false), moodTypes, socialSits);
-                deleteButton.setVisibility(View.VISIBLE);
-                deleteButton.setOnClickListener(view -> {
-                    deleted(((Mood) bundle.getSerializable("Mood")).Serialize(false));
-                    finish();
-                });
+//                deleteButton.setVisibility(View.VISIBLE);
+//                deleteButton.setOnClickListener(view -> {
+//                    deleted(((Mood) bundle.getSerializable("Mood")).Serialize(false));
+//                    finish();
+//                });
             }
         }
 
@@ -108,12 +124,7 @@ public class AddMoodActivity extends AppCompatActivity{
             }
         });
 
-        Button cameraButtonAdd = findViewById(R.id.add_picture_button);
-        cameraButtonAdd.setOnClickListener(v -> {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (intent.resolveActivity(AddMoodActivity.this.getPackageManager()) != null)
-                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-        });
+
 
         Button backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> finish());
@@ -126,21 +137,6 @@ public class AddMoodActivity extends AppCompatActivity{
         });
     }
 
-    /**
-     * Activity result for Camera activity, gets bitmap photo taken during activity and attaches to bitmap variable 'picture'
-     * @param requestCode
-     * @param resultCode
-     * @param data
-     */
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == REQUEST_IMAGE_CAPTURE) {
-                picture = (Bitmap) data.getExtras().get("data");
-            }
-        }
-    }
 
     /**
      * takes a mood and puts it in the database. If the mood is new will create a new mood in the
@@ -218,7 +214,7 @@ public class AddMoodActivity extends AppCompatActivity{
         input.setText(editMood.getReason());
         for(int i = 0; i < moodTypes.length; i++){
             if(moodTypes[i] == editMood.getMoodType()){
-                spinner.setSelection(i);
+                moodText.setText(moodTypes[i].toString());
             }
         }
 
@@ -227,38 +223,23 @@ public class AddMoodActivity extends AppCompatActivity{
         if(editMood.hasSituation()){
             for(int i = 0; i < socialSits.length; i++){
                 if(socialSits[i] == editMood.getSituation()){
-                    socialSpinner.setVisibility(View.VISIBLE);
-                    socialSpinner.setSelection(i);
+                    socialSituationText.setVisibility(View.VISIBLE);
+                    socialSituationText.setText(socialSits[i].toString());
                 }
             }
         }
     }
 
-    /**
-     * will be used to delete passed in mood once implemented
-     * @param mood
-     *      mood to be deleted
-     */
-    private void deleted(Post mood){
-        Toast.makeText(getApplicationContext(), "Mood Deleted", Toast.LENGTH_SHORT).show();
-        MoodCollection
-                .document(mood.toString())
-                .delete()
-                .addOnSuccessListener(aVoid -> Log.d("--DELETE OPERATION---: ",
-                        "Data removal successful"))
-                .addOnFailureListener(e -> Log.d("--DELETE OPERATION---: ",
-                        "Data removal failed" + e.toString()));
-
-    }
 
     private Mood getValues(){
         String moodText = input.getText().toString();
         MoodType selected_type = (MoodType) spinner.getSelectedItem();
         SocialSituation selectedSocial = null;
 
-        if (socialSpinner.getVisibility() == View.VISIBLE)
-            selectedSocial = (SocialSituation) socialSpinner.getSelectedItem();
+        if (socialSpinner.getVisibility() == View.VISIBLE) {
+//            selectedSocial = (SocialSituation) socialSpinner.getSelectedItem();
 
+        }
 
         if (picture == null) {
             return new Mood(selected_type, null).withReason(moodText)

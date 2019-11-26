@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/LinearLayout3"
+        android:layout_width="407dp"
+        android:layout_height="wrap_content"
+        android:background="#319135"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/TopBar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#697969">
+
+            <Button
+                android:id="@+id/edit_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="20dp"
+                android:background="#E6FA02"
+                android:text="EDIT"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <Button
+                android:id="@+id/back_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="5dp"
+                android:drawableStart="@drawable/ic_arrow_back_black_24dp"
+                android:shadowColor="#00948E8E"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/Text_layout"
+        android:layout_width="387dp"
+        android:layout_height="222dp"
+        android:layout_marginBottom="48dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/Image_and_location_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/mood_text_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Mood type:" />
+
+        <TextView
+            android:id="@+id/Mood_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/social_text_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Social Situation:" />
+
+        <TextView
+            android:id="@+id/social_situation_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/reason_text_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="1dp"
+            android:text="Reason:" />
+
+        <TextView
+            android:id="@+id/reason_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/profile_picture"
+        android:layout_width="76dp"
+        android:layout_height="73dp"
+        android:layout_marginBottom="35dp"
+        android:contentDescription="profile_picture"
+        app:layout_constraintBottom_toTopOf="@+id/Text_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/LinearLayout3"
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@color/colorPrimaryDark" />
+
+    <LinearLayout
+        android:id="@+id/Image_and_location_layout"
+        android:layout_width="409dp"
+        android:layout_height="226dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:id="@+id/post_picture"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="ToDo: put map here?"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </LinearLayout>
+    <![CDATA[
+
+
+    android:layout_marginEnd="16dp"
+    android:drawablePadding="5dp"
+    android:ems="10"
+    android:hint="How are you feeling?"
+    android:inputType="textPersonName"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toEndOf="@+id/imageButton4"
+    app:layout_constraintTop_toTopOf="parent"/>
+
+    ]]><!--        app:layout_constraintTop_toBottomOf="@+id/tableRow" />-->
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
