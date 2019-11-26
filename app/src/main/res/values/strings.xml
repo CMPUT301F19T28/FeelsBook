@@ -17,5 +17,6 @@
     <string name="follow_requests">Follow Requests</string>
     <string name="following">Following</string>
     <string name="followers">Followers</string>
+    <string name="delete_button">DELETE</string>
 
 </resources>
