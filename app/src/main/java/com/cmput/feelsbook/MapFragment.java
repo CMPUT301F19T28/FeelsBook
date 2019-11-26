@@ -220,7 +220,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             if(mood.getLocation() != null) {
                 LatLng position = new LatLng(mood.getLocation().getLatitude(), mood.getLocation().getLongitude());
                 String title = "TODO: Put username here";
-                String snippet = "emoji @ " + mood.getDateTime().toString();
+                String snippet = getString(mood.getMoodType().getEmoticon()) + "@ " + mood.getDateTime().toString();
                 Bitmap avatar = mood.getPhoto();
                 ClusterMarker clusterMarker = new ClusterMarker(position, title, snippet, avatar);
                 clusterManager.addItem(clusterMarker);
