@@ -37,6 +37,7 @@
         app:layout_constraintStart_toEndOf="@+id/profileImage"
         app:layout_constraintTop_toBottomOf="@+id/full_name" />
 
+
     <Button
         android:id="@+id/removeButton"
         android:layout_width="110dp"
