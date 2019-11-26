@@ -233,6 +233,11 @@ public class AddMoodFragment extends DialogFragment {
                                 if(socialSpinner.getVisibility() == View.VISIBLE){
                                     editMood.setSituation(selectedSocial);
                                 }
+                                if(locationText.getVisibility() == View.VISIBLE) {
+                                    editMood.setLocation(geoPoint);
+                                } else {
+                                    editMood.setLocation(null);
+                                }
 
                                 editMood.setReason(newMoodReason);
                                 editMood.setMoodType(newSelectedType);

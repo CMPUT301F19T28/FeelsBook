@@ -265,7 +265,8 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                     feedFragment.getRecyclerAdapter().removePost(0);
                     feedFragment.getRecyclerAdapter().notifyItemRemoved(0);
                 }
-                mapFragment.getFeed().clear();
+                if (locationPermissionGranted)
+                    mapFragment.getFeed().clear();
 
                 for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
 
