@@ -247,19 +247,19 @@ public class FilterFragment extends DialogFragment {
     }
 
     public void resetFilterButtons(){
-        prefs.edit().clear().apply();
+        SharedPreferences.Editor edit = prefs.edit();
+        if(prefs.contains("happy")){ edit.remove("happy").apply(); }
+        if(prefs.contains("sad")){ edit.remove("sad").apply(); }
+        if(prefs.contains("angry")){ edit.remove("angry").apply(); }
+        if(prefs.contains("sleepy")){ edit.remove("sleepy").apply(); }
+        if(prefs.contains("annoyed")){ edit.remove("annoyed").apply(); }
+        if(prefs.contains("sexy")){ edit.remove("sexy").apply(); }
+
         this.happyPressed = false;
         this.sadPressed = false;
         this.angryPressed = false;
         this.sleepyPressed = false;
         this.annoyedPressed = false;
         this.sexyPressed = false;
-    }
-
-    public void checkPreferences(){
-        if(prefs.contains(KEY_START)){
-            Log.d("Filter", "called resetPreferences");
-            prefs.edit().clear().apply();
-        }
     }
 }

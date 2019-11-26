@@ -122,10 +122,13 @@ public class MainActivity extends AppCompatActivity implements AddMoodFragment.O
                 // filter button is clicked for the first time
                 if (!filterClicked){
                     SharedPreferences prefs = getSharedPreferences("filterKey", Context.MODE_PRIVATE);
-                    if((prefs.contains("happy")) || prefs.contains("sad") || prefs.contains("angry")
-                            || prefs.contains("sleepy") || prefs.contains("annoyed") || prefs.contains("sexy")){
-                        prefs.edit().clear().apply();
-                    }
+                    SharedPreferences.Editor edit = prefs.edit();
+                    if(prefs.contains("happy")){ edit.remove("happy").apply(); }
+                    if(prefs.contains("sad")){ edit.remove("sad").apply(); }
+                    if(prefs.contains("angry")){ edit.remove("angry").apply(); }
+                    if(prefs.contains("sleepy")){ edit.remove("sleepy").apply(); }
+                    if(prefs.contains("annoyed")){ edit.remove("annoyed").apply(); }
+                    if(prefs.contains("sexy")){ edit.remove("sexy").apply(); }
                 }
 
                 // display filter window
