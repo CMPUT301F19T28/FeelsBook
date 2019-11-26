@@ -61,15 +61,7 @@ public class FollowingRequests extends RecyclerView.Adapter<RecyclerView.ViewHol
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if(task.isSuccessful()) {
                     for(QueryDocumentSnapshot document: task.getResult()) {
-                        Map<String, Object> data = document.getData();
-                        String photoString = (String) data.get("photo");
-                        if(photoString != null) {
-                            byte[] photo = Base64.getDecoder().decode(photoString);
-                            list.add(new FollowUser(document.getId(), (String) data.get("fullname"), BitmapFactory.decodeByteArray(photo, 0, photo.length)));
-                        }
-                        else {
-                            list.add(new FollowUser(document.getId(), (String) data.get("fullname"), null));
-                        }
+                        list.add(document.toObject(FollowUser.class));
                     }
                     notifyDataSetChanged();
                 }
@@ -92,6 +84,7 @@ public class FollowingRequests extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         userName.setText(list.get(position).getUserName());
         fullName.setText(list.get(position).getName());
+        profilePic.setImageBitmap(list.get(position).getProfilePic());
 
         Button accept = holder.itemView.findViewById(R.id.AcceptButton);
         accept.setOnClickListener(new View.OnClickListener() {

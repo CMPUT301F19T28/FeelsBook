@@ -64,6 +64,8 @@ public class SearchActivity extends AppCompatActivity {
                             try {
                                 JSONArray arr = jsonObject.getJSONArray("hits");
                                 for (int i = 0; i < arr.length(); i++) {
+                                    if(arr.getJSONObject(i).getString("username").equals(user.getUserName()))
+                                        continue;
                                     FirebaseFirestore.getInstance()
                                             .collection("users")
                                             .document(arr.getJSONObject(i).getString("username"))
@@ -73,7 +75,8 @@ public class SearchActivity extends AppCompatActivity {
                                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                     if (task.isSuccessful() && task.getResult() != null) {
                                                         DocumentSnapshot doc = task.getResult();
-                                                        adapter.addUser(new FollowUser(task.getResult().getId(), (String) doc.getData().get("name"), (Bitmap) doc.getData().get("profilePic")));
+                                                        if(doc.exists())
+                                                            adapter.addUser(new FollowUser(task.getResult().getId(), (String) doc.getData().get("name"), (Bitmap) doc.getData().get("profilePic")));
                                                     }
                                                 }
                                             });

@@ -153,7 +153,6 @@ public class Mood extends Post implements Serializable {
         profile_pic_feed.setImageBitmap(profilePic);
         username.setText(user);
 
-
         if(reason != null) {
             TextView reasonText = viewHolder.itemView.findViewById(R.id.reasonText);
             reasonText.setText(reason);

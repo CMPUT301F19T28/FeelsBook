@@ -84,7 +84,6 @@ public class MainActivity extends AppCompatActivity{
              */
             @Override
             public void onItemClick(Post post){
-//                new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
                 Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);

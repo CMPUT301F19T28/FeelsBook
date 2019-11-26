@@ -153,6 +153,21 @@ public class User implements Serializable {
         FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(getUserName())
+                .collection("following")
+                .document(userId)
+                .delete();
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(userId)
+                .collection("followers")
+                .document(getUserName())
+                .delete();
+    }
+
+    public void removeFollowing(String  userId) {
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(getUserName())
                 .collection("followers")
                 .document(userId)
                 .delete();

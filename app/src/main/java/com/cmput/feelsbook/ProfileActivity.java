@@ -78,8 +78,6 @@ public class ProfileActivity extends AppCompatActivity{
         db = FirebaseFirestore.getInstance();
 
         postCount = 0;
-        followCount = 0;
-        followersCount = 0;
 
 
         if (bundle != null){
@@ -95,7 +93,6 @@ public class ProfileActivity extends AppCompatActivity{
 
             @Override
             public void onItemClick(Post post){
-//                new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
                 Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
@@ -122,16 +119,13 @@ public class ProfileActivity extends AppCompatActivity{
         Button backButton = findViewById(R.id.exit_profile);
         TextView fullName = findViewById(R.id.full_name);
         TextView userName = findViewById(R.id.username);
-        TextView followText = findViewById(R.id.follower_count);
-        TextView followingText = findViewById(R.id.following_count);
         TextView postsText = findViewById(R.id.total_posts);
         ImageView profilePicture = findViewById(R.id.profile_picture);
 
         postCount = historyFragment.getRecyclerAdapter().getItemCount();
         fullName.setText(currentUser.getName());
-        followText.setText(followCount + " following");
-        followingText.setText(followersCount + " followers");
         userName.setText("@"+currentUser.getUserName());
+
 
         updateFeed();
         postCount = historyFragment.getRecyclerAdapter().getItemCount();
@@ -146,6 +140,26 @@ public class ProfileActivity extends AppCompatActivity{
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        TextView followersText = findViewById(R.id.follower_count);
+        TextView followingText = findViewById(R.id.following_count);
+        db.collection("users").document(currentUser.getUserName()).collection("following").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                followCount = queryDocumentSnapshots.size();
+                followingText.setText(followCount + " following");
+            }
+        });
+        db.collection("users").document(currentUser.getUserName()).collection("followers").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                followersCount = queryDocumentSnapshots.size();
+                followersText.setText(followersCount + " followers");
+            }
+        });
+    }
     /**
      * Launches follower list / following list activity
      * @param v
@@ -179,7 +193,6 @@ public class ProfileActivity extends AppCompatActivity{
                 Location location = null;
                 Bitmap profilePic = null;
                 Date dateTime = null;
-
 
                 try {
                     if (doc.contains("datetime"))
