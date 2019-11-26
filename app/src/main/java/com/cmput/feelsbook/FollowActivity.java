@@ -1,5 +1,6 @@
 package com.cmput.feelsbook;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -65,7 +66,11 @@ public class FollowActivity extends AppCompatActivity {
             // launches a new search activity
             @Override
             public void onClick(View view) {
-                SearchFragment.newInstance(user).show(getSupportFragmentManager(), "FriendRequest");
+                Intent intent = new Intent(FollowActivity.this, SearchActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("user", user);
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
     }

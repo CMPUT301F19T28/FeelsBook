@@ -30,7 +30,6 @@ public class Followers extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public Followers(User user) {
         this.user = user;
         list = new ArrayList<>();
-        fillList();
         FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(user.getUserName())
