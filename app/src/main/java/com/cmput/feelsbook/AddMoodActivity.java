@@ -1,9 +1,12 @@
 package com.cmput.feelsbook;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -13,10 +16,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.cmput.feelsbook.R;
 import com.cmput.feelsbook.User;
@@ -24,11 +29,16 @@ import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.Post;
 import com.cmput.feelsbook.post.SocialSituation;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -47,6 +57,9 @@ public class AddMoodActivity extends AppCompatActivity{
     private DocumentReference UserDocument;
     private Spinner spinner;
     private Spinner socialSpinner;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private GeoPoint geoPoint;
+
 
 
     @Override
@@ -57,6 +70,8 @@ public class AddMoodActivity extends AppCompatActivity{
         input = findViewById(R.id.editText);
         spinner = findViewById(R.id.mood_spinner);
         socialSpinner = findViewById(R.id.social_spinner);
+        TextView locationText = findViewById(R.id.location_text);
+
 
         MoodType[] moodTypes = {MoodType.HAPPY, MoodType.SAD, MoodType.ANGRY, MoodType.ANNOYED, MoodType.SLEEPY, MoodType.SEXY};
         ArrayList<MoodType> moodList = new ArrayList<>(Arrays.asList(moodTypes));
@@ -103,6 +118,11 @@ public class AddMoodActivity extends AppCompatActivity{
         ImageView profilePicture = findViewById(R.id.profile_picture);
         profilePicture.setImageBitmap(bitmapProfilePicture);
 
+        //gets current location and sets location view
+        getLastKnownLocation();
+        locationText.setText("big yeet");
+        locationText.setVisibility(View.GONE); //sets the location view to be gone because it is optional
+
         //if the social situatiion button is pressed then shows the drop down
         Button socialBttn = findViewById(R.id.social_situation_button);
         socialBttn.setOnClickListener(v -> {
@@ -110,6 +130,15 @@ public class AddMoodActivity extends AppCompatActivity{
                 socialSpinner.setVisibility(View.INVISIBLE);
             } else {
                 socialSpinner.setVisibility(View.VISIBLE);
+            }
+        });
+
+        //if the location button is pressed then show the location text
+        final Button locationBttn = findViewById(R.id.add_location_button);
+        locationBttn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                locationText.setVisibility(View.VISIBLE);
             }
         });
 
@@ -128,6 +157,22 @@ public class AddMoodActivity extends AppCompatActivity{
             onSubmit(getValues());
 //                Intent intent = new Intent();
             finish();
+        });
+    }
+
+    public void getLastKnownLocation() {
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(@NonNull Task<Location> task) {
+                Location location = task.getResult();
+                geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+            }
         });
     }
 
