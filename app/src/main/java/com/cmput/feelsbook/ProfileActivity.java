@@ -1,14 +1,13 @@
 package com.cmput.feelsbook;
 
-import android.content.DialogInterface;
+
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -39,6 +38,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -48,6 +48,8 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import io.opencensus.tags.Tag;
 
 /**
  * Handles the profile activities and displays the user profile information.
@@ -62,10 +64,10 @@ import java.util.Iterator;
  * FeedFragment feedFragment - contains the feed activity to be displayed
  * FirebaseFirestore db - created instance of the database where data is being pulled from
  */
-public class ProfileActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener,
-FilterFragment.OnMoodSelectListener, LogoutFragment.OnLogoutListener{
-    private int followCount = 0;
-    private int followersCount = 0;
+
+public class ProfileActivity extends AppCompatActivity implements FilterFragment.OnMoodSelectListener, LogoutFragment.OnLogoutListener{
+    private int followCount;
+    private int followersCount;
     private int postCount;
     private ImageView profilePicture;
     private User currentUser;
@@ -75,7 +77,7 @@ FilterFragment.OnMoodSelectListener, LogoutFragment.OnLogoutListener{
     private FeedFragment historyFragment;
     private MapFragment mapFragment;
     private FirebaseFirestore db;
-    private CollectionReference cr;
+    private CollectionReference MoodCollection;
     private Feed.OnItemClickListener listener;
     private ArrayList<MoodType> filteredMoods;
     private ArrayList<Post> historyCopy;
@@ -94,6 +96,15 @@ FilterFragment.OnMoodSelectListener, LogoutFragment.OnLogoutListener{
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         db = FirebaseFirestore.getInstance();
         filteredMoods = new ArrayList<>();
+        postCount = 0;
+        followCount = 0;
+        followersCount = 0;
+
+
+        if (bundle != null){
+            currentUser = (User)bundle.get("User");
+        }
+
         listener = new Feed.OnItemClickListener(){
             /**
              * Sets onItemClick to open a fragment in which the mood will be edited
@@ -103,7 +114,13 @@ FilterFragment.OnMoodSelectListener, LogoutFragment.OnLogoutListener{
 
             @Override
             public void onItemClick(Post post){
-                new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
+                Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
+                Bundle userBundle = new Bundle();
+                userBundle.putSerializable("User", currentUser);
+                userBundle.putBoolean("editMood", true);
+                userBundle.putSerializable("Mood", ((Mood) post).Serialize(true));
+                intent.putExtras(userBundle);
+                startActivityForResult(intent, 1);
             }
         };
 
@@ -112,7 +129,7 @@ FilterFragment.OnMoodSelectListener, LogoutFragment.OnLogoutListener{
         }
 
         //Sets the document to that of the current user
-        cr = db.collection("users").document(currentUser.getUserName())
+        MoodCollection = db.collection("users").document(currentUser.getUserName())
                 .collection("Moods");
 
         historyFragment = new FeedFragment();
@@ -163,8 +180,6 @@ FilterFragment.OnMoodSelectListener, LogoutFragment.OnLogoutListener{
             }
         });
 
-
-
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -182,7 +197,7 @@ FilterFragment.OnMoodSelectListener, LogoutFragment.OnLogoutListener{
         profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new AddMoodFragment().show(getSupportFragmentManager(), "ADD_MOOD");
+                //new AddMoodFragment().show(getSupportFragmentManager(), "ADD_MOOD");
             }
         });
         final ImageButton filterButton = findViewById(R.id.profile_filter_button);
@@ -207,98 +222,6 @@ FilterFragment.OnMoodSelectListener, LogoutFragment.OnLogoutListener{
     }
 
     /**
-     * Takes a mood from the implemented fragment and adds it to the feedAdapter
-     * @param newMood - Mood that will be added to the feed.
-     */
-    public void onSubmit(Post newMood){
-        HashMap<String, Object> data = new HashMap<>();
-
-        /*
-        If the newMood contains a photo will convert it into a Base64 String to be stored in the
-        database if no photo is present sets the field to null
-         */
-        try {
-            //puts photo into hashmap
-            Bitmap bitmap = ((Mood) newMood).getPhoto();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            byte[] picData = baos.toByteArray();
-            data.put("photo", Base64.getEncoder().encodeToString(picData));
-        }catch (Exception e) {
-            Log.d("-----UPLOAD PHOTO-----",
-                    "****NO PHOTO UPLOADED: " + e);
-            data.put("photo", null);
-        }
-
-        /*
-        If the newMood contains a profilePic, it will convert it into a Base64 String to be stored
-        in the database if no profilePic is present sets the field to null
-         */
-        try {
-            //puts profilePic into hashmap
-            Bitmap bitmap = ((Mood) newMood).getProfilePic();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            byte[] picData = baos.toByteArray();
-            data.put("profilePic", Base64.getEncoder().encodeToString(picData));
-        }catch (Exception e) {
-            Log.d("-----UPLOAD PHOTO-----",
-                    "****NO profilepic UPLOADED: " + e);
-            data.put("profilePic", null);
-        }
-
-        /*
-        Puts the other parameters into the hashmap to be sent to the database
-         */
-        data.put("datetime", newMood.getDateTime());
-        data.put("location", ((Mood) newMood).getLocation());
-        data.put("reason", ((Mood) newMood).getReason());
-        data.put("situation", ((Mood) newMood).getSituation());
-        data.put("moodType", ((Mood) newMood).getMoodType());
-        cr.document(newMood.toString())
-                .set(data)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("Sample", "Data addition successful");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d("Sample", "Data addition failed" + e.toString());
-                    }
-                });
-    }
-
-    /**
-     * Will be used to delete passed in mood once implemented
-     * @param mood
-     * Post mood - mood to be deleted
-     */
-    public void deleted(Post mood){
-        Toast.makeText(ProfileActivity.this, "Mood Deleted", Toast.LENGTH_SHORT).show();
-        //For deleting mood
-        cr.document(mood.toString())
-                .delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("--DELETE OPERATION---: ",
-                                "Data removal successful");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d("--DELETE OPERATION---: ",
-                                "Data removal failed" + e.toString());
-                    }
-                });
-        historyFragment.getRecyclerAdapter().notifyDataSetChanged();
-    }
-
-    /**
      * Launches follower list / following list activity
      * @param v
      */
@@ -311,126 +234,115 @@ FilterFragment.OnMoodSelectListener, LogoutFragment.OnLogoutListener{
     }
 
     /**
-     * Listens for updates the the database and updates the recyclerView when updates
+     * This method updates the FeedFragment whenever the remote database is updated
      */
-    public void updateFeed(){
-        cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+    private void updateFeed(){
+        MoodCollection.addSnapshotListener((queryDocumentSnapshots, e) -> {
 
-                //clears list
-                while( historyFragment.getRecyclerAdapter().getItemCount() > 0) {
-                    historyFragment.getRecyclerAdapter().removePost(0);
-                    historyFragment.getRecyclerAdapter().notifyItemRemoved(0);
-                }
-
-                for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
-
-                    MoodType moodType = null;
-                    String reason = null;
-                    SocialSituation situation = null;
-                    Bitmap photo = null;
-                    Location location = null;
-                    Bitmap profilePic = null;
-                    Date dateTime = null;
-
-
-                    try {
-                        if (doc.contains("datetime"))
-                            dateTime = ((Timestamp) doc.get("datetime")).toDate();
-
-                        if (doc.contains("location"))
-                            location = (Location) doc.get("location");
-
-                        if (doc.contains("photo")) {
-
-                            /*
-                            converts the photo is present converts from a base64 string to a byte[]
-                            and then into a bitmap if no photo is present sets photo to null
-                             */
-                            try {
-                                byte[] decoded = Base64.getDecoder()
-                                        .decode((String)  doc.get("photo"));
-                                photo = BitmapFactory.decodeByteArray(decoded
-                                        , 0, decoded.length);
-                            }catch(Exception error) {
-                                Log.d("-----UPLOAD PHOTO-----",
-                                        "****NO PHOTO DOWNLOADED: " + e);
-                                photo = null;
-                            }
-                        }
-
-                        if (doc.contains("profilePic")) {
-
-                            /*
-                            converts the profilePic is present converts from a base64 string to a byte[]
-                            and then into a bitmap if no photo is present sets profilePic to null
-                             */
-                            try {
-                                byte[] decoded = Base64.getDecoder()
-                                        .decode((String)  doc.get("profilePic"));
-                                profilePic = BitmapFactory.decodeByteArray(decoded
-                                        , 0, decoded.length);
-                            }catch(Exception error) {
-                                Log.d("-----UPLOAD PHOTO-----",
-                                        "****NO PHOTO DOWNLOADED: " + e);
-                                profilePic = null;
-                            }
-                        }
-
-                        if (doc.contains("reason"))
-                            reason = (String) doc.get("reason");
-
-                        if (doc.contains("situation") & (doc.get("situation") != null)) {
-                            situation = SocialSituation.getSocialSituation((String) doc.get("situation"));
-                        }
-
-                        if (doc.contains("moodType") & (doc.get("moodType") != null)) {
-                            moodType = MoodType.getMoodType((String) doc.get("moodType"));
-                        }
-
-                        Mood mood = new Mood(dateTime, moodType, profilePic);
-
-                        if(reason != null)
-                            mood = mood.withReason(reason);
-                        if(situation != null)
-                            mood = mood.withSituation(situation);
-                        if(photo != null)
-                            mood = mood.withPhoto(photo);
-                        if(location != null)
-                            mood.withLocation(location);
-
-                        historyFragment.getRecyclerAdapter().addPost(mood);
-
-
-                    }catch(Exception error){
-                        Log.d("-----UPLOAD SAMPLE-----",
-                                "****MOOD DOWNLOAD FAILED: " + error);
-                    }
-                }
-                historyFragment.getRecyclerAdapter().notifyDataSetChanged();
-                historyCopy = new ArrayList<>(historyFragment.getRecyclerAdapter().getFeed());
-                int postListCount = historyFragment.getRecyclerAdapter().getItemCount();
-
-                // update total number of posts
-                HashMap<String,Object> userUpdate = new HashMap<>();
-                userUpdate.put("total_posts",String.valueOf(postListCount));
-                db.collection("users").document(currentUser.getUserName())
-                        .update(userUpdate)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("Profile", "Counter update successful");
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w("Profile", "Counter update failed: " + e);
-                            }
-                        });
+            //clears list
+            while( historyFragment.getRecyclerAdapter().getItemCount() > 0) {
+                historyFragment.getRecyclerAdapter().removePost(0);
+                historyFragment.getRecyclerAdapter().notifyItemRemoved(0);
             }
+
+            for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
+                MoodType moodType = null;
+                String reason = null;
+                SocialSituation situation = null;
+                Bitmap photo = null;
+                Location location = null;
+                Bitmap profilePic = null;
+                Date dateTime = null;
+
+
+                try {
+                    if (doc.contains("datetime"))
+                        dateTime = ((Timestamp) doc.get("datetime")).toDate();
+
+                    if (doc.contains("location"))
+                        location = (Location) doc.get("location");
+
+                    if (doc.contains("photo")) {
+                        photo = getPhoto((String)  doc.get("photo"));
+                    }
+
+                    if (doc.contains("profilePic")) {
+                        profilePic = getPhoto((String)  doc.get("profilePic"));
+                    }
+
+                    if (doc.contains("reason"))
+                        reason = (String) doc.get("reason");
+
+                    if (doc.contains("situation") & (doc.get("situation") != null)) {
+                        situation = SocialSituation.getSocialSituation((String) doc.get("situation"));
+                    }
+
+                    if (doc.contains("moodType") & (doc.get("moodType") != null)) {
+                        moodType = MoodType.getMoodType((String) doc.get("moodType"));
+                    }
+
+                    Mood mood = new Mood(dateTime, moodType, profilePic);
+
+                    if(reason != null)
+                        mood = mood.withReason(reason);
+                    if(situation != null)
+                        mood = mood.withSituation(situation);
+                    if(photo != null)
+                        mood = mood.withPhoto(photo);
+                    if(location != null)
+                        mood.withLocation(location);
+
+                    historyFragment.getRecyclerAdapter().addPost(mood);
+
+
+                }catch(Exception error){
+                    Log.d("-----UPLOAD SAMPLE-----",
+                            "****MOOD DOWNLOAD FAILED: " + error);
+                }
+            }
+
+            historyFragment.getRecyclerAdapter().notifyDataSetChanged();
+            historyCopy = new ArrayList<>(historyFragment.getRecyclerAdapter().getFeed());
+            int postListCount = historyFragment.getRecyclerAdapter().getItemCount();
+
+            // update total number of posts
+            HashMap<String,Object> userUpdate = new HashMap<>();
+            userUpdate.put("total_posts",String.valueOf(postListCount));
+            db.collection("users").document(currentUser.getUserName())
+                    .update(userUpdate)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("Profile", "Counter update successful");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("Profile", "Counter update failed: " + e);
+                        }
+                    });
         });
+    }
+
+    /**
+     * Takes in a base64 string and converts it into a bitmap
+     * @param photo
+     *          photo to be converted in base64 String format format
+     * @return
+     *      returns bitmap of decoded photo returns null if base64 string was not passed in
+     */
+    private Bitmap getPhoto(String photo){
+        try {
+            @SuppressLint("NewApi") byte[] decoded = Base64.getDecoder()
+                    .decode(photo);
+            return BitmapFactory.decodeByteArray(decoded
+                    , 0, decoded.length);
+        }catch(Exception e){
+            Log.d("-----CONVERT PHOTO-----",
+                    "****NO PHOTO CONVERTED: " + e);
+            return null;
+        }
     }
 
     /**

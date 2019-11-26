@@ -24,14 +24,16 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_margin="4dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
                 android:background="@drawable/circle"
+                android:contentDescription="arrow"
                 android:drawableStart="@drawable/ic_arrow_back_black_24dp"
                 android:paddingStart="15dp"
                 android:paddingEnd="15dp"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:layout_editor_absoluteY="4dp"/>
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
                 android:id="@+id/profile_filter_button"
