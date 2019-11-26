@@ -1,11 +1,14 @@
 package com.cmput.feelsbook;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -15,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
@@ -59,7 +63,7 @@ import java.util.Iterator;
  * FirebaseFirestore db - created instance of the database where data is being pulled from
  */
 public class ProfileActivity extends AppCompatActivity implements AddMoodFragment.OnFragmentInteractionListener,
-FilterFragment.OnMoodSelectListener{
+FilterFragment.OnMoodSelectListener, LogoutFragment.OnLogoutListener{
     private int followCount = 0;
     private int followersCount = 0;
     private int postCount;
@@ -189,6 +193,15 @@ FilterFragment.OnMoodSelectListener{
                 filter = new FilterFragment();
                 filter.show(getSupportFragmentManager(),"MAIN_FILTER");
                 filterClicked = true;
+            }
+        });
+
+        final ImageButton logoutButton = findViewById(R.id.logout_button);
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LogoutFragment frag = new LogoutFragment();
+                frag.show(getSupportFragmentManager(),"logout");
             }
         });
     }
@@ -468,6 +481,12 @@ FilterFragment.OnMoodSelectListener{
         else {
             updateFeed();
         }
+    }
+
+    public void onLogout(){
+        currentUser = null;
+        Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+        startActivity(intent);
     }
 }
 

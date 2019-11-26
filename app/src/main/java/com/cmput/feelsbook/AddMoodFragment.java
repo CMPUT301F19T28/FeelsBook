@@ -66,9 +66,6 @@ public class AddMoodFragment extends DialogFragment {
      * @param mood object that will be edited
      * @return a fragment object
      */
-
-//    public static AddMoodFragment newInstance(Mood mood) {
-
     public static AddMoodFragment newInstance(Post mood){
         Bundle args = new Bundle();
         args.putSerializable("mood", mood);

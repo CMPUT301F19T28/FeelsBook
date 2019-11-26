@@ -41,7 +41,6 @@ public class FilterFragment extends DialogFragment {
 
     private OnMoodSelectListener listener;
     private SharedPreferences prefs;
-    private static String KEY_START = "started";
 
     private boolean happyPressed = false;
     private boolean sadPressed = false;
