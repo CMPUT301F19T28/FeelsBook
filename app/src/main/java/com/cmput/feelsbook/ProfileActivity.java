@@ -189,7 +189,8 @@ public class ProfileActivity extends AppCompatActivity{
             }
 
             for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
-
+                if(!doc.exists())
+                    break;
                 MoodType moodType = null;
                 String reason = null;
                 SocialSituation situation = null;

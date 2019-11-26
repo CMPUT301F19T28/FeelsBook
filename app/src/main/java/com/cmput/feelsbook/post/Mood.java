@@ -157,7 +157,7 @@ public class Mood extends Post implements Serializable {
             TextView reasonText = viewHolder.itemView.findViewById(R.id.reasonText);
             reasonText.setText(reason);
         }
-        if(situation != null) {
+/*        if(situation != null) {
             TextView situationText = viewHolder.itemView.findViewById(R.id.situation_feed);
             situationText.setText(situation.toString());
         }
@@ -165,6 +165,8 @@ public class Mood extends Post implements Serializable {
             ImageView photoFeed = viewHolder.itemView.findViewById(R.id.photo_feed);
             photoFeed.setImageBitmap(photo);
         }
+
+ */
     }
 
     public MoodType getMoodType() {
