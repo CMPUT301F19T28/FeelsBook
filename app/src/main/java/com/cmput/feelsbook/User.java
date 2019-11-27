@@ -72,7 +72,6 @@ public class User implements Serializable {
                 });
                 toFollowers.document(userId).set(documentSnapshot.getData());
                 fromRequest.delete();
-
             }
         });
     }
@@ -151,6 +150,21 @@ public class User implements Serializable {
     }
 
     public void removeFollower(String  userId) {
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(getUserName())
+                .collection("following")
+                .document(userId)
+                .delete();
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(userId)
+                .collection("followers")
+                .document(getUserName())
+                .delete();
+    }
+
+    public void removeFollowing(String  userId) {
         FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(getUserName())
