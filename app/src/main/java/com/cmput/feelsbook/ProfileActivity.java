@@ -1,9 +1,5 @@
 package com.cmput.feelsbook;
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 2e7637158a772d0d1cffc465b3b4d3f5924bd444
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -36,10 +32,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
-<<<<<<< HEAD
 import com.google.firebase.firestore.DocumentReference;
-=======
->>>>>>> 2e7637158a772d0d1cffc465b3b4d3f5924bd444
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -195,9 +188,13 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
 
 
         final FloatingActionButton profileButton = findViewById(R.id.profile_float_button);
-        profileButton.setOnClickListener(view -> {
-            // add mood activity
-
+        profileButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
+            Bundle userBundle = new Bundle();
+            userBundle.putSerializable("User", currentUser);
+            userBundle.putBoolean("editMood", false);
+            intent.putExtras(userBundle);
+            startActivityForResult(intent, 1);
         });
 
         final ImageButton filterButton = findViewById(R.id.profile_filter_button);

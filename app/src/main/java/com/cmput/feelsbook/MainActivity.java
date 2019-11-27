@@ -1,9 +1,6 @@
 package com.cmput.feelsbook;
 
-<<<<<<< HEAD
 import android.content.Context;
-=======
->>>>>>> 2e7637158a772d0d1cffc465b3b4d3f5924bd444
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -104,18 +101,15 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
              */
             @Override
             public void onItemClick(Post post) {
-//                new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
-                public void onItemClick (Post post){
-                    Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
-                    Bundle userBundle = new Bundle();
-                    userBundle.putSerializable("User", currentUser);
-                    userBundle.putBoolean("editMood", true);
-                    userBundle.putSerializable("Mood", ((Mood) post).Serialize(true));
-                    intent.putExtras(userBundle);
-                    startActivityForResult(intent, 1);
+                Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
+                Bundle userBundle = new Bundle();
+                userBundle.putSerializable("User", currentUser);
+                userBundle.putBoolean("editMood", true);
+                userBundle.putSerializable("Mood", ((Mood) post).Serialize(true));
+                intent.putExtras(userBundle);
+                startActivityForResult(intent, 1);
                 }
-            }
-        };
+            };
 
         feedFragment.getRecyclerAdapter().setOnItemClickListener(listener);
 
