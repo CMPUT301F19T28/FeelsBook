@@ -1,6 +1,9 @@
 package com.cmput.feelsbook;
 
+<<<<<<< HEAD
 import android.content.Context;
+=======
+>>>>>>> 2e7637158a772d0d1cffc465b3b4d3f5924bd444
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,7 +12,6 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -42,7 +44,6 @@ import java.util.Iterator;
 import java.util.List;
 
 
-
 /**
  * Homepage where a feed of moods/posts will be seen.
  * Comprised of a scrollable RecyclerView
@@ -53,8 +54,8 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private ViewPagerAdapter viewPagerAdapter;
-    private FeedFragment feedFragment;
-    private MapFragment mapFragment;
+    protected FeedFragment feedFragment;
+    protected MapFragment mapFragment;
     private Feed.OnItemClickListener listener;
     private FirebaseFirestore db;
     private ArrayList<Post> feedCopy;
@@ -74,11 +75,13 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         profileButton = findViewById(R.id.profile_button);
         db = FirebaseFirestore.getInstance();
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
         }
 
+        //Sets the document to that of the current user
         UserDocument = db.collection("users").document(currentUser.getUserName());
 
         //Sets the collectionReference to that of the current users moods
@@ -96,21 +99,24 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
         listener = new Feed.OnItemClickListener() {
             /**
              * Sets onItemClick to open a fragment in which the mood will be edited
-             * @param post
-             *          Post to be edited
+             *
+             * @param post Post to be edited
              */
             @Override
             public void onItemClick(Post post) {
 //                new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
-                Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
-                Bundle userBundle = new Bundle();
-                userBundle.putSerializable("User", currentUser);
-                userBundle.putBoolean("editMood", true);
-                userBundle.putSerializable("Mood", ((Mood) post).Serialize(true));
-                intent.putExtras(userBundle);
-                startActivityForResult(intent, 1);
+                public void onItemClick (Post post){
+                    Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
+                    Bundle userBundle = new Bundle();
+                    userBundle.putSerializable("User", currentUser);
+                    userBundle.putBoolean("editMood", true);
+                    userBundle.putSerializable("Mood", ((Mood) post).Serialize(true));
+                    intent.putExtras(userBundle);
+                    startActivityForResult(intent, 1);
+                }
             }
         };
+
         feedFragment.getRecyclerAdapter().setOnItemClickListener(listener);
 
         final FloatingActionButton addPostBttn = findViewById(R.id.addPostButton);
@@ -139,27 +145,32 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
         });
 
         final ImageButton filterButton = findViewById(R.id.filter_button);
-        filterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v){
+        filterButton.setOnClickListener(view -> {
                 // before creating a window, clears the toggle button saved states if the
                 // filter button is clicked for the first time
-                if (!filterClicked){
+                if (!filterClicked) {
                     SharedPreferences prefs = getSharedPreferences("filterKey", Context.MODE_PRIVATE);
                     SharedPreferences.Editor edit = prefs.edit();
-                    if(prefs.contains("happy")){ edit.remove("happy").apply(); }
-                    if(prefs.contains("sad")){ edit.remove("sad").apply(); }
-                    if(prefs.contains("angry")){ edit.remove("angry").apply(); }
-                    if(prefs.contains("sleepy")){ edit.remove("sleepy").apply(); }
-                    if(prefs.contains("annoyed")){ edit.remove("annoyed").apply(); }
-                    if(prefs.contains("sexy")){ edit.remove("sexy").apply(); }
+                    if (prefs.contains("happy")) { edit.remove("happy").apply();}
+                    if (prefs.contains("sad")) { edit.remove("sad").apply(); }
+                    if (prefs.contains("angry")) { edit.remove("angry").apply(); }
+                    if (prefs.contains("sleepy")) { edit.remove("sleepy").apply(); }
+                    if (prefs.contains("annoyed")) { edit.remove("annoyed").apply(); }
+                    if (prefs.contains("sexy")) { edit.remove("sexy").apply(); }
                 }
 
                 // display filter window
                 filter = new FilterFragment();
-                filter.show(getSupportFragmentManager(),"MAIN_FILTER");
+                filter.show(getSupportFragmentManager(), "MAIN_FILTER");
                 filterClicked = true;
-            }
+            });
+
+        profileButton.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+            Bundle userBundle = new Bundle();
+            userBundle.putSerializable("User", currentUser);
+            intent.putExtras(userBundle);
+            startActivity(intent);
         });
 
         //setLoading()
@@ -332,7 +343,6 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
             feedFragment.getRecyclerAdapter().notifyDataSetChanged();
         }
     }
-    // on new mood added
 
     /**
      * Takes in a base64 string and converts it into a bitmap
@@ -354,4 +364,3 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
         }
     }
 }
-

@@ -1,6 +1,9 @@
 package com.cmput.feelsbook;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2e7637158a772d0d1cffc465b3b4d3f5924bd444
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -33,7 +36,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
+<<<<<<< HEAD
 import com.google.firebase.firestore.DocumentReference;
+=======
+>>>>>>> 2e7637158a772d0d1cffc465b3b4d3f5924bd444
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -48,6 +54,8 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import io.opencensus.tags.Tag;
 
 import io.opencensus.tags.Tag;
 
@@ -95,25 +103,22 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         //profilePicture = findViewById(R.drawable.);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         db = FirebaseFirestore.getInstance();
-        filteredMoods = new ArrayList<>();
         postCount = 0;
-        followCount = 0;
-        followersCount = 0;
 
 
-        if (bundle != null){
-            currentUser = (User)bundle.get("User");
+        if (bundle != null) {
+            currentUser = (User) bundle.get("User");
         }
 
-        listener = new Feed.OnItemClickListener(){
+        listener = new Feed.OnItemClickListener() {
             /**
              * Sets onItemClick to open a fragment in which the mood will be edited
-             * @param post
-             *          Post to be edited
+             *
+             * @param post Post to be edited
              */
 
             @Override
-            public void onItemClick(Post post){
+            public void onItemClick(Post post) {
                 Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
@@ -124,8 +129,8 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
             }
         };
 
-        if (bundle != null){
-            currentUser = (User)bundle.get("User");
+        if (bundle != null) {
+            currentUser = (User) bundle.get("User");
         }
 
         //Sets the document to that of the current user
@@ -136,7 +141,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         historyFragment.getRecyclerAdapter().setOnItemClickListener(listener);
         mapFragment = new MapFragment();
         viewPagerAdapter.AddFragment(historyFragment, "History");
-        viewPagerAdapter.AddFragment(mapFragment,"Map");
+        viewPagerAdapter.AddFragment(mapFragment, "Map");
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -144,14 +149,11 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         Button backButton = findViewById(R.id.exit_profile);
         TextView fullName = findViewById(R.id.full_name);
         TextView userName = findViewById(R.id.username);
-        TextView followText = findViewById(R.id.follower_count);
-        TextView followingText = findViewById(R.id.following_count);
         TextView postsText = findViewById(R.id.total_posts);
         ImageView profilePicture = findViewById(R.id.profile_picture);
         fullName.setText(currentUser.getName());
-        followText.setText(followCount + " following");
-        followingText.setText(followersCount + " followers");
-        userName.setText("@"+currentUser.getUserName());
+        userName.setText("@" + currentUser.getUserName());
+
 
         updateFeed();
 
@@ -162,61 +164,74 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         dr.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()){
+                if (task.isSuccessful()) {
                     DocumentSnapshot doc = task.getResult();
-                    if (doc.exists()){
+                    if (doc.exists()) {
                         postCount = Integer.valueOf(doc.getString("total_posts"));
-                        if (postCount > 1 || postCount ==0){postsText.setText(postCount + " total posts");}
-                        else if (postCount == 1){postsText.setText(postCount + " total post");}
-                        Log.d("Profile","Total posts retrieved: "+postCount);
+                        if (postCount > 1 || postCount == 0) {
+                            postsText.setText(postCount + " total posts");
+                        } else if (postCount == 1) {
+                            postsText.setText(postCount + " total post");
+                        }
+                        Log.d("Profile", "Total posts retrieved: " + postCount);
+                    } else {
+                        Log.d("Profile", "No document found");
                     }
-                    else {
-                        Log.d("Profile","No document found");
-                    }
-                }
-                else{
-                    Log.d("Profile","Document retrieval failed: "+task.getException());
+                } else {
+                    Log.d("Profile", "Document retrieval failed: " + task.getException());
                 }
             }
         });
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (filterClicked){
-                    // reset filtered feed if filter was clicked at least once
-                    filter.resetFilterButtons();
-                    filteredMoods.clear();
-                    updateFeed();
-                }
-                finish();
+        backButton.setOnClickListener(view -> {
+            if (filterClicked) {
+                // reset filtered feed if filter was clicked at least once
+                filter.resetFilterButtons();
+                filteredMoods.clear();
+                updateFeed();
             }
+            finish();
         });
+
 
         final FloatingActionButton profileButton = findViewById(R.id.profile_float_button);
-        profileButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //new AddMoodFragment().show(getSupportFragmentManager(), "ADD_MOOD");
-            }
+        profileButton.setOnClickListener(view -> {
+            // add mood activity
+
         });
+
         final ImageButton filterButton = findViewById(R.id.profile_filter_button);
-        filterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v){
-                // creates filter window
-                filter = new FilterFragment();
-                filter.show(getSupportFragmentManager(),"MAIN_FILTER");
-                filterClicked = true;
-            }
+        filterButton.setOnClickListener(view -> {
+            // creates filter window
+            filter = new FilterFragment();
+            filter.show(getSupportFragmentManager(), "MAIN_FILTER");
+            filterClicked = true;
         });
 
         final ImageButton logoutButton = findViewById(R.id.logout_button);
-        logoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        logoutButton.setOnClickListener(view -> {
                 LogoutFragment frag = new LogoutFragment();
-                frag.show(getSupportFragmentManager(),"logout");
+                frag.show(getSupportFragmentManager(), "logout");
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        TextView followersText = findViewById(R.id.follower_count);
+        TextView followingText = findViewById(R.id.following_count);
+        db.collection("users").document(currentUser.getUserName()).collection("following").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                followCount = queryDocumentSnapshots.size();
+                followingText.setText(followCount + " following");
+            }
+        });
+        db.collection("users").document(currentUser.getUserName()).collection("followers").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                followersCount = queryDocumentSnapshots.size();
+                followersText.setText(followersCount + " followers");
             }
         });
     }
@@ -246,6 +261,8 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
             }
 
             for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
+                if(!doc.exists())
+                    break;
                 MoodType moodType = null;
                 String reason = null;
                 SocialSituation situation = null;
@@ -253,7 +270,6 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                 Location location = null;
                 Bitmap profilePic = null;
                 Date dateTime = null;
-
 
                 try {
                     if (doc.contains("datetime"))
@@ -323,6 +339,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                         }
                     });
         });
+
     }
 
     /**

@@ -10,6 +10,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.algolia.search.saas.AlgoliaException;
+import com.algolia.search.saas.Client;
+import com.algolia.search.saas.Index;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -19,6 +22,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -42,6 +47,8 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText passwordField;
     private EditText usernameField;
     private FirebaseFirestore db;
+    private Client client;
+    private Index index;
 
     private final String SIGNUP_TAG = "Invalid field";
     public static final String USER = "com.cmput.feelsbook.SignUpActivity.User";
@@ -51,6 +58,9 @@ public class SignUpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signup_screen);
 
+
+        client = new Client("CZHQW4KJVA","394205d7e7f173719c08f3e187b2a77b");
+        index = client.getIndex("users");
         signupButton  = findViewById(R.id.confirm_signup);
         cancelButton  = findViewById(R.id.cancel_signup);
         nameField     = findViewById(R.id.s_name_text);
@@ -83,6 +93,11 @@ public class SignUpActivity extends AppCompatActivity {
                             DocumentSnapshot doc = task.getResult();
                             if (!doc.exists()) {
                                 createUser(username);
+                                try {
+                                    index.addObjectAsync(new JSONObject().put("username",username), username, null);
+                                }catch (Exception e) {
+                                    Log.d(TAG, "Error");
+                                }
                             }
                             else {
                                 Toast.makeText(SignUpActivity.this, "Username is not available", Toast.LENGTH_SHORT).show();

@@ -20,8 +20,8 @@ public class SearchFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.test_search, null);
-        EditText search = view.findViewById(R.id.search);
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.search_activity, null);
+        EditText search = view.findViewById(R.id.search_text);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         final User user = (User) getArguments().getSerializable("user");
         return builder.setView(view)

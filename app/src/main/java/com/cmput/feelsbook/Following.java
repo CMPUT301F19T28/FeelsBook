@@ -64,9 +64,9 @@ public class Following extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         username.setText(list.get(position).getUserName());
         fullname.setText(list.get(position).getName());
+        profilePic.setImageBitmap(list.get(position).getProfilePic());
 
         Button remove = holder.itemView.findViewById(R.id.toggleButton);
-        remove.setText("Remove");
         remove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
