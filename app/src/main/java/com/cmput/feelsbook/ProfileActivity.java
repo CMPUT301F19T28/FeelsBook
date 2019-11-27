@@ -197,7 +197,6 @@ public class ProfileActivity extends AppCompatActivity{
                 historyFragment.getRecyclerAdapter().removePost(0);
                 historyFragment.getRecyclerAdapter().notifyItemRemoved(0);
             }
-            mapFragment.getFeed().clear();
 
             for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
                 if(!doc.exists())
@@ -246,10 +245,10 @@ public class ProfileActivity extends AppCompatActivity{
                         mood = mood.withPhoto(photo);
                     if(location != null)
                         mood.withLocation(location);
+                        mapFragment.addPost(mood);
+
 
                     historyFragment.getRecyclerAdapter().addPost(mood);
-                    mapFragment.addPost(mood);
-
 
 
                 }catch(Exception error){

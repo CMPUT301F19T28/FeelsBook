@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             Bundle userBundle = new Bundle();
             userBundle.putSerializable("User", currentUser);
-            bundle.putBoolean("locationPermission", locationPermissionGranted);
+            userBundle.putBoolean("locationPermission", locationPermissionGranted);
             intent.putExtras(userBundle);
             startActivity(intent);
         });
@@ -157,7 +157,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void getFollowing() {
         List<FollowUser> following = new ArrayList<FollowUser>();
-        mapFragment.getFeed().clear();
 
         FirebaseFirestore.getInstance()
                 .collection("users")
@@ -261,9 +260,10 @@ public class MainActivity extends AppCompatActivity {
                                         mood = mood.withPhoto(photo);
                                     if (location != null)
                                         mood.withLocation(location);
+                                        mapFragment.addPost(mood);
+
 
                                     feedFragment.getRecyclerAdapter().addPost(mood);
-                                    mapFragment.addPost(mood);
 
                                 } catch (Exception error) {
                                     Log.d("-----UPLOAD SAMPLE-----",

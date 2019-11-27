@@ -46,7 +46,6 @@ public class User implements Serializable {
         this.userName = userName;
         this.name = name;
         this.posts = posts;
-        //this.following = following;
     }
 
 

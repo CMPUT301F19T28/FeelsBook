@@ -1,9 +1,12 @@
 package com.cmput.feelsbook;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -13,10 +16,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.cmput.feelsbook.R;
 import com.cmput.feelsbook.User;
@@ -24,11 +29,16 @@ import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.Post;
 import com.cmput.feelsbook.post.SocialSituation;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -51,6 +61,10 @@ public class AddMoodActivity extends AppCompatActivity{
     private DocumentReference UserDocument;
     private Spinner spinner;
     private Spinner socialSpinner;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private GeoPoint geoPoint;
+    private TextView locationText;
+
 
 
     @Override
@@ -110,6 +124,22 @@ public class AddMoodActivity extends AppCompatActivity{
                 socialSpinner.setVisibility(View.INVISIBLE);
             } else {
                 socialSpinner.setVisibility(View.VISIBLE);
+            }
+        });
+
+        //gets current location and sets location view
+        locationText = findViewById(R.id.location_text);
+        getLastKnownLocation();
+        locationText.setText("Current location will be included.");
+        locationText.setVisibility(View.GONE); //sets the location view to be gone because it is optional
+
+        //if the location button is pressed then shows the drop down
+        Button locationBttn = findViewById(R.id.add_location_button);
+        locationBttn.setOnClickListener(v -> {
+            if (locationText.getVisibility() == View.VISIBLE) {
+                locationText.setVisibility(View.INVISIBLE);
+            } else {
+                locationText.setVisibility(View.VISIBLE);
             }
         });
 
@@ -306,21 +336,40 @@ public class AddMoodActivity extends AppCompatActivity{
         String moodText = input.getText().toString();
         MoodType selected_type = (MoodType) spinner.getSelectedItem();
         SocialSituation selectedSocial = null;
+        GeoPoint location = null;
 
         if (socialSpinner.getVisibility() == View.VISIBLE)
             selectedSocial = (SocialSituation) socialSpinner.getSelectedItem();
 
+        if (locationText.getVisibility() == View.VISIBLE)
+            location = geoPoint;
+
 
         if (picture == null) {
             return new Mood(selected_type, null).withReason(moodText)
-                    .withSituation(selectedSocial).withUser(currentUser.getUserName());
+                    .withSituation(selectedSocial).withLocation(geoPoint).withUser(currentUser.getUserName());
         }
         else{
             return new Mood(selected_type, null).withPhoto(picture).withReason(moodText)
-                    .withSituation(selectedSocial).withUser(currentUser.getUserName());
+                    .withSituation(selectedSocial).withLocation(geoPoint).withUser(currentUser.getUserName());
         }
 
     }
 
+    public void getLastKnownLocation() {
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(@NonNull Task<Location> task) {
+                Location location = task.getResult();
+                geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+            }
+        });
+    }
 
 }
