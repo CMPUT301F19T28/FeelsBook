@@ -71,13 +71,22 @@ public class ViewMoodActivity extends AppCompatActivity{
         profilePicture.setImageBitmap(bitmapProfilePicture);
 
         Button backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> finish());
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ViewMoodActivity.this, ProfileActivity.class);
+                Bundle userBundle = new Bundle();
+                userBundle.putSerializable("User", currentUser);
+                intent.putExtras(userBundle);
+                startActivity(intent);
+            }
+        });
 
 
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
+                Intent intent = new Intent(ViewMoodActivity.this, AddMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
                 userBundle.putBoolean("editMood", true);
