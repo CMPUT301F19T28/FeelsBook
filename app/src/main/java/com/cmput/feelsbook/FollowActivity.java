@@ -1,5 +1,6 @@
 package com.cmput.feelsbook;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,6 +9,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.tabs.TabLayout;
 
 /**
  * Handles the display of followers/following list as well as follow requests.
@@ -20,25 +24,34 @@ import androidx.recyclerview.widget.RecyclerView;
 public class FollowActivity extends AppCompatActivity {
 
     private User user;
-    private RecyclerView follow_requests;
-    private RecyclerView.LayoutManager layoutManager;
-    private FollowingRequests followingRequests;
+    private FollowFragment followFragment;
+    private FollowersFragment followersFragment;
+    private FollowingFragment followingFragment;
     private FollowList followingList;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+    private ViewPagerAdapter viewPagerAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.follow_activity);
-        if (getIntent().getExtras()!= null){
-            user = (User) getIntent().getExtras().get("user");
-        }
+        user = (User) getIntent().getExtras().get("user");
 
         followingList = new FollowList();
-        follow_requests = findViewById(R.id.follow_requests_list);
-        layoutManager = new LinearLayoutManager(this);
-        follow_requests.setLayoutManager(layoutManager);
-        followingRequests = new FollowingRequests(user);
-        follow_requests.setAdapter(followingRequests);
+        followFragment = new FollowFragment(user);
+        tabLayout = findViewById(R.id.follow_tabs);
+        viewPager = findViewById(R.id.followPager);
+        viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        followFragment = new FollowFragment(user);
+        followersFragment = new FollowersFragment(user);
+        followingFragment = new FollowingFragment(user);
+        viewPagerAdapter.AddFragment(followFragment,"Follow Requests");
+        viewPagerAdapter.AddFragment(followersFragment, "Followers");
+        viewPagerAdapter.AddFragment(followingFragment, "Following");
+        viewPager.setAdapter(viewPagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
+
 
         Button back = findViewById(R.id.follow_back_button);
         back.setOnClickListener(new View.OnClickListener() {
@@ -53,7 +66,11 @@ public class FollowActivity extends AppCompatActivity {
             // launches a new search activity
             @Override
             public void onClick(View view) {
-                SearchFragment.newInstance(user).show(getSupportFragmentManager(), "FriendRequest");
+                Intent intent = new Intent(FollowActivity.this, SearchActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("user", user);
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
     }
