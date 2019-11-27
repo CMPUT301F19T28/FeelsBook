@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
@@ -215,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
                                 String reason = null;
                                 SocialSituation situation = null;
                                 Bitmap photo = null;
-                                Location location = null;
+                                GeoPoint location = null;
                                 Bitmap profilePic = null;
                                 Date dateTime = null;
                                 String user = "null";
@@ -225,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
                                         dateTime = ((Timestamp) doc.get("datetime")).toDate();
 
                                     if (doc.contains("location"))
-                                        location = (Location) doc.get("location");
+                                        location = (GeoPoint) doc.get("location");
 
                                     if (doc.contains("photo")) {
                                         photo = getPhoto((String) doc.get("photo"));

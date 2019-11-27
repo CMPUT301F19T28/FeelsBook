@@ -206,7 +206,7 @@ public class ProfileActivity extends AppCompatActivity{
                 String reason = null;
                 SocialSituation situation = null;
                 Bitmap photo = null;
-                Location location = null;
+                GeoPoint location = null;
                 Bitmap profilePic = null;
                 Date dateTime = null;
 
@@ -215,7 +215,7 @@ public class ProfileActivity extends AppCompatActivity{
                         dateTime = ((Timestamp) doc.get("datetime")).toDate();
 
                     if (doc.contains("location"))
-                        location = (Location) doc.get("location");
+                        location = (GeoPoint) doc.get("location");
 
                     if (doc.contains("photo")) {
                         photo = getPhoto((String)  doc.get("photo"));
