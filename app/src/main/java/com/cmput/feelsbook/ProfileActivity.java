@@ -133,6 +133,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         historyFragment = new FeedFragment();
         historyFragment.getRecyclerAdapter().setOnItemClickListener(listener);
         mapFragment = new MapFragment();
+        filteredMoods = new ArrayList<>();
         viewPagerAdapter.AddFragment(historyFragment, "History");
         viewPagerAdapter.AddFragment(mapFragment, "Map");
 
