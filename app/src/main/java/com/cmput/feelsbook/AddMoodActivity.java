@@ -62,11 +62,7 @@ public class AddMoodActivity extends AppCompatActivity{
         spinner = findViewById(R.id.mood_spinner);
         socialSpinner = findViewById(R.id.social_spinner);
 
-        MoodType[] moodTypes = {MoodType.HAPPY, MoodType.SAD, MoodType.ANGRY, MoodType.ANNOYED, MoodType.SLEEPY, MoodType.SEXY};
-        ArrayList<MoodType> moodList = new ArrayList<>(Arrays.asList(moodTypes));
-        ArrayAdapter<MoodType> moodTypeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, moodList);
-
-        moodTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        MoodTypeAdapter moodTypeAdapter = new MoodTypeAdapter(this, Arrays.asList(MoodType.values()));
         spinner.setAdapter(moodTypeAdapter);
 
         //creates social situation spinner drop down menu
@@ -88,7 +84,7 @@ public class AddMoodActivity extends AppCompatActivity{
             currentUser = (User) bundle.get("User");
             edit  = (boolean) bundle.get("editMood");
             if(edit){
-                setValues(((Mood) bundle.getSerializable("Mood")).Serialize(false), moodTypes, socialSits);
+                setValues(((Mood) bundle.getSerializable("Mood")).Serialize(false), MoodType.values(), socialSits);
                 edited = ((Mood) bundle.getSerializable("Mood")).Serialize(false);
                 deleteButton.setVisibility(View.VISIBLE);
                 deleteButton.setOnClickListener(view -> {

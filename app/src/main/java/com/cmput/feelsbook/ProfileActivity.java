@@ -154,6 +154,28 @@ public class ProfileActivity extends AppCompatActivity{
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        TextView followersText = findViewById(R.id.follower_count);
+        TextView followingText = findViewById(R.id.following_count);
+        db.collection("users").document(currentUser.getUserName()).collection("following").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                followCount = queryDocumentSnapshots.size();
+                followingText.setText(followCount + " following");
+            }
+        });
+        db.collection("users").document(currentUser.getUserName()).collection("followers").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                followersCount = queryDocumentSnapshots.size();
+                followersText.setText(followersCount + " followers");
+            }
+        });
+    }
+
+
     /**
      * Launches follower list / following list activity
      * @param v
