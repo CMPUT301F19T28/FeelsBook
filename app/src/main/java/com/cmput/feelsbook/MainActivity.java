@@ -164,7 +164,6 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
 
         //setLoading()
         getFollowing();
-        feedCopy = new ArrayList<>(feedFragment.getRecyclerAdapter().getFeed());
     }
 
     private void getFollowing() {
@@ -329,7 +328,8 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
             feedFragment.getRecyclerAdapter().notifyDataSetChanged();
         }
         else {
-            updateFeed();
+            feedFragment.getRecyclerAdapter().setFeed(feedCopy);
+            feedFragment.getRecyclerAdapter().notifyDataSetChanged();
         }
     }
     // on new mood added
