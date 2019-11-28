@@ -8,21 +8,21 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import javax.annotation.Nullable;
 
-/**
- * Creates the feed list from the user's own posts and following users' posts.
- * recyclerView - tied to the RecyclerView object to display the feed
- * Feed recyclerAdapter - contains the list of posts to display and other methods
- */
-public class FeedFragment extends Fragment{
+public class FollowFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private Feed recyclerAdapter;
+    private FollowingRequests recyclerAdapter;
 
-    public FeedFragment(){
+    public FollowFragment(FollowingRequests adapter) {
+        this.recyclerAdapter = adapter;
+    }
+
+    public FollowFragment(User user){
         // default constructor
-        recyclerAdapter = new Feed();
+        recyclerAdapter = new FollowingRequests(user);
     }
 
     @Nullable
@@ -42,7 +42,7 @@ public class FeedFragment extends Fragment{
         return recyclerView;
     }
 
-    public Feed getRecyclerAdapter() {
+    public FollowingRequests getRecyclerAdapter() {
         return recyclerAdapter;
     }
 }

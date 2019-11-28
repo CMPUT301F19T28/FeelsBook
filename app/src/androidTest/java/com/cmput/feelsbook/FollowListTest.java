@@ -14,7 +14,7 @@ public class FollowListTest {
 
     @Before
     public void setup() {
-        user = new User("JoeUserName", "Joe", new Feed(), new FollowList());
+        user = new User("JoeUserName", "Joe", new Feed());
     }
 
     @Test

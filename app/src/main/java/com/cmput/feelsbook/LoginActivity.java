@@ -2,6 +2,8 @@ package com.cmput.feelsbook;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -15,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -23,11 +26,18 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
 
 /**
  * Handles the login and verification of a user.
@@ -53,6 +63,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_screen);
 
+
         db = FirebaseFirestore.getInstance();  // Create an instance to access Cloud Firestore
         userField = findViewById(R.id.user_text);
         passField = findViewById(R.id.password_text);
@@ -68,6 +79,9 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         };
+
+        userField.setText("");
+        passField.setText("");
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -150,7 +164,7 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void successfulLogin(DocumentSnapshot document){
         Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
-        User user = new User(document.getId(), document.getString("name"), new Feed(), new FollowList());
+        User user = new User(document.getId(), document.getString("name"), new Feed());
         Intent intent = new Intent(LoginActivity.this, PermissionsActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("User",user);
