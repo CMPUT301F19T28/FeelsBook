@@ -300,7 +300,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         });
 
     }
-    
+
 
     /**
      * Handles when a filter button is pressed.

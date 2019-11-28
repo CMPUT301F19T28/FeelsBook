@@ -84,6 +84,7 @@ public class AddMoodActivity extends AppCompatActivity{
             currentUser = (User) bundle.get("User");
             if ((boolean) bundle.get("editMood")) {
                 mood = (Mood) bundle.get("Mood");
+                input.setText(mood.getReason());
                 spinner.setSelection(moodTypeAdapter.getPosition(mood.getMoodType()));
                 socialSpinner.setSelection(socialAdapter.getPosition(mood.getSituation()));
                 deleteButton.setVisibility(View.VISIBLE);
@@ -126,6 +127,7 @@ public class AddMoodActivity extends AppCompatActivity{
             mood.setReason(input.getText().toString());
             mood.setSituation(socialAdapter.getItem(socialSpinner.getSelectedItemPosition()));
             mood.setProfilePic(Mood.profilePicString(bitmapProfilePicture));
+            mood.setUser(currentUser.getUserName());
             onSubmit(mood);
             Intent returnIntent = new Intent();
             returnIntent.putExtra("Mood", mood);

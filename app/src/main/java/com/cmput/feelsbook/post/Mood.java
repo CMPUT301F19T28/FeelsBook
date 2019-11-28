@@ -126,9 +126,8 @@ public class Mood extends Post implements Serializable {
     }
 
 
-    public Mood withUser(String username){
+    public void setUser(String username){
         this.user = username;
-        return this;
     }
 
     public String getUser(){
