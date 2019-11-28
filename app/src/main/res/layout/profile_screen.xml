@@ -57,7 +57,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/profile_filter_button"
                 app:layout_constraintTop_toTopOf="parent"
                 android:background="@drawable/logout_button"
-                app:srcCompat="@android:drawable/ic_lock_power_off" />
+                app:srcCompat="@drawable/logout_arrow_black" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </TableRow>
@@ -197,6 +197,6 @@
         app:backgroundTint="@color/add_post_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_add" />
+        app:srcCompat="@drawable/ic_add_grey_700_24dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
