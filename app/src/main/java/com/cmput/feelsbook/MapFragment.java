@@ -1,6 +1,7 @@
 package com.cmput.feelsbook;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -85,7 +86,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private ArrayList<ClusterMarker> clusterMarkers = new ArrayList<>();
     private User currentUser;
     private Boolean firstRun = false;
-    private List<Mood> feed;
+    private List<Post> feed;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -138,7 +139,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     public void onComplete(@NonNull Task task) {
                         if (task.isSuccessful()) {
                             Location currentLocation = (Location) task.getResult();
-                            setCameraView(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM);
+                            try {
+                                setCameraView(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM);
+                            } catch (NullPointerException n) {
+                                Log.e(TAG, "getDeviceLocation: Null Pointer Exception: " + n.getMessage());
+                            }
                         }
                         else {
                             Toast.makeText(getActivity(), "unable to get current location", Toast.LENGTH_SHORT).show();
@@ -210,12 +215,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      */
     public void updateMapMarkers(){
         for (int i = 0; i < feed.size(); i++) {
-            Mood mood = feed.get(i);
-            if(mood.getLocation() != null) {
-                LatLng position = new LatLng(mood.getLocation().getLatitude(), mood.getLocation().getLongitude());
+            Mood mood = (Mood) feed.get(i);
+            if(mood.hasLocation()) {
+                LatLng position = new LatLng(mood.getLatitude(), mood.getLongitude());
                 String title = "TODO: Put username here";
                 String snippet = getString(mood.getMoodType().getEmoticon()) + "@ " + mood.getDateTime().toString();
-                Bitmap avatar = mood.getPhoto();
+                Bitmap avatar = getPhoto(mood.getPhoto());
                 ClusterMarker clusterMarker = new ClusterMarker(position, title, snippet, avatar);
                 clusterManager.addItem(clusterMarker);
                 clusterMarkers.add(clusterMarker);
@@ -313,11 +318,34 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapView.onLowMemory();
     }
 
-    public List<Mood> getFeed() {
+    public List<Post> getFeed() {
         return feed;
     }
 
-    public void addPost(Mood mood) {
-        feed.add(mood);
+    public void setFeed(List<Post> feed) {
+        this.feed = feed;
+    }
+
+    public void updateMap() {
+        mapView.getMapAsync(this);
+    }
+    /**
+     * Takes in a base64 string and converts it into a bitmap
+     * @param photo
+     *          photo to be converted in base64 String format format
+     * @return
+     *      returns bitmap of decoded photo returns null if base64 string was not passed in
+     */
+    private Bitmap getPhoto(String photo){
+        try {
+            @SuppressLint("NewApi") byte[] decoded = Base64.getDecoder()
+                    .decode(photo);
+            return BitmapFactory.decodeByteArray(decoded
+                    , 0, decoded.length);
+        }catch(Exception e){
+            Log.d("-----CONVERT PHOTO-----",
+                    "****NO PHOTO CONVERTED: " + e);
+            return null;
+        }
     }
 }

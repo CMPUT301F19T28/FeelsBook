@@ -62,7 +62,7 @@ public class AddMoodActivity extends AppCompatActivity{
     private Spinner spinner;
     private Spinner socialSpinner;
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private GeoPoint geoPoint;
+    private GeoPoint currentLocation;
     private TextView locationText;
 
     private Mood mood = new Mood();
@@ -161,6 +161,11 @@ public class AddMoodActivity extends AppCompatActivity{
             mood.setPhoto(Mood.photoString(picture));
             mood.setReason(input.getText().toString());
             mood.setSituation(socialAdapter.getItem(socialSpinner.getSelectedItemPosition()));
+            if (locationText.getVisibility() == View.VISIBLE) {
+                mood.setLatitude(currentLocation.getLatitude());
+                mood.setLongitude(currentLocation.getLongitude());
+
+            }
             mood.setProfilePic(Mood.profilePicString(bitmapProfilePicture));
             onSubmit(mood);
             finish();
@@ -234,30 +239,6 @@ public class AddMoodActivity extends AppCompatActivity{
                 });
     }
 
-    private Mood getValues(){
-        String moodText = input.getText().toString();
-        MoodType selected_type = (MoodType) spinner.getSelectedItem();
-        SocialSituation selectedSocial = null;
-        GeoPoint location = null;
-
-        if (socialSpinner.getVisibility() == View.VISIBLE)
-            selectedSocial = (SocialSituation) socialSpinner.getSelectedItem();
-
-        if (locationText.getVisibility() == View.VISIBLE)
-            location = geoPoint;
-
-
-        if (picture == null) {
-            return new Mood(selected_type, null).withReason(moodText)
-                    .withSituation(selectedSocial).withLocation(geoPoint).withUser(currentUser.getUserName());
-        }
-        else{
-            return new Mood(selected_type, null).withPhoto(picture).withReason(moodText)
-                    .withSituation(selectedSocial).withLocation(geoPoint).withUser(currentUser.getUserName());
-        }
-
-    }
-
     public void getLastKnownLocation() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -268,8 +249,8 @@ public class AddMoodActivity extends AppCompatActivity{
         fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
             @Override
             public void onComplete(@NonNull Task<Location> task) {
-                Location location = task.getResult();
-                geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                Location location = (Location) task.getResult();
+                currentLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
             }
         });
     }

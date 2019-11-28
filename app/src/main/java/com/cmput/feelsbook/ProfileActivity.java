@@ -279,8 +279,9 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                 if(doc.exists())
                     historyFragment.getRecyclerAdapter().addPost(doc.toObject(Mood.class));
             }
-
+            mapFragment.setFeed(historyFragment.getRecyclerAdapter().getFeed());
             historyFragment.getRecyclerAdapter().notifyDataSetChanged();
+            mapFragment.updateMap();
             historyCopy = new ArrayList<>(historyFragment.getRecyclerAdapter().getFeed());
             int postListCount = historyFragment.getRecyclerAdapter().getItemCount();
 

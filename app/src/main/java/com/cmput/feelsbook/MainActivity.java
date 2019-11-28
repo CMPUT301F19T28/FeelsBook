@@ -241,8 +241,10 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                                 DocumentSnapshot doc = task.getResult();
                                 feedFragment.getRecyclerAdapter().addPost(doc.toObject(Mood.class));
                             }
+                            mapFragment.setFeed(feedFragment.getRecyclerAdapter().getFeed());
                             Log.d("Main","Feed size: "+feedFragment.getRecyclerAdapter().getItemCount());
                             feedFragment.getRecyclerAdapter().notifyDataSetChanged();
+                            mapFragment.updateMap();
                             feedCopy = new ArrayList<>(feedFragment.getRecyclerAdapter().getFeed());
                         }
                     });

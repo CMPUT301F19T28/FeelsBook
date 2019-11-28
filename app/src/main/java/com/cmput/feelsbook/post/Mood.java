@@ -3,14 +3,11 @@ package com.cmput.feelsbook.post;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.location.Location;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.cmput.feelsbook.Feed;
-import com.cmput.feelsbook.ProxyBitmap;
 import com.cmput.feelsbook.R;
 import com.google.firebase.firestore.GeoPoint;
 
@@ -21,8 +18,6 @@ import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Locale;
-
-import static java.util.Base64.getDecoder;
 
 /**
  * Object that contains information about a mood.
@@ -42,7 +37,8 @@ public class Mood extends Post implements Serializable {
     private String reason;
     private SocialSituation situation;
     private String photo;
-    private Location location;
+    private double latitude;
+    private double longitude;
     private String user;
 
 
@@ -116,13 +112,15 @@ public class Mood extends Post implements Serializable {
 
     /**
      * Builder style to add a location to the Mood
-     * @param location
+     * @param latitude
+     * @param longitude
      * A location where the user is posting their Mood
      * @return
      * The mood with a Location added
      */
-    public Mood withLocation(GeoPoint location) {
-        this.location = location;
+    public Mood withLocation(double latitude, double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
         return this;
     }
 
@@ -194,7 +192,7 @@ public class Mood extends Post implements Serializable {
         return photo != null;
     }
 
-    public boolean hasLocation() {return location != null;}
+    public boolean hasLocation() {return (latitude != 0 && longitude != 0);}
 
     public void setSituation(SocialSituation situation) {
         this.situation = situation;
@@ -216,12 +214,20 @@ public class Mood extends Post implements Serializable {
         this.photo = photo;
     }
 
-    public GeoPoint getLocation() {
-        return location;
+    public double getLatitude() {
+        return latitude;
     }
 
-    public void setLocation(GeoPoint location) {
-        this.location = location;
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     public static String photoString(Bitmap bitmap) {
