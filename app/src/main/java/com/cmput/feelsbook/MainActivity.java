@@ -63,15 +63,16 @@ import java.util.List;
  */
 public class MainActivity extends AppCompatActivity implements FilterFragment.OnMoodSelectListener{
     private ImageButton profileButton;
-    User currentUser;
-    TabLayout tabLayout;
-    ViewPager viewPager;
-    ViewPagerAdapter viewPagerAdapter;
-    FeedFragment feedFragment;
-    MapFragment mapFragment;
-    Feed.OnItemClickListener listener;
-    FirebaseFirestore db;
-    CollectionReference cr;
+    private User currentUser;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+    private ViewPagerAdapter viewPagerAdapter;
+    protected FeedFragment feedFragment;
+    protected MapFragment mapFragment;
+    private Feed.OnItemClickListener listener;
+    private FirebaseFirestore db;
+    private List<Post> feedCopy;
+    private List<MoodType> filteredMoods;
     private Boolean locationPermissionGranted;
     private ArrayList<Post> feedCopy;
     private ArrayList<MoodType> filteredMoods;
@@ -97,6 +98,10 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
             locationPermissionGranted = bundle.getBoolean("locationPermission");
         }
 
+        if(currentUser == null){
+            throw new AssertionError("User is not set from login.");
+        }
+
         //Sets the document to that of the current user
         UserDocument = db.collection("users").document(currentUser.getUserName());
 
@@ -105,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
 
         feedFragment = new FeedFragment();
         filteredMoods = new ArrayList<>();
+        feedCopy = new ArrayList<>();
         viewPagerAdapter.AddFragment(feedFragment, "Feed");
 
         if (locationPermissionGranted) {
@@ -331,18 +337,20 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
      * @param moodType - the MoodType to be filtered
      */
     public void onSelect(MoodType moodType){
-        filteredMoods.add(moodType);
-        Log.d("Filter","(SELECT-Main)Current filtered mood size: "+filteredMoods.size());
-        Iterator<Post> it = feedCopy.iterator();
-        ArrayList<Post> result = new ArrayList<>();
-        while (it.hasNext()){
-            Mood m = (Mood)it.next();
-            if (filteredMoods.contains(m.getMoodType())){
-                result.add(m);
+        if(feedCopy.size() > 0){
+            filteredMoods.add(moodType);
+            Log.d("Filter","(SELECT-Main)Current filtered mood size: "+filteredMoods.size());
+            Iterator<Post> it = feedCopy.iterator();
+            List<Post> result = new ArrayList<>();
+            while (it.hasNext()){
+                Mood m = (Mood)it.next();
+                if (filteredMoods.contains(m.getMoodType())){
+                    result.add(m);
+                }
             }
+            feedFragment.getRecyclerAdapter().setFeed(result);
+            feedFragment.getRecyclerAdapter().notifyDataSetChanged();
         }
-        feedFragment.getRecyclerAdapter().setFeed(result);
-        feedFragment.getRecyclerAdapter().notifyDataSetChanged();
     }
 
     /**
@@ -357,7 +365,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
         Log.d("Filter","(DESELECT-Main)Current filtered mood size: "+filteredMoods.size());
         if (filteredMoods.size() > 0){
             Iterator<Post> it = feedCopy.iterator();
-            ArrayList<Post> result = new ArrayList<>();
+            List<Post> result = new ArrayList<>();
             while (it.hasNext()){
                 Mood m = (Mood)it.next();
                 if (filteredMoods.contains(m.getMoodType())){
