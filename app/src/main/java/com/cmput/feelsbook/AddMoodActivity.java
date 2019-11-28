@@ -82,6 +82,7 @@ public class AddMoodActivity extends AppCompatActivity{
 
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
+            Log.d("Add","Username is: "+currentUser.getUserName());
             if((boolean) bundle.get("editMood")){
                 setValues(((Mood) bundle.getSerializable("Mood")).Serialize(false), MoodType.values(), socialSits);
                 deleteButton.setVisibility(View.VISIBLE);
@@ -90,6 +91,10 @@ public class AddMoodActivity extends AppCompatActivity{
                     finish();
                 });
             }
+        }
+
+        if(currentUser == null){
+            throw new AssertionError("Calling a null user object");
         }
 
         //Sets the document to that of the current user
@@ -155,7 +160,6 @@ public class AddMoodActivity extends AppCompatActivity{
      */
     @SuppressLint("NewApi")
     private void onSubmit(Post newMood){
-
         HashMap<String, Object> data = new HashMap<>();
 
         /*
@@ -195,6 +199,7 @@ public class AddMoodActivity extends AppCompatActivity{
         /*
         puts the other parameters into the hashmap to be sent to the database
          */
+        Log.d("Login"," username: "+currentUser.getUserName());
         data.put("datetime", newMood.getDateTime());
         data.put("location", ((Mood) newMood).getLocation());
         data.put("reason", ((Mood) newMood).getReason());
@@ -202,11 +207,13 @@ public class AddMoodActivity extends AppCompatActivity{
         data.put("moodType", ((Mood) newMood).getMoodType());
         data.put("User", currentUser.getUserName());
 
+
         MoodCollection
                 .document(newMood.toString())
                 .set(data)
                 .addOnSuccessListener(aVoid -> Log.d("Sample", "Data addition successful"))
                 .addOnFailureListener(e -> Log.d("Sample", "Data addition failed" + e.toString()));
+
 
         db.collection("mostRecent")
                 .document(currentUser.getUserName())
@@ -223,6 +230,7 @@ public class AddMoodActivity extends AppCompatActivity{
                         Log.d("Sample", "Data addition failed" + e.toString());
                     }
                 });
+
     }
 
     /**

@@ -55,8 +55,8 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
     protected MapFragment mapFragment;
     private Feed.OnItemClickListener listener;
     private FirebaseFirestore db;
-    private ArrayList<Post> feedCopy;
-    private ArrayList<MoodType> filteredMoods;
+    private List<Post> feedCopy;
+    private List<MoodType> filteredMoods;
     private FilterFragment filter;
     private boolean filterClicked = false;
     private CollectionReference MoodCollection;
@@ -78,6 +78,10 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
             currentUser = (User) bundle.get("User");
         }
 
+        if(currentUser == null){
+            throw new AssertionError("User is not set from login.");
+        }
+
         //Sets the document to that of the current user
         UserDocument = db.collection("users").document(currentUser.getUserName());
 
@@ -87,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
         feedFragment = new FeedFragment();
         mapFragment = new MapFragment();
         filteredMoods = new ArrayList<>();
+        feedCopy = new ArrayList<>();
         viewPagerAdapter.AddFragment(feedFragment, "Feed");
         viewPagerAdapter.AddFragment(mapFragment, "Map");
 
@@ -296,18 +301,20 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
      * @param moodType - the MoodType to be filtered
      */
     public void onSelect(MoodType moodType){
-        filteredMoods.add(moodType);
-        Log.d("Filter","(SELECT-Main)Current filtered mood size: "+filteredMoods.size());
-        Iterator<Post> it = feedCopy.iterator();
-        ArrayList<Post> result = new ArrayList<>();
-        while (it.hasNext()){
-            Mood m = (Mood)it.next();
-            if (filteredMoods.contains(m.getMoodType())){
-                result.add(m);
+        if(feedCopy.size() > 0){
+            filteredMoods.add(moodType);
+            Log.d("Filter","(SELECT-Main)Current filtered mood size: "+filteredMoods.size());
+            Iterator<Post> it = feedCopy.iterator();
+            List<Post> result = new ArrayList<>();
+            while (it.hasNext()){
+                Mood m = (Mood)it.next();
+                if (filteredMoods.contains(m.getMoodType())){
+                    result.add(m);
+                }
             }
+            feedFragment.getRecyclerAdapter().setFeed(result);
+            feedFragment.getRecyclerAdapter().notifyDataSetChanged();
         }
-        feedFragment.getRecyclerAdapter().setFeed(result);
-        feedFragment.getRecyclerAdapter().notifyDataSetChanged();
     }
 
     /**
@@ -322,7 +329,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
         Log.d("Filter","(DESELECT-Main)Current filtered mood size: "+filteredMoods.size());
         if (filteredMoods.size() > 0){
             Iterator<Post> it = feedCopy.iterator();
-            ArrayList<Post> result = new ArrayList<>();
+            List<Post> result = new ArrayList<>();
             while (it.hasNext()){
                 Mood m = (Mood)it.next();
                 if (filteredMoods.contains(m.getMoodType())){

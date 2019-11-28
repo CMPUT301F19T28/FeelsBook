@@ -11,12 +11,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.cmput.feelsbook.post.Post;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Serializable {
 
     private final String TAG = "Feed";
 
-    private ArrayList<Post> feedList;
+    private List<Post> feedList;
 
     private OnItemClickListener listener;
 
@@ -29,7 +30,7 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
         setOnItemClickListener(null);
     }
 
-    public Feed(ArrayList<Post> feed) {
+    public Feed(List<Post> feed) {
 
         this.feedList = feed;
         setOnItemClickListener(null);
@@ -51,9 +52,9 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
         return feedList.get(pos);
     }
 
-    public ArrayList<Post> getFeed(){ return this.feedList; }
+    public List<Post> getFeed(){ return this.feedList; }
 
-    public void setFeed(ArrayList<Post> feedList){ this.feedList = feedList;}
+    public void setFeed(List<Post> feedList){ this.feedList = feedList;}
 
     public void setOnItemClickListener(OnItemClickListener listener){
         this.listener = listener;

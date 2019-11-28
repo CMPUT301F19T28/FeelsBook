@@ -12,11 +12,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
@@ -34,23 +31,17 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
-import io.opencensus.tags.Tag;
-
-import io.opencensus.tags.Tag;
 
 /**
  * Handles the profile activities and displays the user profile information.
@@ -80,8 +71,8 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
     private FirebaseFirestore db;
     private CollectionReference MoodCollection;
     private Feed.OnItemClickListener listener;
-    private ArrayList<MoodType> filteredMoods;
-    private ArrayList<Post> historyCopy;
+    private List<MoodType> filteredMoods;
+    private List<Post> historyCopy;
     private FilterFragment filter;
     private boolean filterClicked = false;
 
@@ -126,6 +117,10 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
             currentUser = (User) bundle.get("User");
         }
 
+        if(currentUser == null){
+            throw new AssertionError("User is null from MainActivity.");
+        }
+
         //Sets the document to that of the current user
         MoodCollection = db.collection("users").document(currentUser.getUserName())
                 .collection("Moods");
@@ -134,6 +129,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         historyFragment.getRecyclerAdapter().setOnItemClickListener(listener);
         mapFragment = new MapFragment();
         filteredMoods = new ArrayList<>();
+        historyCopy = new ArrayList<>();
         viewPagerAdapter.AddFragment(historyFragment, "History");
         viewPagerAdapter.AddFragment(mapFragment, "Map");
 
@@ -147,9 +143,6 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         ImageView profilePicture = findViewById(R.id.profile_picture);
         fullName.setText(currentUser.getName());
         userName.setText("@" + currentUser.getUserName());
-
-
-        updateFeed();
 
         // document reference used to fetch total number of posts field inside of the database
         DocumentReference dr = db.collection("users")
@@ -232,6 +225,8 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                 followersText.setText(followersCount + " followers");
             }
         });
+
+        updateFeed();
     }
 
     /**
@@ -367,19 +362,21 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
      * @param moodType - the MoodType to be filtered
      */
     public void onSelect(MoodType moodType){
-        filteredMoods.add(moodType);
-        // log used for debugging
-        Log.d("Filter","(SELECT-Profile)Current filtered mood size: "+filteredMoods.size());
-        Iterator<Post> it = historyCopy.iterator();
-        ArrayList<Post> result = new ArrayList<>();
-        while (it.hasNext()){
-            Mood m = (Mood)it.next();
-            if (filteredMoods.contains(m.getMoodType())){
-                result.add(m);
+        if (historyCopy.size() > 0){
+            filteredMoods.add(moodType);
+            // log used for debugging
+            Log.d("Filter","(SELECT-Profile)Current filtered mood size: "+filteredMoods.size());
+            Iterator<Post> it = historyCopy.iterator();
+            List<Post> result = new ArrayList<>();
+            while (it.hasNext()){
+                Mood m = (Mood)it.next();
+                if (filteredMoods.contains(m.getMoodType())){
+                    result.add(m);
+                }
             }
+            historyFragment.getRecyclerAdapter().setFeed(result);
+            historyFragment.getRecyclerAdapter().notifyDataSetChanged();
         }
-        historyFragment.getRecyclerAdapter().setFeed(result);
-        historyFragment.getRecyclerAdapter().notifyDataSetChanged();
     }
 
     /**
@@ -395,7 +392,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         Log.d("Filter","(DESELECT-Profile)Current filtered mood size: "+filteredMoods.size());
         if (filteredMoods.size() > 0){
             Iterator<Post> it = historyCopy.iterator();
-            ArrayList<Post> result = new ArrayList<>();
+            List<Post> result = new ArrayList<>();
             while (it.hasNext()){
                 Mood m = (Mood)it.next();
                 if (filteredMoods.contains(m.getMoodType())){
@@ -410,9 +407,14 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         }
     }
 
+    /**
+     * Logs out the current logged in user from the application.
+     */
     public void onLogout(){
-        currentUser = null;
+        Bundle userBundle = getIntent().getExtras();
+        userBundle.remove("User");
         Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+        intent.putExtras(userBundle);
         startActivity(intent);
     }
 }
