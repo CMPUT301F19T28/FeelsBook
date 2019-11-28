@@ -51,6 +51,18 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <Button
+                android:id="@+id/edit_profile_pic_button"
+                android:layout_width="78dp"
+                android:layout_height="48dp"
+                android:layout_marginRight="20dp"
+                android:background="@color/add_post_color"
+                android:text="Add/Edit Profile Picture"
+                android:textSize="8sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <ImageView
                 android:id="@+id/profile_picture"
                 android:layout_width="84dp"

@@ -74,11 +74,6 @@ public class ViewMoodActivity extends AppCompatActivity{
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(ViewMoodActivity.this, ProfileActivity.class);
-//                Bundle userBundle = new Bundle();
-//                userBundle.putSerializable("User", currentUser);
-//                intent.putExtras(userBundle);
-//                startActivity(intent);
                 finish();
             }
         });

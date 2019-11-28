@@ -1,11 +1,13 @@
 package com.cmput.feelsbook;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -69,6 +71,8 @@ public class ProfileActivity extends AppCompatActivity{
     private FirebaseFirestore db;
     private CollectionReference MoodCollection;
     private Feed.OnItemClickListener listener;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private Bitmap profilePicBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +103,6 @@ public class ProfileActivity extends AppCompatActivity{
 
             @Override
             public void onItemClick(Post post){
-//                new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
                 Intent intent = new Intent(getApplicationContext(), ViewMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
@@ -124,6 +127,7 @@ public class ProfileActivity extends AppCompatActivity{
         tabLayout.setupWithViewPager(viewPager);
 
         Button backButton = findViewById(R.id.exit_profile);
+        Button editProfilePictureButton = findViewById(R.id.edit_profile_pic_button);
         TextView fullName = findViewById(R.id.full_name);
         TextView userName = findViewById(R.id.username);
         TextView followText = findViewById(R.id.follower_count);
@@ -136,6 +140,7 @@ public class ProfileActivity extends AppCompatActivity{
         followText.setText(followCount + " following");
         followingText.setText(followersCount + " followers");
         userName.setText("@"+currentUser.getUserName());
+//        profilePicture.setImageBitmap(currentUser.getProfilePic());
 
         updateFeed();
         postCount = historyFragment.getRecyclerAdapter().getItemCount();
@@ -152,6 +157,35 @@ public class ProfileActivity extends AppCompatActivity{
                 startActivity(intent);
             }
         });
+
+        editProfilePictureButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (intent.resolveActivity(ProfileActivity.this.getPackageManager()) != null)
+                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                    currentUser.setProfilePic(profilePicBitmap);
+                    profilePicture.setImageBitmap(profilePicBitmap);
+            }
+        });
+    }
+
+    /**
+     * Activity result for Camera activity, gets bitmap photo taken during activity and attaches to bitmap variable 'picture'
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQUEST_IMAGE_CAPTURE) {
+                profilePicBitmap = (Bitmap) data.getExtras().get("data");
+//                currentUser.setProfilePic(profilePicBitmap);
+//                profilePicture.setImageBitmap(currentUser.getProfilePic());
+            }
+        }
     }
 
     @Override
