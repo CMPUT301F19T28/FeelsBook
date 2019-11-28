@@ -23,6 +23,7 @@ public abstract class Post implements Serializable{
 
     protected String profilePic;
     protected Date dateTime;
+    protected String user;
 
     public Post() {
 
@@ -44,6 +45,14 @@ public abstract class Post implements Serializable{
 
     public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public Bitmap profilePicBitmap() {

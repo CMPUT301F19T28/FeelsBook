@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -65,9 +66,8 @@ public class ProfileActivity extends AppCompatActivity{
     private ViewPager viewPager;
     private ViewPagerAdapter viewPagerAdapter;
     private FeedFragment historyFragment;
-    private MapFragment mapFragment;
     private FirebaseFirestore db;
-    private CollectionReference MoodCollection;
+    private MapFragment mapFragment;
     private Feed.OnItemClickListener listener;
 
     @Override
@@ -107,10 +107,6 @@ public class ProfileActivity extends AppCompatActivity{
             }
         };
 
-        //Sets the document to that of the current user
-        MoodCollection = db.collection("users").document(currentUser.getUserName())
-                .collection("Moods");
-
         historyFragment = new FeedFragment();
         historyFragment.getRecyclerAdapter().setOnItemClickListener(listener);
         mapFragment = new MapFragment();
@@ -130,9 +126,26 @@ public class ProfileActivity extends AppCompatActivity{
         fullName.setText(currentUser.getName());
         userName.setText("@"+currentUser.getUserName());
 
-
-        updateFeed();
-        postCount = historyFragment.getRecyclerAdapter().getItemCount();
+        db.collection("users")
+                .document(currentUser.getUserName())
+                .collection("Moods")
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    if(e == null) {
+                        for(DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
+                            switch (doc.getType()) {
+                                case ADDED:
+                                    historyFragment.getRecyclerAdapter().addPost(doc.getDocument().toObject(Mood.class));
+                                    historyFragment.getRecyclerAdapter().notifyItemInserted(doc.getNewIndex());
+                                    break;
+                                case REMOVED:
+                                    historyFragment.getRecyclerAdapter().removePost(doc.getOldIndex());
+                                    historyFragment.getRecyclerAdapter().notifyItemRemoved(doc.getOldIndex());
+                                    historyFragment.getRecyclerAdapter().notifyItemRangeChanged(doc.getOldIndex(), historyFragment.getRecyclerAdapter().getItemCount());
+                                    break;
+                            }
+                        }
+                    }
+                });
 
         postsText.setText(postCount + " total post");
 
@@ -174,28 +187,6 @@ public class ProfileActivity extends AppCompatActivity{
         bundle.putSerializable("user",currentUser);
         intent.putExtras(bundle);
         startActivity(intent);
-    }
-
-    /**
-     * This method updates the FeedFragment whenever the remote database is updated
-     */
-    private void updateFeed(){
-        MoodCollection.addSnapshotListener((queryDocumentSnapshots, e) -> {
-
-            //clears list
-            while( historyFragment.getRecyclerAdapter().getItemCount() > 0) {
-                historyFragment.getRecyclerAdapter().removePost(0);
-                historyFragment.getRecyclerAdapter().notifyItemRemoved(0);
-            }
-            for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
-                if(doc.exists())
-                    historyFragment.getRecyclerAdapter().addPost(doc.toObject(Mood.class));
-            }
-
-            historyFragment.getRecyclerAdapter().notifyDataSetChanged();
-        });
-
-
     }
 }
 

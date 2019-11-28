@@ -26,6 +26,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.cmput.feelsbook.post.Post;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -121,49 +122,36 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        //setLoading()
-        getFollowing();
-    }
-
-    private void getFollowing() {
-        List<FollowUser> following = new ArrayList<FollowUser>();
-        FirebaseFirestore.getInstance()
-                .collection("users")
+        db.collection("users")
                 .document(currentUser.getUserName())
                 .collection("following")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        for(DocumentSnapshot doc :task.getResult().getDocuments()) {
-                            following.add(doc.toObject(FollowUser.class));
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    if(e == null) {
+                        for(DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
+                            switch (doc.getType()) {
+                                case ADDED:
+                                    currentUser.addUserToFollowing(doc.getDocument().toObject(FollowUser.class));
+                                    db.collection("mostRecent")
+                                            .document(doc.getDocument().getId())
+                                            .addSnapshotListener((documentSnapshot, e2) -> {
+                                                if(documentSnapshot != null && documentSnapshot.exists()) {
+                                                    feedFragment.getRecyclerAdapter().addPost(documentSnapshot.toObject(Mood.class));
+                                                    feedFragment.getRecyclerAdapter().notifyItemInserted(feedFragment.getRecyclerAdapter().getItemCount() - 1);
+                                                }
+                                            });
+                                    break;
+                                case REMOVED:
+                                    currentUser.removeUserFromFollowing(doc.getOldIndex());
+                                    feedFragment.getRecyclerAdapter()
+                                            .getFeed()
+                                            .stream()
+                                            .filter(post -> post.getUser().equals(doc.getDocument().getId()))
+                                            .findFirst()
+                                            .ifPresent(post -> feedFragment.getRecyclerAdapter().removePost(post));
+                                    break;
+                            }
                         }
-                        currentUser.setFollowingList(following);
-                        updateFeed();
                     }
                 });
-    }
-
-    /**
-     * This method updates the FeedFragment whenever the remote database is updated
-     */
-    private void updateFeed() {
-        List<FollowUser> followingList = currentUser.getFollowingList();
-        for (int i = 0; i < followingList.size(); i++) {
-            db.collection("mostRecent")
-                    .document(followingList.get(i).getUserName())
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.getResult().exists()) {
-                                DocumentSnapshot doc = task.getResult();
-                                feedFragment.getRecyclerAdapter().addPost(doc.toObject(Mood.class));
-                            }
-                            feedFragment.getRecyclerAdapter().notifyDataSetChanged();
-                        }
-
-                    });
-        }
     }
 }
