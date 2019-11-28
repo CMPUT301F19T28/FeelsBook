@@ -94,6 +94,10 @@ public class AddMoodActivity extends AppCompatActivity{
             }
         }
 
+        if(currentUser == null){
+            throw new AssertionError("Calling a null user object");
+        }
+
         //Sets the document to that of the current user
         UserDocument = db.collection("users").document(currentUser.getUserName());
 
@@ -161,6 +165,7 @@ public class AddMoodActivity extends AppCompatActivity{
                     if(task.isSuccessful())
                         updateMostRecent();
                 });
+
     }
 
     /**

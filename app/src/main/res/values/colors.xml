@@ -8,4 +8,10 @@
     <color name="add_post_color">#FAF43C</color>
     <color name="defaultWhite">#FFFFFF</color>
     <color name="defaultGray">#E0E0E0</color>
+    <color name="yellow">#FFFF80</color>
+    <color name="blue">#80B3FF</color>
+    <color name="red">#FF6666</color>
+    <color name="purple">#DF80FF</color>
+    <color name="orange">#FFB380</color>
+    <color name="pink">#FFCCF2</color>
 </resources>

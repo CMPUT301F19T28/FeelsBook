@@ -18,7 +18,7 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
 
     private final String TAG = "Feed";
 
-    private List<Post> feed;
+    private List<Post> feedList;
 
     private OnItemClickListener listener;
 
@@ -27,33 +27,35 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
     }
 
     public Feed() {
-        this.feed = new ArrayList<>();
+        this.feedList = new ArrayList<>();
         setOnItemClickListener(null);
     }
 
     public Feed(List<Post> feed) {
 
-        this.feed = feed;
+        this.feedList = feed;
         setOnItemClickListener(null);
     }
 
     public void addPost(Post post) {
-        feed.add(post);
+        feedList.add(post);
     }
 
     public void removePost(Post post) {
-        feed.remove(post);
+        feedList.remove(post);
     }
 
     public void removePost(int pos) {
-        feed.remove(pos);
+        feedList.remove(pos);
     }
 
     public Post getPost(int pos) {
-        return feed.get(pos);
+        return feedList.get(pos);
     }
 
-    public Serializable getFeed(){ return (Serializable)this.feed; }
+    public List<Post> getFeed(){ return this.feedList; }
+
+    public void setFeed(List<Post> feedList){ this.feedList = feedList;}
 
     public void setOnItemClickListener(OnItemClickListener listener){
         this.listener = listener;
@@ -83,17 +85,16 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Log.d(TAG, "called onBindViewHolder");
-        feed.get(position).displayPost(holder);
-        holder.bind(feed.get(position), listener);
+        feedList.get(position).displayPost(holder);
+        holder.bind(feedList.get(position), listener);
     }
 
     @Override
     public int getItemCount() {
-        return feed.size();
+        return feedList.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder  implements Serializable{
-
 
         public ViewHolder(final View view) {
             super(view);
