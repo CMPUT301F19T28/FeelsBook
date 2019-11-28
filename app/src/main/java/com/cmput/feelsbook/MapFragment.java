@@ -200,10 +200,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     });
             googleMap.setOnMarkerClickListener(clusterManager);
             clusterManager.setOnClusterItemInfoWindowClickListener(
-                    new ClusterManager.OnClusterItemInfoWindowClickListener<ClusterItem>() {
-                        @Override public void onClusterItemInfoWindowClick(ClusterItem clusterItem) {
-                            Toast.makeText(getContext(), "Clicked info window: make this goto view/edit activity" + firstRun.toString(),
-                                    Toast.LENGTH_SHORT).show();
+                    new ClusterManager.OnClusterItemInfoWindowClickListener<ClusterMarker>() {
+                        @Override public void onClusterItemInfoWindowClick(ClusterMarker clusterMarker) {
+                            Intent intent = new Intent(getActivity().getApplicationContext(), AddMoodActivity.class);
+                            Bundle userBundle = new Bundle();
+                            userBundle.putSerializable("User", currentUser);
+                            userBundle.putBoolean("editMood", true);
+                            userBundle.putSerializable("Mood", clusterMarker.getMood());
+                            intent.putExtras(userBundle);
+                            startActivityForResult(intent, 1);
                         }
                     });
             googleMap.setOnInfoWindowClickListener(clusterManager);
@@ -221,7 +226,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 String title = "TODO: Put username here";
                 String snippet = getString(mood.getMoodType().getEmoticon()) + "@ " + mood.getDateTime().toString();
                 Bitmap avatar = getPhoto(mood.getPhoto());
-                ClusterMarker clusterMarker = new ClusterMarker(position, title, snippet, avatar);
+                ClusterMarker clusterMarker = new ClusterMarker(position, title, snippet, avatar, mood);
                 clusterManager.addItem(clusterMarker);
                 clusterMarkers.add(clusterMarker);
             }
