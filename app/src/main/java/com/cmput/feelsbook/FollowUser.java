@@ -23,6 +23,12 @@ public class FollowUser implements Serializable {
         this.profilePic = profilePicString(profilePic);
     }
 
+    public FollowUser(String userName, String name, String profilePic) {
+        this.userName = userName;
+        this.name = name;
+        this.profilePic = profilePic;
+    }
+
     public String getUserName() {
         return userName;
     }

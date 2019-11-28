@@ -76,7 +76,7 @@ public class SearchActivity extends AppCompatActivity {
                                                     if (task.isSuccessful() && task.getResult() != null) {
                                                         DocumentSnapshot doc = task.getResult();
                                                         if(doc.exists())
-                                                            adapter.addUser(doc.toObject(FollowUser.class));
+                                                            adapter.addUser(new FollowUser(doc.getId(), (String) doc.getData().get("name"), (String) doc.getData().get("profilePic")));
                                                     }
                                                 }
                                             });
