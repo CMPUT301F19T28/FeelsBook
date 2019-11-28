@@ -67,6 +67,10 @@ public class SignUpActivity extends AppCompatActivity {
         passwordField = findViewById(R.id.s_password_text);
         usernameField = findViewById(R.id.s_user_text);
 
+        nameField.getText().clear();
+        passwordField.getText().clear();
+        usernameField.getText().clear();
+
         db = FirebaseFirestore.getInstance();  // Create an instance to access Cloud Firestore
         final CollectionReference collectionReference = db.collection("users");
 
@@ -156,7 +160,7 @@ public class SignUpActivity extends AppCompatActivity {
             HashMap<String, String> data = new HashMap<>();
             data.put("password", hashedPassword);
             data.put("name", name);
-            data.put("username",username);
+            data.put("total_posts","0");
 
             db.collection("users")
                     .document(username)
