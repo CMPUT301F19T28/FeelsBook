@@ -66,7 +66,7 @@ public class Followers extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         fullName.setText(list.get(position).getName());
         profilePic.setImageBitmap(list.get(position).getProfilePic());
 
-        Button remove = holder.itemView.findViewById(R.id.toggleButton);
+        Button remove = holder.itemView.findViewById(R.id.follow_remove_button);
         remove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

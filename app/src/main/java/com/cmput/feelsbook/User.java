@@ -29,7 +29,6 @@ import java.util.Map;
  * allows for creation of new posts.
  * String userName, name - contains the username and name of the user, respectively
  * Feed posts - contains the user's personal posts
- * FollowList followList - contains the user's following list
  * Bitmap profilePicture - contains the user's profile pictur
  */
 public class User implements Serializable {

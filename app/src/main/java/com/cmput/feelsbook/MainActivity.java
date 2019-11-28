@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
     }
 
     private void getFollowing() {
-        List<FollowUser> following = new ArrayList<FollowUser>();
+        List<FollowUser> following = new ArrayList<>();
         FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(currentUser.getUserName())
@@ -281,6 +281,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                                             "****MOOD DOWNLOAD FAILED: " + error);
                                 }
                             }
+                            Log.d("Main","Feed size: "+feedFragment.getRecyclerAdapter().getItemCount());
                             feedFragment.getRecyclerAdapter().notifyDataSetChanged();
                             feedCopy = new ArrayList<>(feedFragment.getRecyclerAdapter().getFeed());
                         }
