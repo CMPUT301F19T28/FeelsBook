@@ -1,13 +1,17 @@
 package com.cmput.feelsbook;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
+import java.util.Base64;
 
 public class FollowUser implements Serializable {
 
     private String userName;
     private String name;
-    private Bitmap profilePic;
+    private String profilePic;
 
     public FollowUser() {
 
@@ -16,7 +20,7 @@ public class FollowUser implements Serializable {
     public FollowUser(String userName, String name, Bitmap profilePic) {
         this.userName = userName;
         this.name = name;
-        this.profilePic = profilePic;
+        this.profilePic = profilePicString(profilePic);
     }
 
     public String getUserName() {
@@ -35,11 +39,28 @@ public class FollowUser implements Serializable {
         this.name = name;
     }
 
-    public Bitmap getProfilePic() {
+    public String getProfilePic() {
         return profilePic;
     }
 
-    public void setProfilePic(Bitmap profilePic) {
+    public void setProfilePic(String profilePic) {
         this.profilePic = profilePic;
+    }
+
+    public Bitmap profilePicBitmap() {
+        if(profilePic != null) {
+            byte[] photo = Base64.getDecoder().decode(profilePic);
+            return BitmapFactory.decodeByteArray(photo, 0, photo.length);
+        }
+        return null;
+    }
+
+    public static String profilePicString(Bitmap bitmap) {
+        if(bitmap != null) {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            return Base64.getEncoder().encodeToString(stream.toByteArray());
+        }
+        return null;
     }
 }
