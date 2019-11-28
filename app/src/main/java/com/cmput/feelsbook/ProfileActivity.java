@@ -145,16 +145,16 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         userName.setText("@" + currentUser.getUserName());
 
         // document reference used to fetch total number of posts field inside of the database
-        DocumentReference dr = db.collection("users")
-                .document(currentUser.getUserName());
+        CollectionReference cr = db.collection("users")
+                .document(currentUser.getUserName()).collection("Moods");
 
-        dr.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        cr.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    DocumentSnapshot doc = task.getResult();
-                    if (doc.exists()) {
-                        postCount = Integer.valueOf(doc.getString("total_posts"));
+                    QuerySnapshot doc = task.getResult();
+                    if (doc != null) {
+                        postCount = doc.size();
                         if (postCount > 1 || postCount == 0) {
                             postsText.setText(postCount + " total posts");
                         } else if (postCount == 1) {
@@ -211,6 +211,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         super.onResume();
         TextView followersText = findViewById(R.id.follower_count);
         TextView followingText = findViewById(R.id.following_count);
+        TextView postsText = findViewById(R.id.total_posts);
         db.collection("users").document(currentUser.getUserName()).collection("following").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -225,6 +226,20 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                 followersText.setText(followersCount + " followers");
             }
         });
+        db.collection("users").document(currentUser.getUserName()).collection("Moods")
+                .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        postCount = queryDocumentSnapshots.size();
+                        if (postCount > 1 || postCount == 0) {
+                            postsText.setText(postCount + " total posts");
+                        } else if (postCount == 1) {
+                            postsText.setText(postCount + " total post");
+                        }
+                        Log.d("Profile", "Counter update successful");
+                    }
+                });
+
 
         updateFeed();
     }
