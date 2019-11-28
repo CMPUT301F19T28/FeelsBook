@@ -36,6 +36,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -55,7 +56,7 @@ import io.opencensus.tags.Tag;
  * FeedFragment feedFragment - contains the feed activity to be displayed
  * FirebaseFirestore db - created instance of the database where data is being pulled from
  */
-public class ProfileActivity extends AppCompatActivity{
+public class ProfileActivity extends AppCompatActivity {
     private int followCount;
     private int followersCount;
     private int postCount;
@@ -99,12 +100,11 @@ public class ProfileActivity extends AppCompatActivity{
 
             @Override
             public void onItemClick(Post post){
-//                new AddMoodFragment().newInstance(post).show(getSupportFragmentManager(), "EDIT_MOOD");
                 Intent intent = new Intent(getApplicationContext(), ViewMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
 //                userBundle.putBoolean("editMood", true);
-                userBundle.putSerializable("Mood", ((Mood) post).Serialize(true));
+                userBundle.putSerializable("Mood", ((Mood) post));
                 intent.putExtras(userBundle);
                 startActivityForResult(intent, 1);
             }
@@ -195,72 +195,33 @@ public class ProfileActivity extends AppCompatActivity{
                 historyFragment.getRecyclerAdapter().removePost(0);
                 historyFragment.getRecyclerAdapter().notifyItemRemoved(0);
             }
-
             for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
-
-                MoodType moodType = null;
-                String reason = null;
-                SocialSituation situation = null;
-                Bitmap photo = null;
-                Location location = null;
-                Bitmap profilePic = null;
-                Date dateTime = null;
-                String user = "null";
-
-
-                try {
-                    if (doc.contains("datetime"))
-                        dateTime = ((Timestamp) doc.get("datetime")).toDate();
-
-                    if (doc.contains("location"))
-                        location = (Location) doc.get("location");
-
-                    if (doc.contains("photo")) {
-                        photo = getPhoto((String)  doc.get("photo"));
-                    }
-
-                    if (doc.contains("profilePic")) {
-                        profilePic = getPhoto((String)  doc.get("profilePic"));
-                    }
-
-                    if (doc.contains("reason"))
-                        reason = (String) doc.get("reason");
-
-                    if (doc.contains("situation") & (doc.get("situation") != null)) {
-                        situation = SocialSituation.getSocialSituation((String) doc.get("situation"));
-                    }
-
-                    if (doc.contains("moodType") & (doc.get("moodType") != null)) {
-                        moodType = MoodType.getMoodType((String) doc.get("moodType"));
-                    }
-
-                    if(doc.contains("User")){
-                        user = (String) doc.get("User");
-                    }
-
-                    Mood mood = new Mood(dateTime, moodType, profilePic).withUser(user);
-
-                    if(reason != null)
-                        mood = mood.withReason(reason);
-                    if(situation != null)
-                        mood = mood.withSituation(situation);
-                    if(photo != null)
-                        mood = mood.withPhoto(photo);
-                    if(location != null)
-                        mood.withLocation(location);
-
-                    historyFragment.getRecyclerAdapter().addPost(mood);
-
-
-                }catch(Exception error){
-                    Log.d("-----UPLOAD SAMPLE-----",
-                            "****MOOD DOWNLOAD FAILED: " + error);
-                }
+                if(doc.exists())
+                    historyFragment.getRecyclerAdapter().addPost(doc.toObject(Mood.class));
             }
 
             historyFragment.getRecyclerAdapter().notifyDataSetChanged();
-        });
+            historyCopy = new ArrayList<>(historyFragment.getRecyclerAdapter().getFeed());
+            int postListCount = historyFragment.getRecyclerAdapter().getItemCount();
 
+            // update total number of posts
+            HashMap<String,Object> userUpdate = new HashMap<>();
+            userUpdate.put("total_posts",String.valueOf(postListCount));
+            db.collection("users").document(currentUser.getUserName())
+                    .update(userUpdate)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("Profile", "Counter update successful");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("Profile", "Counter update failed: " + e);
+                        }
+                    });
+        });
 
     }
 

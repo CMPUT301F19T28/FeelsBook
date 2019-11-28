@@ -61,7 +61,7 @@ public class ViewMoodActivity extends AppCompatActivity{
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
-            post = ((Mood) bundle.getSerializable("Mood")).Serialize(false);
+            post = ((Mood) bundle.getSerializable("Mood"));
             setValues((Mood)post);
 
             if(((Mood) post).getUser().equals(currentUser.getUserName())){
@@ -77,11 +77,6 @@ public class ViewMoodActivity extends AppCompatActivity{
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(ViewMoodActivity.this, ProfileActivity.class);
-//                Bundle userBundle = new Bundle();
-//                userBundle.putSerializable("User", currentUser);
-//                intent.putExtras(userBundle);
-//                startActivity(intent);
                 finish();
             }
         });
@@ -94,7 +89,7 @@ public class ViewMoodActivity extends AppCompatActivity{
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
                 userBundle.putBoolean("editMood", true);
-                userBundle.putSerializable("Mood", ((Mood) post).Serialize(true));
+                userBundle.putSerializable("Mood", ((Mood) post));
                 intent.putExtras(userBundle);
                 startActivityForResult(intent, REQUEST_EDIT_MOOD);
 
@@ -115,7 +110,7 @@ public class ViewMoodActivity extends AppCompatActivity{
         }
 
         if(editMood.hasPhoto()){
-            photo.setImageBitmap(editMood.getPhoto());
+            photo.setImageBitmap(editMood.photoBitmap());
         }
     }
 
@@ -134,7 +129,7 @@ public class ViewMoodActivity extends AppCompatActivity{
 
         if (requestCode == REQUEST_EDIT_MOOD) {
             if(resultCode == Activity.RESULT_OK){
-                Mood mood = ((Mood) data.getSerializableExtra("Mood")).Serialize(false);
+                Mood mood = ((Mood) data.getSerializableExtra("Mood"));
                 setValues(mood);
             }
 

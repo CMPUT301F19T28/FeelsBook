@@ -66,7 +66,7 @@ public class User implements Serializable {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         if(documentSnapshot.exists()) {
-                            toFollowing.document(getUserName()).set(new FollowUser(documentSnapshot.getId(),(String) documentSnapshot.getData().get("name"), null));
+                            toFollowing.document(getUserName()).set(new FollowUser(documentSnapshot.getId(),(String) documentSnapshot.getData().get("name"), (String) documentSnapshot.getData().get("profilePic")));
                         }
                     }
                 });
