@@ -101,7 +101,7 @@ public class ProfileActivity extends AppCompatActivity{
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
                 userBundle.putBoolean("editMood", true);
-                userBundle.putSerializable("Mood", ((Mood) post).Serialize(true));
+                userBundle.putSerializable("Mood", post);
                 intent.putExtras(userBundle);
                 startActivityForResult(intent, 1);
             }
@@ -187,62 +187,9 @@ public class ProfileActivity extends AppCompatActivity{
                 historyFragment.getRecyclerAdapter().removePost(0);
                 historyFragment.getRecyclerAdapter().notifyItemRemoved(0);
             }
-
             for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
-                if(!doc.exists())
-                    break;
-                MoodType moodType = null;
-                String reason = null;
-                SocialSituation situation = null;
-                Bitmap photo = null;
-                Location location = null;
-                Bitmap profilePic = null;
-                Date dateTime = null;
-
-                try {
-                    if (doc.contains("datetime"))
-                        dateTime = ((Timestamp) doc.get("datetime")).toDate();
-
-                    if (doc.contains("location"))
-                        location = (Location) doc.get("location");
-
-                    if (doc.contains("photo")) {
-                        photo = getPhoto((String)  doc.get("photo"));
-                    }
-
-                    if (doc.contains("profilePic")) {
-                        profilePic = getPhoto((String)  doc.get("profilePic"));
-                    }
-
-                    if (doc.contains("reason"))
-                        reason = (String) doc.get("reason");
-
-                    if (doc.contains("situation") & (doc.get("situation") != null)) {
-                        situation = SocialSituation.getSocialSituation((String) doc.get("situation"));
-                    }
-
-                    if (doc.contains("moodType") & (doc.get("moodType") != null)) {
-                        moodType = MoodType.getMoodType((String) doc.get("moodType"));
-                    }
-
-                    Mood mood = new Mood(dateTime, moodType, profilePic);
-
-                    if(reason != null)
-                        mood = mood.withReason(reason);
-                    if(situation != null)
-                        mood = mood.withSituation(situation);
-                    if(photo != null)
-                        mood = mood.withPhoto(photo);
-                    if(location != null)
-                        mood.withLocation(location);
-
-                    historyFragment.getRecyclerAdapter().addPost(mood);
-
-
-                }catch(Exception error){
-                    Log.d("-----UPLOAD SAMPLE-----",
-                            "****MOOD DOWNLOAD FAILED: " + error);
-                }
+                if(doc.exists())
+                    historyFragment.getRecyclerAdapter().addPost(doc.toObject(Mood.class));
             }
 
             historyFragment.getRecyclerAdapter().notifyDataSetChanged();
@@ -250,26 +197,5 @@ public class ProfileActivity extends AppCompatActivity{
 
 
     }
-
-    /**
-     * Takes in a base64 string and converts it into a bitmap
-     * @param photo
-     *          photo to be converted in base64 String format format
-     * @return
-     *      returns bitmap of decoded photo returns null if base64 string was not passed in
-     */
-    private Bitmap getPhoto(String photo){
-        try {
-            @SuppressLint("NewApi") byte[] decoded = Base64.getDecoder()
-                    .decode(photo);
-            return BitmapFactory.decodeByteArray(decoded
-                    , 0, decoded.length);
-        }catch(Exception e){
-            Log.d("-----CONVERT PHOTO-----",
-                    "****NO PHOTO CONVERTED: " + e);
-            return null;
-        }
-    }
-
 }
 
