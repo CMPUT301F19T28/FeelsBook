@@ -19,7 +19,6 @@ import com.google.android.material.tabs.TabLayout;
  * RecyclerView follow_requests - list of follow requests to be displayed
  * FollowingRequests followingRequests - adapter used to populate list of following requests
  * from the user
- * FollowList followingList - used to display other users the current user is following
  */
 public class FollowActivity extends AppCompatActivity {
 
@@ -27,7 +26,6 @@ public class FollowActivity extends AppCompatActivity {
     private FollowFragment followFragment;
     private FollowersFragment followersFragment;
     private FollowingFragment followingFragment;
-    private FollowList followingList;
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private ViewPagerAdapter viewPagerAdapter;
@@ -38,7 +36,6 @@ public class FollowActivity extends AppCompatActivity {
         setContentView(R.layout.follow_activity);
         user = (User) getIntent().getExtras().get("user");
 
-        followingList = new FollowList();
         followFragment = new FollowFragment(user);
         tabLayout = findViewById(R.id.follow_tabs);
         viewPager = findViewById(R.id.followPager);

@@ -1,6 +1,8 @@
 package com.cmput.feelsbook.post;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Location;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -12,11 +14,15 @@ import com.cmput.feelsbook.ProxyBitmap;
 import com.cmput.feelsbook.R;
 import com.google.firebase.firestore.GeoPoint;
 
+import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Locale;
+
+import static java.util.Base64.getDecoder;
 
 /**
  * Object that contains information about a mood.
@@ -35,11 +41,14 @@ public class Mood extends Post implements Serializable {
     private MoodType moodType;
     private String reason;
     private SocialSituation situation;
-    private ProxyBitmap serilizable_photo;
-    private Bitmap photo;
-    private GeoPoint location;
+    private String photo;
+    private Location location;
     private String user;
 
+
+    public Mood() {
+        this.dateTime = new Date();
+    }
 
     /**
      * Create a Mood object with the current Date
@@ -51,7 +60,7 @@ public class Mood extends Post implements Serializable {
     public Mood(MoodType moodType, Bitmap profilePic) {
         this.dateTime = new Date();
         this.moodType = moodType;
-        this.profilePic = profilePic;
+        this.profilePic = profilePicString(profilePic);
     }
 
     /**
@@ -66,7 +75,7 @@ public class Mood extends Post implements Serializable {
     public Mood(Date dateTime, MoodType moodType, Bitmap profilePic) {
         this.dateTime = dateTime;
         this.moodType = moodType;
-        this.profilePic = profilePic;
+        this.profilePic = profilePicString(profilePic);
     }
 
     /**
@@ -101,8 +110,7 @@ public class Mood extends Post implements Serializable {
      * The mood with a Photo added
      */
     public Mood withPhoto(Bitmap photo) {
-        this.photo = photo;
-        this.serilizable_photo = new ProxyBitmap(photo);
+        this.photo = photoString(photo);
         return this;
     }
 
@@ -118,19 +126,6 @@ public class Mood extends Post implements Serializable {
         return this;
     }
 
-    /**
-     * To make the Mood object serializable convert Bitmap photo to Proxybitmap
-     * @param change
-     * @return
-     */
-    public Mood Serialize(boolean change){
-        if(change) {
-            this.photo = null;
-        }else if(serilizable_photo != null){
-            this.photo = serilizable_photo.getBitmap();
-        }
-        return this;
-    }
 
     public Mood withUser(String username){
         this.user = username;
@@ -148,10 +143,10 @@ public class Mood extends Post implements Serializable {
         ImageView profile_pic_feed = viewHolder.itemView.findViewById(R.id.profileImage);
         TextView username = viewHolder.itemView.findViewById(R.id.user_name);
 
-
+        viewHolder.itemView.setBackgroundColor(Color.parseColor(moodType.getColor()));
         dateTimeText.setText(dateFormatter.format(dateTime));
         moodText.setText(moodType.getEmoticon());
-        profile_pic_feed.setImageBitmap(profilePic);
+        profile_pic_feed.setImageBitmap(profilePicBitmap());
         username.setText(user);
 
         if(reason != null) {
@@ -164,7 +159,7 @@ public class Mood extends Post implements Serializable {
         }
         if(photo != null) {
             ImageView photoFeed = viewHolder.itemView.findViewById(R.id.photo_feed);
-            photoFeed.setImageBitmap(photo);
+            photoFeed.setImageBitmap(photoBitmap());
         }
 
  */
@@ -205,11 +200,19 @@ public class Mood extends Post implements Serializable {
         this.situation = situation;
     }
 
-    public Bitmap getPhoto() {
+    public Bitmap photoBitmap() {
+        if(photo != null) {
+            byte[] photo = Base64.getDecoder().decode(this.photo);
+            return BitmapFactory.decodeByteArray(photo, 0, photo.length);
+        }
+        return null;
+    }
+
+    public String getPhoto() {
         return photo;
     }
 
-    public void setPhoto(Bitmap photo) {
+    public void setPhoto(String photo) {
         this.photo = photo;
     }
 
@@ -219,5 +222,14 @@ public class Mood extends Post implements Serializable {
 
     public void setLocation(GeoPoint location) {
         this.location = location;
+    }
+
+    public static String photoString(Bitmap bitmap) {
+        if(bitmap != null) {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            return Base64.getEncoder().encodeToString(stream.toByteArray());
+        }
+        return null;
     }
 }

@@ -30,6 +30,7 @@ public class Followers extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public Followers(User user) {
         this.user = user;
         list = new ArrayList<>();
+
         FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(user.getUserName())
@@ -63,9 +64,9 @@ public class Followers extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         username.setText(list.get(position).getUserName());
         fullName.setText(list.get(position).getName());
-        profilePic.setImageBitmap(list.get(position).getProfilePic());
+        profilePic.setImageBitmap(list.get(position).profilePicBitmap());
 
-        Button remove = holder.itemView.findViewById(R.id.removeButton);
+        Button remove = holder.itemView.findViewById(R.id.follow_remove_button);
         remove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
