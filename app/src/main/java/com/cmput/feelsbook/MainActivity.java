@@ -258,9 +258,11 @@ public class MainActivity extends AppCompatActivity {
                                         mood = mood.withSituation(situation);
                                     if (photo != null)
                                         mood = mood.withPhoto(photo);
-                                    if (location != null)
+                                    if (location != null) {
                                         mood.withLocation(location);
                                         mapFragment.addPost(mood);
+                                    }
+
 
 
                                     feedFragment.getRecyclerAdapter().addPost(mood);

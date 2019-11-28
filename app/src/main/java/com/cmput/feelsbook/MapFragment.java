@@ -84,8 +84,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private ClusterManagerRenderer clusterManagerRenderer;
     private ArrayList<ClusterMarker> clusterMarkers = new ArrayList<>();
     private User currentUser;
-    private CollectionReference cr;
-    private FirebaseFirestore db;
     private Boolean firstRun = false;
     private List<Mood> feed;
 
@@ -97,9 +95,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             locationPermissionGranted = getArguments().getBoolean("locationPermission");
         }
         this.feed = new ArrayList<>();
-        db = FirebaseFirestore.getInstance();
-        cr = db.collection("users").document(currentUser.getUserName())
-                .collection("Moods");
     }
 
     @Nullable
