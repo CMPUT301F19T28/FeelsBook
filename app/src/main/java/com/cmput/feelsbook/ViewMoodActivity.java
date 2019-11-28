@@ -1,6 +1,7 @@
 package com.cmput.feelsbook;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -38,10 +39,12 @@ public class ViewMoodActivity extends AppCompatActivity{
     private ImageView photo;
     private ImageView profilePicture;
     private Post post;
+    private static final int REQUEST_EDIT_MOOD = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.view_mood_activity);
 
 
@@ -93,7 +96,8 @@ public class ViewMoodActivity extends AppCompatActivity{
                 userBundle.putBoolean("editMood", true);
                 userBundle.putSerializable("Mood", ((Mood) post).Serialize(true));
                 intent.putExtras(userBundle);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_EDIT_MOOD);
+
             }
         });
 
@@ -112,6 +116,28 @@ public class ViewMoodActivity extends AppCompatActivity{
 
         if(editMood.hasPhoto()){
             photo.setImageBitmap(editMood.getPhoto());
+        }
+    }
+
+    /**
+     * Activity result for edit mood activity, gets mood edited during activity and displays changes
+     * @param requestCode
+     *     the code sent requesting results
+     * @param resultCode
+     *     the code returned upon completion
+     * @param data
+     *     the data sent
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_EDIT_MOOD) {
+            if(resultCode == Activity.RESULT_OK){
+                Mood mood = ((Mood) data.getSerializableExtra("Mood")).Serialize(false);
+                setValues(mood);
+            }
+
         }
     }
 

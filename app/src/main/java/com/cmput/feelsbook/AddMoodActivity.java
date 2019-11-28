@@ -89,11 +89,7 @@ public class AddMoodActivity extends AppCompatActivity{
                 deleteButton.setVisibility(View.VISIBLE);
                 deleteButton.setOnClickListener(view -> {
                     deleted(((Mood) bundle.getSerializable("Mood")).Serialize(false));
-                    Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-                    Bundle userBundle = new Bundle();
-                    userBundle.putSerializable("User", currentUser);
-                    intent.putExtras(userBundle);
-                    startActivity(intent);
+                    finish();
                 });
             }
         }
@@ -132,11 +128,11 @@ public class AddMoodActivity extends AppCompatActivity{
         Button postButton = findViewById(R.id.edit_button);
         postButton.setOnClickListener(v -> {
             onSubmit(getValues());
-            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-            Bundle userBundle = new Bundle();
-            userBundle.putSerializable("User", currentUser);
-            intent.putExtras(userBundle);
-            startActivity(intent);
+            Mood mood = getValues().Serialize(true);
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("Mood", mood);
+            setResult(Activity.RESULT_OK, returnIntent);
+            finish();
         });
     }
 

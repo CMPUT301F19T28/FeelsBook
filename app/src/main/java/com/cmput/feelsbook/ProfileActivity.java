@@ -145,11 +145,7 @@ public class ProfileActivity extends AppCompatActivity{
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                Bundle userBundle = new Bundle();
-                userBundle.putSerializable("User", currentUser);
-                intent.putExtras(userBundle);
-                startActivity(intent);
+                finish();
             }
         });
     }
