@@ -1,16 +1,12 @@
 package com.cmput.feelsbook.post;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput.feelsbook.Feed;
 
-import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
-import java.util.Base64;
 import java.util.Date;
 
 /**
@@ -21,20 +17,16 @@ import java.util.Date;
  */
 public abstract class Post implements Serializable{
 
-    protected String profilePic;
+    protected Bitmap profilePic;
     protected Date dateTime;
-
-    public Post() {
-
-    }
 
     public abstract void displayPost(RecyclerView.ViewHolder viewHolder);
 
-    public String getProfilePic() {
+    public Bitmap getProfilePic() {
         return profilePic;
     }
 
-    public void setProfilePic(String profilePic) {
+    public void setProfilePic(Bitmap profilePic) {
         this.profilePic = profilePic;
     }
 
@@ -46,25 +38,8 @@ public abstract class Post implements Serializable{
         this.dateTime = dateTime;
     }
 
-    public Bitmap profilePicBitmap() {
-        if(profilePic != null) {
-            byte[] photo = Base64.getDecoder().decode(profilePic);
-            return BitmapFactory.decodeByteArray(photo, 0, photo.length);
-        }
-        return null;
-    }
-
     @Override
     public String toString(){
         return getClass().getName()+"@"+Integer.toHexString(dateTime.hashCode());
-    }
-
-    public static String profilePicString(Bitmap bitmap) {
-        if(bitmap != null) {
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            return Base64.getEncoder().encodeToString(stream.toByteArray());
-        }
-        return null;
     }
 }

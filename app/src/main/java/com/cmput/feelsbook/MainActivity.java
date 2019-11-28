@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
                 userBundle.putBoolean("editMood", true);
-                userBundle.putSerializable("Mood", post);
+                userBundle.putSerializable("Mood", ((Mood) post).Serialize(true));
                 intent.putExtras(userBundle);
                 startActivityForResult(intent, 1);
             }
@@ -135,8 +135,29 @@ public class MainActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        for(DocumentSnapshot doc :task.getResult().getDocuments()) {
-                            following.add(doc.toObject(FollowUser.class));
+                        List<DocumentSnapshot> list = task.getResult().getDocuments();
+                        if (list.size() != 0) {
+                            for (int i = 0; i < list.size(); i++) {
+                                DocumentSnapshot doc = list.get(i);
+                                Bitmap photo;
+
+                                /*
+                                converts the photo is present converts from a base64 string to a byte[]
+                                and then into a bitmap if no photo is present sets photo to null
+                                 */
+                                try {
+                                    byte[] decoded = Base64.getDecoder()
+                                            .decode((String) doc.get("photo"));
+                                    photo = BitmapFactory.decodeByteArray(decoded
+                                            , 0, decoded.length);
+                                } catch (Exception e) {
+                                    Log.d("-----UPLOAD PHOTO-----",
+                                            "****NO PHOTO DOWNLOADED: " + e);
+                                    photo = null;
+                                }
+                                FollowUser newFollowUser = new FollowUser(doc.getId(), doc.get("name").toString(), photo);
+                                following.add(newFollowUser);
+                            }
                         }
                         currentUser.setFollowingList(following);
                         updateFeed();
@@ -158,12 +179,88 @@ public class MainActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                             if (task.getResult().exists()) {
                                 DocumentSnapshot doc = task.getResult();
-                                feedFragment.getRecyclerAdapter().addPost(doc.toObject(Mood.class));
+
+                                MoodType moodType = null;
+                                String reason = null;
+                                SocialSituation situation = null;
+                                Bitmap photo = null;
+                                Location location = null;
+                                Bitmap profilePic = null;
+                                Date dateTime = null;
+                                String user = "null";
+
+                                try {
+                                    if (doc.contains("datetime"))
+                                        dateTime = ((Timestamp) doc.get("datetime")).toDate();
+
+                                    if (doc.contains("location"))
+                                        location = (Location) doc.get("location");
+
+                                    if (doc.contains("photo")) {
+                                        photo = getPhoto((String) doc.get("photo"));
+                                    }
+
+                                    if (doc.contains("profilePic")) {
+                                        profilePic = getPhoto((String) doc.get("profilePic"));
+                                    }
+
+                                    if (doc.contains("reason"))
+                                        reason = (String) doc.get("reason");
+
+                                    if (doc.contains("situation") & (doc.get("situation") != null)) {
+                                        situation = SocialSituation.getSocialSituation((String) doc.get("situation"));
+                                    }
+
+                                    if (doc.contains("moodType") & (doc.get("moodType") != null)) {
+                                        moodType = MoodType.getMoodType((String) doc.get("moodType"));
+                                    }
+
+                                    if (doc.contains("User")) {
+                                        user = (String) doc.get("User");
+                                    }
+
+                                    Mood mood = new Mood(dateTime, moodType, profilePic).withUser(user);
+
+                                    if (reason != null)
+                                        mood = mood.withReason(reason);
+                                    if (situation != null)
+                                        mood = mood.withSituation(situation);
+                                    if (photo != null)
+                                        mood = mood.withPhoto(photo);
+                                    if (location != null)
+                                        mood.withLocation(location);
+
+                                    feedFragment.getRecyclerAdapter().addPost(mood);
+                                } catch (Exception error) {
+                                    Log.d("-----UPLOAD SAMPLE-----",
+                                            "****MOOD DOWNLOAD FAILED: " + error);
+                                }
                             }
                             feedFragment.getRecyclerAdapter().notifyDataSetChanged();
                         }
 
                     });
+        }
+    }
+
+
+    /**
+     * Takes in a base64 string and converts it into a bitmap
+     * @param photo
+     *          photo to be converted in base64 String format format
+     * @return
+     *      returns bitmap of decoded photo returns null if base64 string was not passed in
+     */
+    private Bitmap getPhoto(String photo){
+        try {
+            @SuppressLint("NewApi") byte[] decoded = Base64.getDecoder()
+                    .decode(photo);
+            return BitmapFactory.decodeByteArray(decoded
+                    , 0, decoded.length);
+        }catch(Exception e){
+            Log.d("-----CONVERT PHOTO-----",
+                    "****NO PHOTO CONVERTED: " + e);
+            return null;
         }
     }
 }
