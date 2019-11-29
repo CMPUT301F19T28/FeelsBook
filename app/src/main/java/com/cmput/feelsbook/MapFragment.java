@@ -203,7 +203,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Filtera
                 LatLng position = new LatLng(mood.getLatitude(), mood.getLongitude());
                 String title = mood.getUser();
                 String snippet = getString(mood.getMoodType().getEmoticon()) + "@ " + mood.getDateTime().toString();
-                Bitmap avatar = getPhoto(mood.getProfilePic());
+                Bitmap avatar = Bitmap.createScaledBitmap(mood.profilePicBitmap(), 80, 80, false);
                 ClusterMarker clusterMarker = new ClusterMarker(position, title, snippet, avatar, mood);
                 clusterManager.addItem(clusterMarker);
                 clusterMarkers.add(clusterMarker);
@@ -365,24 +365,5 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Filtera
 
     public void updateMap() {
         mapView.getMapAsync(this);
-    }
-    /**
-     * Takes in a base64 string and converts it into a bitmap
-     * @param photo
-     *          photo to be converted in base64 String format format
-     * @return
-     *      returns bitmap of decoded photo returns null if base64 string was not passed in
-     */
-    private Bitmap getPhoto(String photo){
-        try {
-            @SuppressLint("NewApi") byte[] decoded = Base64.getDecoder()
-                    .decode(photo);
-            return BitmapFactory.decodeByteArray(decoded
-                    , 0, decoded.length);
-        }catch(Exception e){
-            Log.d("-----CONVERT PHOTO-----",
-                    "****NO PHOTO CONVERTED: " + e);
-            return null;
-        }
     }
 }

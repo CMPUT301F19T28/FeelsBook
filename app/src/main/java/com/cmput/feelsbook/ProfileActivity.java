@@ -59,9 +59,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
     private Boolean locationPermissionGranted;
     private List<MoodType> filteredMoods;
     private List<Post> historyCopy;
-    private boolean filterPressed = false;
     private FilterFragment filter;
-    private boolean filterClicked = false;
     private Bitmap bitmapProfilePicture;
 
     @Override
@@ -75,6 +73,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         profilePicture = findViewById(R.id.profile_picture);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         db = FirebaseFirestore.getInstance();
+        filter = new FilterFragment();
 
         listener = new Feed.OnItemClickListener(){
             /**
@@ -88,7 +87,6 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                 Intent intent = new Intent(getApplicationContext(), ViewMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
-//                userBundle.putBoolean("editMood", true);
                 userBundle.putSerializable("Mood", post);
                 intent.putExtras(userBundle);
                 startActivityForResult(intent, 1);
@@ -187,6 +185,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
             }
         });
 
+        followersText.setText("lol");
         db.collection("users")
                 .document(currentUser.getUserName())
                 .collection("followers")
@@ -211,7 +210,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                 });
 
         backButton.setOnClickListener(view -> {
-            if(filterPressed) {
+            if(filter.prefs != null) {
                 filter.reset();
                 historyFragment.getRecyclerAdapter().clearMoods();
                 mapFragment.clearMoods();
@@ -232,8 +231,6 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
 
         final ImageButton filterButton = findViewById(R.id.profile_filter_button);
         filterButton.setOnClickListener(view -> {
-            filterPressed = true;
-            filter = new FilterFragment();
             filter.show(getSupportFragmentManager(), "MAIN_FILTER");
         });
 
@@ -253,7 +250,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         Bundle bundle = new Bundle();
         bundle.putSerializable("user",currentUser);
         intent.putExtras(bundle);
-        if(filterPressed) {
+        if(filter.prefs != null) {
             filter.reset();
             historyFragment.getRecyclerAdapter().clearMoods();
             mapFragment.clearMoods();

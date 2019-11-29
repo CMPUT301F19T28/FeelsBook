@@ -186,7 +186,6 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                                             .ifPresent(post -> feedFragment.getRecyclerAdapter().removePost(post));
                                     mapFragment.getFeed().stream().filter(post -> post.getUser().equals(doc.getDocument().getId())).findFirst().ifPresent(post -> mapFragment.removePost(post));
                                     mapFragment.updateMap();
-
                                     break;
                             }
                         }
