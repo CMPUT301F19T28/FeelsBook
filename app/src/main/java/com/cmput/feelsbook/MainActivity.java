@@ -224,8 +224,10 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                 if(task.isSuccessful()){
                     DocumentSnapshot document = task.getResult();
                     if(document.exists()){
-                        currentUser.setProfilePic(document.get("profilePic").toString());
-                        profileButton.setImageBitmap(currentUser.profilePicBitmap());
+                        if(document.contains("profilePic") && document.get("profilePic") != null) {
+                            currentUser.setProfilePic(document.get("profilePic").toString());
+                            profileButton.setImageBitmap(currentUser.profilePicBitmap());
+                        }
                     }
                 }
             }

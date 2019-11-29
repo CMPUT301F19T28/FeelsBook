@@ -145,7 +145,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="Location" />
-        
+
     </LinearLayout>
 
     <Button

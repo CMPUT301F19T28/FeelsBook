@@ -127,17 +127,22 @@ public class AddMoodActivity extends AppCompatActivity{
 
         Button postButton = findViewById(R.id.edit_button);
         postButton.setOnClickListener(v -> {
+
             mood.setMoodType(moodTypeAdapter.getItem(spinner.getSelectedItemPosition()));
             mood.setPhoto(Mood.photoString(picture));
             mood.setReason(input.getText().toString());
-            mood.setSituation(socialAdapter.getItem(socialSpinner.getSelectedItemPosition()));
+            if(socialAdapter.getItem(socialSpinner.getSelectedItemPosition())!= SocialSituation.SELECT_A_SOCIAL_SITUATION)
+                mood.setSituation(socialAdapter.getItem(socialSpinner.getSelectedItemPosition()));
             mood.setProfilePic(Mood.profilePicString(bitmapProfilePicture));
             mood.setUser(currentUser.getUserName());
+
             onSubmit(mood);
             Intent returnIntent = new Intent();
             returnIntent.putExtra("Mood", mood);
+            returnIntent.putExtra("User", currentUser);
             setResult(Activity.RESULT_OK, returnIntent);
             finish();
+
         });
     }
 

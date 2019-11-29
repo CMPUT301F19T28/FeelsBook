@@ -82,6 +82,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
     private FilterFragment filter;
     private boolean filterClicked = false;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int ADD_MOOD = 2;
     private static final int MY_CAMERA_REQUEST_CODE = 100;
     private Bitmap profilePicBitmap;
     private DocumentReference UserDocument;
@@ -201,7 +202,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
             userBundle.putSerializable("User", currentUser);
             userBundle.putBoolean("editMood", false);
             intent.putExtras(userBundle);
-            startActivityForResult(intent, 1);
+            startActivityForResult(intent, ADD_MOOD);
         });
 
         final ImageButton filterButton = findViewById(R.id.profile_filter_button);
@@ -250,7 +251,13 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
 
                 UserDocument.update("profilePic",currentUser.getProfilePic());
 
+            }else {
+                currentUser = (User) data.getSerializableExtra("User");
+
+                if (currentUser.getProfilePic() != null)
+                    profilePicture.setImageBitmap(currentUser.profilePicBitmap());
             }
+
         }
     }
 

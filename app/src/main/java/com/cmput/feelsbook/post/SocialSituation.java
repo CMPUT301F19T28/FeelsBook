@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
  */
 public enum SocialSituation {
 
+    SELECT_A_SOCIAL_SITUATION,
     ALONE,
     ONEPERSON,
     SEVERAL,

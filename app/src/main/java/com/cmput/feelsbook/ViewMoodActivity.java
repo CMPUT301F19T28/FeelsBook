@@ -38,7 +38,7 @@ public class ViewMoodActivity extends AppCompatActivity{
     private TextView socialSituationText;
     private ImageView photo;
     private ImageView profilePicture;
-    private Post post;
+    private Mood post;
     private static final int REQUEST_EDIT_MOOD = 1;
 
     @Override
@@ -70,7 +70,7 @@ public class ViewMoodActivity extends AppCompatActivity{
         }
 
         // sets users profile picture
-        Bitmap bitmapProfilePicture = currentUser.profilePicBitmap();
+        Bitmap bitmapProfilePicture = post.profilePicBitmap();
         profilePicture.setImageBitmap(bitmapProfilePicture);
 
         Button backButton = findViewById(R.id.back_button);
