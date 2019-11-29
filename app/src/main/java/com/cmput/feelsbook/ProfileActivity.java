@@ -280,27 +280,25 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                 Date dateTime = null;
 
                 try {
-                    if (doc.contains("datetime"))
+                    if (doc.contains("datetime")){
                         dateTime = ((Timestamp) doc.get("datetime")).toDate();
-
-                    if (doc.contains("location"))
+                        Log.d("Profile","Datetime accessed: "+dateTime);
+                    }
+                    if (doc.contains("location")){
                         location = (Location) doc.get("location");
-
+                    }
                     if (doc.contains("photo")) {
                         photo = getPhoto((String)  doc.get("photo"));
                     }
-
                     if (doc.contains("profilePic")) {
                         profilePic = getPhoto((String)  doc.get("profilePic"));
                     }
-
                     if (doc.contains("reason"))
                         reason = (String) doc.get("reason");
 
                     if (doc.contains("situation") & (doc.get("situation") != null)) {
                         situation = SocialSituation.getSocialSituation((String) doc.get("situation"));
                     }
-
                     if (doc.contains("moodType") & (doc.get("moodType") != null)) {
                         moodType = MoodType.getMoodType((String) doc.get("moodType"));
                     }

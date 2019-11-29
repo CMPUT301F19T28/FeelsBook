@@ -250,8 +250,8 @@ public class AddMoodActivity extends AppCompatActivity{
             }
         }
 
-        //checks to see if the editmood has a social situation
-        // if makes dropdown visible and sets the social situation
+        // checks to see if the editmood has a social situation
+        // makes dropdown visible and sets the social situation
         if(editMood.hasSituation()){
             for(int i = 0; i < socialSits.length; i++){
                 if(socialSits[i] == editMood.getSituation()){
