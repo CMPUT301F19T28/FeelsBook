@@ -180,10 +180,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Filtera
             clusterManager.setOnClusterItemInfoWindowClickListener(
                     new ClusterManager.OnClusterItemInfoWindowClickListener<ClusterMarker>() {
                         @Override public void onClusterItemInfoWindowClick(ClusterMarker clusterMarker) {
-                            Intent intent = new Intent(getActivity().getApplicationContext(), AddMoodActivity.class);
+                            Intent intent = new Intent(getActivity().getApplicationContext(), ViewMoodActivity.class);
                             Bundle userBundle = new Bundle();
                             userBundle.putSerializable("User", currentUser);
-                            userBundle.putBoolean("editMood", true);
+//                userBundle.putBoolean("editMood", true);
                             userBundle.putSerializable("Mood", clusterMarker.getMood());
                             intent.putExtras(userBundle);
                             startActivityForResult(intent, 1);

@@ -151,8 +151,6 @@ public class Mood extends Post implements Serializable {
         TextView moodText = viewHolder.itemView.findViewById(R.id.moodText);
         ImageView profile_pic_feed = viewHolder.itemView.findViewById(R.id.profileImage);
         TextView username = viewHolder.itemView.findViewById(R.id.user_name);
-        ImageView photoImage = viewHolder.itemView.findViewById(R.id.photo_image);
-        ImageView locationImage = viewHolder.itemView.findViewById(R.id.location_image);
 
         viewHolder.itemView.setBackgroundColor(Color.parseColor(moodType.getColor()));
         dateTimeText.setText(dateFormatter.format(dateTime));
@@ -164,11 +162,6 @@ public class Mood extends Post implements Serializable {
             TextView reasonText = viewHolder.itemView.findViewById(R.id.reasonText);
             reasonText.setText(reason);
         }
-
-        if(photo == null)
-            photoImage.setVisibility(View.INVISIBLE);
-        if(!(hasLocation()))
-            locationImage.setVisibility(View.INVISIBLE);
 
     }
 
@@ -237,14 +230,6 @@ public class Mood extends Post implements Serializable {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
     }
 
 
