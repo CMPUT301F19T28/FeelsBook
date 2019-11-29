@@ -38,13 +38,12 @@ public class User implements Serializable {
     private String name;
     private Feed posts;
     private List<FollowUser> following;
-    private Bitmap profilePicture;
+    private String profilePicture;
 
     public User(String userName, String name, Feed posts){
         this.userName = userName;
         this.name = name;
         this.posts = posts;
-        //this.following = following;
     }
 
 
@@ -203,11 +202,11 @@ public class User implements Serializable {
         following = followsList;
     }
 
-    public Bitmap getProfilePic(){
+    public String getProfilePic(){
         return this.profilePicture;
     }
 
-    public void setProfilePic(Bitmap picture) {this.profilePicture = picture;}
+    public void setProfilePic(String picture) {this.profilePicture = picture;}
 
     public String getUserName() {
         return userName;

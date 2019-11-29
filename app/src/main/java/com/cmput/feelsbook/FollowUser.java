@@ -1,19 +1,20 @@
 package com.cmput.feelsbook;
 
-import android.graphics.Bitmap;
 import java.io.Serializable;
 
 public class FollowUser implements Serializable {
 
     private String userName;
     private String name;
-    private Bitmap profilePic;
+    private String profilePic;
 
-    public FollowUser() {
-
+    public FollowUser(String userName, String name) {
+        this.userName = userName;
+        this.name = name;
+        this.profilePic = null;
     }
 
-    public FollowUser(String userName, String name, Bitmap profilePic) {
+    public FollowUser(String userName, String name, String profilePic) {
         this.userName = userName;
         this.name = name;
         this.profilePic = profilePic;
@@ -35,11 +36,11 @@ public class FollowUser implements Serializable {
         this.name = name;
     }
 
-    public Bitmap getProfilePic() {
+    public String getProfilePic() {
         return profilePic;
     }
 
-    public void setProfilePic(Bitmap profilePic) {
+    public void setProfilePic(String profilePic) {
         this.profilePic = profilePic;
     }
 }

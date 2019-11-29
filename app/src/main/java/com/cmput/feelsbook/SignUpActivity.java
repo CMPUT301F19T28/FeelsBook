@@ -1,7 +1,9 @@
 package com.cmput.feelsbook;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -27,6 +29,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -48,11 +51,12 @@ public class SignUpActivity extends AppCompatActivity implements ProfilePicFragm
     private EditText nameField;
     private EditText passwordField;
     private EditText usernameField;
-    private ImageView profilePic;
+    private ImageView profilePicView;
     private FirebaseFirestore db;
     private Client client;
     private Index index;
     private ProfilePicFragment chooseProfile;
+    private Bitmap chosenPic;
 
     private final String SIGNUP_TAG = "Invalid field";
     public static final String USER = "com.cmput.feelsbook.SignUpActivity.User";
@@ -65,12 +69,12 @@ public class SignUpActivity extends AppCompatActivity implements ProfilePicFragm
 
         client = new Client("CZHQW4KJVA","394205d7e7f173719c08f3e187b2a77b");
         index = client.getIndex("users");
-        signupButton  = findViewById(R.id.confirm_signup);
-        cancelButton  = findViewById(R.id.cancel_signup);
-        nameField     = findViewById(R.id.s_name_text);
-        passwordField = findViewById(R.id.s_password_text);
-        usernameField = findViewById(R.id.s_user_text);
-        profilePic    = findViewById(R.id.set_profile_pic);
+        signupButton    = findViewById(R.id.confirm_signup);
+        cancelButton    = findViewById(R.id.cancel_signup);
+        nameField       = findViewById(R.id.s_name_text);
+        passwordField   = findViewById(R.id.s_password_text);
+        usernameField   = findViewById(R.id.s_user_text);
+        profilePicView  = findViewById(R.id.set_profile_pic);
 
         nameField.getText().clear();
         passwordField.getText().clear();
@@ -113,9 +117,9 @@ public class SignUpActivity extends AppCompatActivity implements ProfilePicFragm
                         }
                     }
                 });
+                finish();
             }
         });
-
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,16 +128,25 @@ public class SignUpActivity extends AppCompatActivity implements ProfilePicFragm
             }
         });
 
-        profilePic.setOnClickListener(view -> {
+        profilePicView.setOnClickListener(view -> {
             // add profile pic fragment
             chooseProfile = new ProfilePicFragment();
             chooseProfile.show(getSupportFragmentManager(), "PICTURE_CHOOSE");
-
         });
 
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        if(chosenPic != null){
+            profilePicView.setImageBitmap(chosenPic);
+        }
+    }
+
     /**
+     *
      * Checks the requirements of the field:
      *  All the fields are not empty
      *  The length of the password is at least a length of 8
@@ -173,6 +186,17 @@ public class SignUpActivity extends AppCompatActivity implements ProfilePicFragm
             data.put("password", hashedPassword);
             data.put("name", name);
             data.put("total_posts","0");
+            try {
+                //puts profilePic into hashmap
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                chosenPic.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+                byte[] picData = baos.toByteArray();
+                data.put("profilePic", Base64.encodeToString(picData, Base64.NO_WRAP));
+
+            } catch (Exception e) {
+                Log.d("-----UPLOAD PHOTO-----",
+                        "**NO profilepic UPLOADED: " + e);
+            }
 
             db.collection("users")
                     .document(username)
@@ -190,7 +214,6 @@ public class SignUpActivity extends AppCompatActivity implements ProfilePicFragm
                         }
                     });
 
-            finish();
         }
         catch (NoSuchAlgorithmException e){
             Log.d(TAG, "Exception thrown for incorrect algorithm " + e);
@@ -215,7 +238,11 @@ public class SignUpActivity extends AppCompatActivity implements ProfilePicFragm
         return hexString.toString();
     }
 
+    /**
+     * Receives the profile picture chosen by the user during sign-up
+     * @param picture
+     */
     public void onPictureSelect(Bitmap picture){
-
+        chosenPic = picture;
     }
 }
