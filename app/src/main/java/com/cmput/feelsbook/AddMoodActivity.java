@@ -22,10 +22,13 @@ import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.Post;
 import com.cmput.feelsbook.post.SocialSituation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -41,7 +44,6 @@ public class AddMoodActivity extends AppCompatActivity{
 
     private EditText input;
     private Bitmap picture;
-    private Bitmap dp;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private User currentUser;
     private FirebaseFirestore db;
@@ -49,8 +51,7 @@ public class AddMoodActivity extends AppCompatActivity{
     private DocumentReference UserDocument;
     private Spinner spinner;
     private Spinner socialSpinner;
-    private boolean edit = false;
-    private Mood edited;
+    private Mood mood = new Mood();
 
 
     @Override
@@ -66,36 +67,31 @@ public class AddMoodActivity extends AppCompatActivity{
         spinner.setAdapter(moodTypeAdapter);
 
         //creates social situation spinner drop down menu
-        SocialSituation[] socialSits = {SocialSituation.ALONE, SocialSituation.ONEPERSON, SocialSituation.SEVERAL, SocialSituation.CROWD};
-        ArrayList<SocialSituation> socialSitList = new ArrayList<>(Arrays.asList(socialSits));
-        ArrayAdapter<SocialSituation> socialAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, socialSitList);
-
+        ArrayAdapter<SocialSituation> socialAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, Arrays.asList(SocialSituation.values()));
         socialAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         socialSpinner.setAdapter(socialAdapter);
-        socialSpinner.setVisibility(View.GONE); //sets the view to be gone because it is optional
 
         Bundle bundle = getIntent().getExtras();
         db = FirebaseFirestore.getInstance();
 
         Button deleteButton = findViewById(R.id.delete_button);
 
-
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
-            edit  = (boolean) bundle.get("editMood");
-            if(edit){
-                setValues(((Mood) bundle.getSerializable("Mood")).Serialize(false), MoodType.values(), socialSits);
-                edited = ((Mood) bundle.getSerializable("Mood")).Serialize(false);
+            if ((boolean) bundle.get("editMood")) {
+                mood = (Mood) bundle.get("Mood");
+                spinner.setSelection(moodTypeAdapter.getPosition(mood.getMoodType()));
+                socialSpinner.setSelection(socialAdapter.getPosition(mood.getSituation()));
                 deleteButton.setVisibility(View.VISIBLE);
                 deleteButton.setOnClickListener(view -> {
-                    deleted(((Mood) bundle.getSerializable("Mood")).Serialize(false));
-                    Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-                    Bundle userBundle = new Bundle();
-                    userBundle.putSerializable("User", currentUser);
-                    intent.putExtras(userBundle);
-                    startActivity(intent);
+                    delete(mood);
+                    finish();
                 });
             }
+        }
+
+        if(currentUser == null){
+            throw new AssertionError("Calling a null user object");
         }
 
         //Sets the document to that of the current user
@@ -109,16 +105,6 @@ public class AddMoodActivity extends AppCompatActivity{
         ImageView profilePicture = findViewById(R.id.profile_picture);
         profilePicture.setImageBitmap(bitmapProfilePicture);
 
-        //if the social situatiion button is pressed then shows the drop down
-        Button socialBttn = findViewById(R.id.social_situation_button);
-        socialBttn.setOnClickListener(v -> {
-            if (socialSpinner.getVisibility() == View.VISIBLE) {
-                socialSpinner.setVisibility(View.INVISIBLE);
-            } else {
-                socialSpinner.setVisibility(View.VISIBLE);
-            }
-        });
-
         Button cameraButtonAdd = findViewById(R.id.add_picture_button);
         cameraButtonAdd.setOnClickListener(v -> {
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -131,12 +117,13 @@ public class AddMoodActivity extends AppCompatActivity{
 
         Button postButton = findViewById(R.id.edit_button);
         postButton.setOnClickListener(v -> {
-            onSubmit(getValues());
-            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-            Bundle userBundle = new Bundle();
-            userBundle.putSerializable("User", currentUser);
-            intent.putExtras(userBundle);
-            startActivity(intent);
+            mood.setMoodType(moodTypeAdapter.getItem(spinner.getSelectedItemPosition()));
+            mood.setPhoto(Mood.photoString(picture));
+            mood.setReason(input.getText().toString());
+            mood.setSituation(socialAdapter.getItem(socialSpinner.getSelectedItemPosition()));
+            mood.setProfilePic(Mood.profilePicString(bitmapProfilePicture));
+            onSubmit(mood);
+            finish();
         });
     }
 
@@ -164,103 +151,14 @@ public class AddMoodActivity extends AppCompatActivity{
      */
     @SuppressLint("NewApi")
     private void onSubmit(Post newMood){
-
-        HashMap<String, Object> data = new HashMap<>();
-
-        /*
-        If the newMood contains a photo will convert it into a Base64 String to be stored in the
-        database if no photo is present sets the field to null
-         */
-        try {
-            //puts photo into hashmap
-            Bitmap bitmap = ((Mood) newMood).getPhoto();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            byte[] picData = baos.toByteArray();
-            data.put("photo", Base64.getEncoder().encodeToString(picData));
-        }catch (Exception e) {
-            Log.d("-----UPLOAD PHOTO-----",
-                    "****NO PHOTO UPLOADED: " + e);
-            data.put("photo", null);
-        }
-
-        /*
-        If the newMood contains a profilePic will convert it into a Base64 String to be stored in the
-        database if no profilePic is present sets the field to null
-         */
-        try {
-            //puts profilePic into hashmap
-            Bitmap bitmap = newMood.getProfilePic();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            byte[] picData = baos.toByteArray();
-            data.put("profilePic", Base64.getEncoder().encodeToString(picData));
-        }catch (Exception e) {
-            Log.d("-----UPLOAD PHOTO-----",
-                    "****NO profilepic UPLOADED: " + e);
-            data.put("profilePic", null);
-        }
-
-        /*
-        puts the other parameters into the hashmap to be sent to the database
-         */
-        data.put("datetime", newMood.getDateTime());
-        data.put("location", ((Mood) newMood).getLocation());
-        data.put("reason", ((Mood) newMood).getReason());
-        data.put("situation", ((Mood) newMood).getSituation());
-        data.put("moodType", ((Mood) newMood).getMoodType());
-        data.put("User", currentUser.getUserName());
-
         MoodCollection
                 .document(newMood.toString())
-                .set(data)
-                .addOnSuccessListener(aVoid -> Log.d("Sample", "Data addition successful"))
-                .addOnFailureListener(e -> Log.d("Sample", "Data addition failed" + e.toString()));
-
-        db.collection("mostRecent")
-                .document(currentUser.getUserName())
-                .set(data)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("Sample", "Data addition successful");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d("Sample", "Data addition failed" + e.toString());
-                    }
+                .set(newMood)
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful())
+                        updateMostRecent();
                 });
-    }
 
-    /**
-     * Sets Edittext and spinner values  to that of the passed in mood
-     * @param editMood
-     *     Mood who's values are to taken
-     * @param moodTypes
-     *     array of moodtypes that corresponds to the spinner values
-     * @param socialSits
-     *     array of social situations that corresponds to the spinner values
-     */
-    private void setValues(Mood editMood, MoodType[] moodTypes, SocialSituation[] socialSits){
-        input.setText(editMood.getReason());
-        for(int i = 0; i < moodTypes.length; i++){
-            if(moodTypes[i] == editMood.getMoodType()){
-                spinner.setSelection(i);
-            }
-        }
-
-        //checks to see if the editmood has a social situation
-        // if makes dropdown visible and sets the social situation
-        if(editMood.hasSituation()){
-            for(int i = 0; i < socialSits.length; i++){
-                if(socialSits[i] == editMood.getSituation()){
-                    socialSpinner.setVisibility(View.VISIBLE);
-                    socialSpinner.setSelection(i);
-                }
-            }
-        }
     }
 
     /**
@@ -268,42 +166,27 @@ public class AddMoodActivity extends AppCompatActivity{
      * @param mood
      *      mood to be deleted
      */
-    private void deleted(Post mood){
+    private void delete(Post mood){
         Toast.makeText(getApplicationContext(), "Mood Deleted", Toast.LENGTH_SHORT).show();
         MoodCollection
                 .document(mood.toString())
                 .delete()
-                .addOnSuccessListener(aVoid -> Log.d("--DELETE OPERATION---: ",
-                        "Data removal successful"))
-                .addOnFailureListener(e -> Log.d("--DELETE OPERATION---: ",
-                        "Data removal failed" + e.toString()));
-        updateMostRecent();
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful())
+                        updateMostRecent();
+                });
     }
 
     public void updateMostRecent(){
-        MoodCollection.orderBy("datetime", Query.Direction.DESCENDING).limit(1)
+        MoodCollection.orderBy("dateTime", Query.Direction.DESCENDING).limit(1)
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         if (queryDocumentSnapshots.size() != 0){
-                            for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
-                                db.collection("mostRecent")
-                                        .document(currentUser.getUserName())
-                                        .set(doc.getData())
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                Log.d("AddMood", "Most recent successfully set");
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Log.w("AddMood", "Failure to set most recent document with " + e);
-                                            }
-                                        });
-                            }
+                            db.collection("mostRecent")
+                                    .document(currentUser.getUserName())
+                                    .set(queryDocumentSnapshots.getDocuments().get(0).getData());
                         } else {
                             db.collection("mostRecent").document(currentUser.getUserName()).delete();
                         }

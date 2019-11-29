@@ -23,14 +23,12 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Used to represent the individual using the application. Contains personal information and
  * allows for creation of new posts.
  * String userName, name - contains the username and name of the user, respectively
  * Feed posts - contains the user's personal posts
- * FollowList followList - contains the user's following list
  * Bitmap profilePicture - contains the user's profile pictur
  */
 public class User implements Serializable {
@@ -66,7 +64,7 @@ public class User implements Serializable {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         if(documentSnapshot.exists()) {
-                            toFollowing.document(getUserName()).set(new FollowUser(documentSnapshot.getId(),(String) documentSnapshot.getData().get("name"), null));
+                            toFollowing.document(getUserName()).set(new FollowUser(documentSnapshot.getId(),(String) documentSnapshot.getData().get("name"), (String) documentSnapshot.getData().get("profilePic")));
                         }
                     }
                 });
@@ -209,7 +207,7 @@ public class User implements Serializable {
         return this.profilePicture;
     }
 
-    public void setProfilePic(Bitmap profilePicture) {this.profilePicture = profilePicture;}
+    public void setProfilePic(Bitmap picture) {this.profilePicture = picture;}
 
     public String getUserName() {
         return userName;

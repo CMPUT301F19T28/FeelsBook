@@ -76,6 +76,9 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         };
+
+        userField.setText("");
+        passField.setText("");
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -159,6 +162,7 @@ public class LoginActivity extends AppCompatActivity {
     private void successfulLogin(DocumentSnapshot document){
         Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
         User user = new User(document.getId(), document.getString("name"), new Feed());
+        Log.d("Login","(LOGIN)Successful login with User:" + document.getId());
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("User",user);
