@@ -23,6 +23,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -46,6 +48,7 @@ public class SignUpActivity extends AppCompatActivity implements ProfilePicFragm
 
     private static final String TAG = "SignUpActivity";
 
+    private final long ONE_MEGABYTE = 1024 * 1024;
     private Button signupButton;
     private Button cancelButton;
     private EditText nameField;
@@ -101,7 +104,8 @@ public class SignUpActivity extends AppCompatActivity implements ProfilePicFragm
                         if (task.isSuccessful()) {
                             DocumentSnapshot doc = task.getResult();
                             if (!doc.exists()) {
-                                createUser(username);
+                                getProfilePic(username);
+                                finish();
                                 try {
                                     index.addObjectAsync(new JSONObject().put("username",username), username, null);
                                 }catch (Exception e) {
@@ -117,7 +121,6 @@ public class SignUpActivity extends AppCompatActivity implements ProfilePicFragm
                         }
                     }
                 });
-                finish();
             }
         });
 
@@ -168,13 +171,30 @@ public class SignUpActivity extends AppCompatActivity implements ProfilePicFragm
         return  true;
     }
 
+    private void getProfilePic(String username){
+        if (chosenPic == null){
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReference();
+            StorageReference defaultPic1 = storageRef.child("default_profile_pictures/app_default_profile_pic.png");
+            defaultPic1.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                @Override
+                public void onSuccess(byte[] bytes) {
+                    // Data retrieval success, convert to a BitMap and set as user's profile pic
+                    Bitmap profilePic = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    createUser(username, profilePic);
+                }
+            });
+        } else{
+            createUser(username, chosenPic);
+        }
+    }
     /**
      * Create a new document with the entered username as doc ID
      * Fill in name and password entries into the document
      * @param username
      *  The username the user has entered
      */
-    private void createUser(String username){
+    private void createUser(String username, Bitmap profilePic){
         final String password = passwordField.getText().toString();
         final String name = nameField.getText().toString();
 
@@ -189,7 +209,7 @@ public class SignUpActivity extends AppCompatActivity implements ProfilePicFragm
             try {
                 // encodes the profile picture taken from the user document
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                chosenPic.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                profilePic.compress(Bitmap.CompressFormat.PNG, 100, baos);
                 byte[] picData = baos.toByteArray();
                 data.put("profilePic", Base64.getEncoder().encodeToString(picData));
 

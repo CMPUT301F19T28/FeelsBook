@@ -120,6 +120,17 @@ public class Mood extends Post implements Serializable {
         return this;
     }
 
+    /**
+     * To make the Mood object serializable convert Bitmap photo to Proxybitmap
+     * @param change
+     * @return
+     */
+    public Mood Serialize(boolean change){
+        if(change) {
+            this.photo = null;
+        }
+        return this;
+    }
 
     public Mood withUser(String username){
         this.user = username;
@@ -147,16 +158,6 @@ public class Mood extends Post implements Serializable {
             TextView reasonText = viewHolder.itemView.findViewById(R.id.reasonText);
             reasonText.setText(reason);
         }
-/*        if(situation != null) {
-            TextView situationText = viewHolder.itemView.findViewById(R.id.situation_feed);
-            situationText.setText(situation.toString());
-        }
-        if(photo != null) {
-            ImageView photoFeed = viewHolder.itemView.findViewById(R.id.photo_feed);
-            photoFeed.setImageBitmap(photoBitmap());
-        }
-
- */
     }
 
     public MoodType getMoodType() {
