@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -19,30 +18,17 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.cmput.feelsbook.R;
-import com.cmput.feelsbook.User;
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.Post;
 import com.cmput.feelsbook.post.SocialSituation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
 
 public class AddMoodActivity extends AppCompatActivity{
 
@@ -91,7 +77,10 @@ public class AddMoodActivity extends AppCompatActivity{
                 deleteButton.setVisibility(View.VISIBLE);
                 deleteButton.setOnClickListener(view -> {
                     delete(mood);
-                    finish();
+                    Intent intent = new Intent(this, ProfileActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+
                 });
             }
         }
