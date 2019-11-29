@@ -15,6 +15,11 @@ public class ClusterMarker implements ClusterItem {
     private Bitmap iconPicture;
     private Mood mood;
 
+    /**
+     * Used in conjunction with ClusterManagerRenderer to manage a group of posts in map view
+     * within close geographical proximity of one another
+     */
+
     public ClusterMarker(LatLng position, String title, String snippet, Bitmap iconPicture, Mood mood) {
         this.position = position;
         this.title = title;

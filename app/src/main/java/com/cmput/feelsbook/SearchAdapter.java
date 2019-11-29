@@ -16,6 +16,10 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+/**
+ * Adapter used in conjunction with Search activity
+ **/
+
 public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<FollowUser> list;

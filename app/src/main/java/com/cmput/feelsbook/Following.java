@@ -19,6 +19,10 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+/**
+ * Allows an individual user to see which users this individual tracks
+ */
+
 public class Following extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<FollowUser> list;

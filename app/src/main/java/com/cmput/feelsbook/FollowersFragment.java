@@ -11,6 +11,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import javax.annotation.Nullable;
 
+/**
+ * * Creates a small window used to view users that track ones posts
+ */
+
 public class FollowersFragment extends Fragment {
 
     private RecyclerView recyclerView;

@@ -15,6 +15,10 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
 
+/**
+ * Used in conjunction with location tracking of posts when multiple posts are in a similar location
+ * ClusterManagerRenderer is used to deal with these situations when the map view is selected
+ */
 public class ClusterManagerRenderer extends DefaultClusterRenderer<ClusterMarker> {
 
     private final IconGenerator iconGenerator;

@@ -11,6 +11,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import javax.annotation.Nullable;
 
+/**
+ * * Creates a small window used to view users that an individual user tracks
+ */
+
 public class FollowingFragment extends Fragment {
 
     private RecyclerView recyclerView;
