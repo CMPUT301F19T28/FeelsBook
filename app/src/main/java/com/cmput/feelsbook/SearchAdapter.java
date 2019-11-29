@@ -51,10 +51,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         username.setText(list.get(position).getUserName());
         fullname.setText(list.get(position).getName());
-
-        byte[] photo = Base64.getDecoder().decode(list.get(position).getProfilePic());
-        Bitmap bitmapProfilePicture = BitmapFactory.decodeByteArray(photo, 0, photo.length);
-        profilePic.setImageBitmap(bitmapProfilePicture);
+        profilePic.setImageBitmap(list.get(position).profilePicBitmap());
 
         Button send = holder.itemView.findViewById(R.id.follow_remove_button);
         send.setText("Send");
@@ -64,6 +61,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 user.sendFollowRequest(view.getContext(), list.get(position).getUserName());
                 list.remove(position);
                 notifyItemRemoved(position);
+                notifyItemRangeChanged(position, list.size());
             }
         });
 

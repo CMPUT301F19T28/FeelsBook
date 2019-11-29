@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -40,33 +41,27 @@ public class FollowingRequests extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private List<FollowUser> list;
     private User user;
-    FirebaseFirestore db;
-    CollectionReference cr;
+
 
     public FollowingRequests(User user) {
-        db = FirebaseFirestore.getInstance();
-        cr = db.collection("users").document(user.getUserName()).collection("followRequests");
         list = new ArrayList<>();
         this.user = user;
-        fillList();
-    }
-
-    /**
-     * Populates list attribute with all users that made follow requests pulled from the
-     * user's database
-     */
-    public void fillList() {
-        cr.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if(task.isSuccessful()) {
-                    for(QueryDocumentSnapshot document: task.getResult()) {
-                        list.add(document.toObject(FollowUser.class));
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(user.getUserName())
+                .collection("followRequests")
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    if(e == null) {
+                        for(DocumentChange doc: queryDocumentSnapshots.getDocumentChanges()) {
+                            switch (doc.getType()) {
+                                case ADDED:
+                                    list.add(doc.getDocument().toObject(FollowUser.class));
+                                    break;
+                            }
+                        }
+                        notifyDataSetChanged();
                     }
-                    notifyDataSetChanged();
-                }
-            }
-        });
+                });
     }
 
     @NonNull
@@ -84,10 +79,7 @@ public class FollowingRequests extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         userName.setText(list.get(position).getUserName());
         fullName.setText(list.get(position).getName());
-
-        byte[] photo = Base64.getDecoder().decode(list.get(position).getProfilePic());
-        Bitmap bitmapProfilePicture = BitmapFactory.decodeByteArray(photo, 0, photo.length);
-        profilePic.setImageBitmap(bitmapProfilePicture);
+        profilePic.setImageBitmap(list.get(position).profilePicBitmap());
 
         Button accept = holder.itemView.findViewById(R.id.AcceptButton);
         accept.setOnClickListener(new View.OnClickListener() {
@@ -96,6 +88,7 @@ public class FollowingRequests extends RecyclerView.Adapter<RecyclerView.ViewHol
                 user.acceptFollowRequest(list.get(position).getUserName());
                 list.remove(position);
                 notifyItemRemoved(position);
+                notifyItemRangeChanged(position, list.size());
             }
         });
 
@@ -106,6 +99,7 @@ public class FollowingRequests extends RecyclerView.Adapter<RecyclerView.ViewHol
                 user.declineFollowRequest(list.get(position).getUserName());
                 list.remove(position);
                 notifyItemRemoved(position);
+                notifyItemRangeChanged(position, list.size());
             }
         });
     }
