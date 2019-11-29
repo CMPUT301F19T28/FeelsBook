@@ -139,27 +139,42 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         CollectionReference cr = db.collection("users")
                 .document(currentUser.getUserName()).collection("Moods");
 
-        cr.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    QuerySnapshot doc = task.getResult();
-                    if (doc != null) {
-                        postCount = doc.size();
-                        if (postCount > 1 || postCount == 0) {
-                            postsText.setText(postCount + " total posts");
-                        } else if (postCount == 1) {
-                            postsText.setText(postCount + " total post");
-                        }
-                        Log.d("Profile", "Total posts retrieved: " + postCount);
-                    } else {
-                        Log.d("Profile", "No document found");
-                    }
-                } else {
-                    Log.d("Profile", "Document retrieval failed: " + task.getException());
+        cr.addSnapshotListener((queryDocumentSnapshots, e) -> {
+            if(queryDocumentSnapshots != null) {
+                postCount = queryDocumentSnapshots.getDocuments().size();
+                if (postCount > 1 || postCount == 0) {
+                    postsText.setText(postCount + " total posts");
+                } else if (postCount == 1) {
+                    postsText.setText(postCount + " total post");
                 }
             }
         });
+
+        TextView followersText = findViewById(R.id.follower_count);
+        TextView followingText = findViewById(R.id.following_count);
+
+        db.collection("users")
+                .document(currentUser.getUserName())
+                .collection("followers")
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    if(queryDocumentSnapshots != null) {
+                        followersCount = queryDocumentSnapshots.getDocuments().size();
+                        if(followersCount > 1 || followersCount == 0)
+                            followersText.setText(followersCount + " followers");
+                        else if(followersCount == 1)
+                            followersText.setText(followersCount + " follower");
+
+                    }
+                });
+        db.collection("users")
+                .document(currentUser.getUserName())
+                .collection("following")
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    if(queryDocumentSnapshots != null) {
+                        followCount = queryDocumentSnapshots.getDocuments().size();
+                        followingText.setText(followCount + " following");
+                    }
+                });
 
         backButton.setOnClickListener(view -> {
             if(filter.prefs != null) {
