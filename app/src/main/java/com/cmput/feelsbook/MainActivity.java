@@ -271,7 +271,9 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                 }
             }
             feedFragment.getRecyclerAdapter().setFeed(result);
+            mapFragment.setFeed(result);
             feedFragment.getRecyclerAdapter().notifyDataSetChanged();
+            mapFragment.updateMap();
         }
     }
 
@@ -295,11 +297,15 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                 }
             }
             feedFragment.getRecyclerAdapter().setFeed(result);
+            mapFragment.setFeed(result);
             feedFragment.getRecyclerAdapter().notifyDataSetChanged();
+            mapFragment.updateMap();
         }
         else {
             feedFragment.getRecyclerAdapter().setFeed(feedCopy);
+            mapFragment.setFeed(feedCopy);
             feedFragment.getRecyclerAdapter().notifyDataSetChanged();
+            mapFragment.updateMap();
         }
     }
 

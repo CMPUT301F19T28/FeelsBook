@@ -3,6 +3,8 @@ package com.cmput.feelsbook.post;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.Image;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -140,6 +142,8 @@ public class Mood extends Post implements Serializable {
         TextView moodText = viewHolder.itemView.findViewById(R.id.moodText);
         ImageView profile_pic_feed = viewHolder.itemView.findViewById(R.id.profileImage);
         TextView username = viewHolder.itemView.findViewById(R.id.user_name);
+        ImageView photoImage = viewHolder.itemView.findViewById(R.id.photo_image);
+        ImageView locationImage = viewHolder.itemView.findViewById(R.id.location_image);
 
         viewHolder.itemView.setBackgroundColor(Color.parseColor(moodType.getColor()));
         dateTimeText.setText(dateFormatter.format(dateTime));
@@ -151,16 +155,12 @@ public class Mood extends Post implements Serializable {
             TextView reasonText = viewHolder.itemView.findViewById(R.id.reasonText);
             reasonText.setText(reason);
         }
-/*        if(situation != null) {
-            TextView situationText = viewHolder.itemView.findViewById(R.id.situation_feed);
-            situationText.setText(situation.toString());
-        }
-        if(photo != null) {
-            ImageView photoFeed = viewHolder.itemView.findViewById(R.id.photo_feed);
-            photoFeed.setImageBitmap(photoBitmap());
-        }
 
- */
+        if(photo == null)
+            photoImage.setVisibility(View.INVISIBLE);
+        if(!(hasLocation()))
+            locationImage.setVisibility(View.INVISIBLE);
+
     }
 
     public MoodType getMoodType() {

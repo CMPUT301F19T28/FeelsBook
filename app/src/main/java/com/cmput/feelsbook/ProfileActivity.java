@@ -346,7 +346,9 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                 }
             }
             historyFragment.getRecyclerAdapter().setFeed(result);
+            mapFragment.setFeed(result);
             historyFragment.getRecyclerAdapter().notifyDataSetChanged();
+            mapFragment.updateMap();
         }
     }
 
@@ -371,7 +373,9 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                 }
             }
             historyFragment.getRecyclerAdapter().setFeed(result);
+            mapFragment.setFeed(result);
             historyFragment.getRecyclerAdapter().notifyDataSetChanged();
+            mapFragment.updateMap();
         }
         else {
             updateFeed();

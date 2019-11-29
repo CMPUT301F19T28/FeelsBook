@@ -265,7 +265,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
 
         initClusterManager();
-        googleMap.setInfoWindowAdapter(clusterManager.getMarkerManager());
         updateMapMarkers();
 
         new Handler().postDelayed(new Runnable() {
