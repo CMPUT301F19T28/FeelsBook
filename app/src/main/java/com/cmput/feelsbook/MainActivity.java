@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                                             .addSnapshotListener((documentSnapshot, e2) -> {
                                                 if(documentSnapshot != null && documentSnapshot.exists()) {
                                                     Mood mood = documentSnapshot.toObject(Mood.class);
-                                                    if(currentUser.getFollowingList().stream().allMatch(followUser -> followUser.getUserName().equals(mood.getUser()))) {
+                                                    if(currentUser.getFollowingList().stream().anyMatch(followUser -> followUser.getUserName().equals(mood.getUser()))) {
                                                         feedFragment.getRecyclerAdapter()
                                                                 .getFeed()
                                                                 .stream()
