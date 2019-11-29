@@ -164,7 +164,10 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void successfulLogin(DocumentSnapshot document){
         Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
+        String encodedPic = document.getString("profilePic");
         User user = new User(document.getId(), document.getString("name"), new Feed());
+        user.setProfilePic(encodedPic);
+        Log.d("Login","(LOGIN)Successful login with User: " + document.getId());
         Intent intent = new Intent(LoginActivity.this, PermissionsActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("User",user);

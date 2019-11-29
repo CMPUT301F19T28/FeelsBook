@@ -7,9 +7,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -18,8 +18,6 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -35,21 +33,14 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.HashMap;
 
 public class AddMoodActivity extends AppCompatActivity{
 
@@ -67,6 +58,8 @@ public class AddMoodActivity extends AppCompatActivity{
     private TextView locationText;
     private MapView mapView;
 
+    private boolean edit = false;
+    private Mood edited;
     private Mood mood = new Mood();
 
 
@@ -111,7 +104,10 @@ public class AddMoodActivity extends AppCompatActivity{
                 deleteButton.setVisibility(View.VISIBLE);
                 deleteButton.setOnClickListener(view -> {
                     delete(mood);
-                    finish();
+                    Intent intent = new Intent(this, ProfileActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+
                 });
             }
         }
@@ -127,8 +123,11 @@ public class AddMoodActivity extends AppCompatActivity{
         MoodCollection = UserDocument.collection("Moods");
 
         // sets users profile picture
-        Bitmap bitmapProfilePicture = currentUser.getProfilePic();
+        String stringProfilePicture = currentUser.getProfilePic();
         ImageView profilePicture = findViewById(R.id.profile_picture);
+
+        byte[] photo = Base64.getDecoder().decode(stringProfilePicture);
+        Bitmap bitmapProfilePicture = BitmapFactory.decodeByteArray(photo, 0, photo.length);
         profilePicture.setImageBitmap(bitmapProfilePicture);
 
         //if the location button is pressed then shows the drop down
@@ -151,10 +150,13 @@ public class AddMoodActivity extends AppCompatActivity{
         Button backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> finish());
 
-        Button postButton = findViewById(R.id.post_button);
+        Button postButton = findViewById(R.id.edit_button);
         postButton.setOnClickListener(v -> {
             mood.setMoodType(moodTypeAdapter.getItem(spinner.getSelectedItemPosition()));
-            mood.setPhoto(Mood.photoString(picture));
+            if(picture != null)
+                mood.setPhoto(Mood.photoString(picture));
+            else
+                mood.setPhoto(mood.getPhoto());
             mood.setReason(input.getText().toString());
             mood.setSituation(socialAdapter.getItem(socialSpinner.getSelectedItemPosition()));
             if (locationText.getVisibility() == View.VISIBLE) {
@@ -164,7 +166,11 @@ public class AddMoodActivity extends AppCompatActivity{
             }
             mood.setUser(currentUser.getUserName());
             mood.setProfilePic(Mood.profilePicString(bitmapProfilePicture));
+            mood.setUser(currentUser.getUserName());
             onSubmit(mood);
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("Mood", mood);
+            setResult(Activity.RESULT_OK, returnIntent);
             finish();
         });
     }

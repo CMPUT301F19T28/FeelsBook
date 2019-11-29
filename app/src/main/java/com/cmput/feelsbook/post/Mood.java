@@ -121,10 +121,24 @@ public class Mood extends Post implements Serializable {
         return this;
     }
 
-
-    public Mood withUser(String username){
-        this.user = username;
+    /**
+     * To make the Mood object serializable convert Bitmap photo to Proxybitmap
+     * @param change
+     * @return
+     */
+    public Mood Serialize(boolean change){
+        if(change) {
+            this.photo = null;
+        }
         return this;
+    }
+
+    public void setUser(String username){
+        this.user = username;
+    }
+
+    public String getUser(){
+        return user;
     }
 
     /**
@@ -232,6 +246,7 @@ public class Mood extends Post implements Serializable {
     public void setUser(String user) {
         this.user = user;
     }
+
 
     public static String photoString(Bitmap bitmap) {
         if(bitmap != null) {

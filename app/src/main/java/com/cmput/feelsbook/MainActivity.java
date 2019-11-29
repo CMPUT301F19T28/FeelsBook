@@ -1,6 +1,9 @@
 package com.cmput.feelsbook;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,7 +17,12 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -36,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
     private CollectionReference MoodCollection;
     private DocumentReference UserDocument;
     private Boolean locationPermissionGranted;
+    private Bitmap bitmapProfilePicture;
 
 
     @Override
@@ -75,18 +84,19 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
-        listener = new Feed.OnItemClickListener() {
+
+        listener = new Feed.OnItemClickListener(){
             /**
              * Sets onItemClick to open a fragment in which the mood will be edited
              *
              * @param post Post to be edited
              */
             @Override
-            public void onItemClick(Post post) {
-                Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
+            public void onItemClick(Post post){
+                Intent intent = new Intent(getApplicationContext(), ViewMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
-                userBundle.putBoolean("editMood", true);
+//                userBundle.putBoolean("editMood", true);
                 userBundle.putSerializable("Mood", post);
                 intent.putExtras(userBundle);
                 startActivityForResult(intent, 1);
@@ -106,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
         });
 
         profileButton = findViewById(R.id.profile_button);
+
         profileButton.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             Bundle userBundle = new Bundle();
@@ -126,6 +137,16 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                 filter.show(getSupportFragmentManager(), "MAIN_FILTER");
             });
 
+        // decode profile picture string
+        String photo = currentUser.getProfilePic();
+        byte[] decodePhoto = Base64.getDecoder().decode(photo);
+        bitmapProfilePicture = BitmapFactory.decodeByteArray(decodePhoto, 0, decodePhoto.length);
+
+        if(bitmapProfilePicture != null){
+            profileButton.setImageBitmap(Bitmap.createScaledBitmap(bitmapProfilePicture, 80,80,false));
+        }
+
+
         db.collection("users")
                 .document(currentUser.getUserName())
                 .collection("following")
@@ -139,10 +160,19 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                                             .document(doc.getDocument().getId())
                                             .addSnapshotListener((documentSnapshot, e2) -> {
                                                 if(documentSnapshot != null && documentSnapshot.exists()) {
-                                                    feedFragment.getRecyclerAdapter().addPost(documentSnapshot.toObject(Mood.class));
-                                                    feedFragment.getRecyclerAdapter().notifyItemInserted(feedFragment.getRecyclerAdapter().getItemCount() - 1);
-                                                    mapFragment.addPost(documentSnapshot.toObject(Mood.class));
-                                                    mapFragment.updateMap();
+                                                    Mood mood = documentSnapshot.toObject(Mood.class);
+                                                    if(currentUser.getFollowingList().stream().anyMatch(followUser -> followUser.getUserName().equals(mood.getUser()))) {
+                                                        feedFragment.getRecyclerAdapter()
+                                                                .getFeed()
+                                                                .stream()
+                                                                .filter(post -> post.getUser().equals(mood.getUser()))
+                                                                .findFirst()
+                                                                .ifPresent(post -> feedFragment.getRecyclerAdapter().removePost(post));
+                                                        feedFragment.getRecyclerAdapter().addPost(documentSnapshot.toObject(Mood.class));
+                                                        feedFragment.getRecyclerAdapter().notifyItemInserted(feedFragment.getRecyclerAdapter().getItemCount() - 1);
+                                                        mapFragment.addPost(documentSnapshot.toObject(Mood.class));
+                                                        mapFragment.updateMap();
+                                                    }
                                                 }
                                             });
                                     break;
