@@ -1,6 +1,7 @@
 package com.cmput.feelsbook.post;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.widget.ImageView;
@@ -15,6 +16,7 @@ import com.cmput.feelsbook.R;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Locale;
 
@@ -35,7 +37,6 @@ public class Mood extends Post implements Serializable {
     private MoodType moodType;
     private String reason;
     private SocialSituation situation;
-    private ProxyBitmap serilizable_photo;
     private Bitmap photo;
     private Location location;
     private String user;
@@ -102,7 +103,6 @@ public class Mood extends Post implements Serializable {
      */
     public Mood withPhoto(Bitmap photo) {
         this.photo = photo;
-        this.serilizable_photo = new ProxyBitmap(photo);
         return this;
     }
 
@@ -126,8 +126,6 @@ public class Mood extends Post implements Serializable {
     public Mood Serialize(boolean change){
         if(change) {
             this.photo = null;
-        }else if(serilizable_photo != null){
-            this.photo = serilizable_photo.getBitmap();
         }
         return this;
     }
@@ -151,23 +149,16 @@ public class Mood extends Post implements Serializable {
         viewHolder.itemView.setBackgroundColor(Color.parseColor(moodType.getColor()));
         dateTimeText.setText(dateFormatter.format(dateTime));
         moodText.setText(moodType.getEmoticon());
-        profile_pic_feed.setImageBitmap(profilePic);
         username.setText(user);
 
         if(reason != null) {
             TextView reasonText = viewHolder.itemView.findViewById(R.id.reasonText);
             reasonText.setText(reason);
         }
-/*        if(situation != null) {
-            TextView situationText = viewHolder.itemView.findViewById(R.id.situation_feed);
-            situationText.setText(situation.toString());
-        }
-        if(photo != null) {
-            ImageView photoFeed = viewHolder.itemView.findViewById(R.id.photo_feed);
-            photoFeed.setImageBitmap(photo);
-        }
 
- */
+        if(profilePic != null) {
+            profile_pic_feed.setImageBitmap(Bitmap.createScaledBitmap(profilePic, 80,80,false));
+        }
     }
 
     public MoodType getMoodType() {

@@ -1,5 +1,7 @@
 package com.cmput.feelsbook;
 
+import android.graphics.Bitmap;
+
 import java.io.Serializable;
 
 public class FollowUser implements Serializable {

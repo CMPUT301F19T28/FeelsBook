@@ -201,10 +201,8 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                         if (list.size() != 0) {
                             for (int i = 0; i < list.size(); i++) {
                                 DocumentSnapshot doc = list.get(i);
-                                String photo = doc.getString("profilePic");
-                                byte[] decodePhoto = Base64.getDecoder().decode(photo);
-                                bitmapProfilePicture = BitmapFactory.decodeByteArray(decodePhoto, 0, decodePhoto.length);
-                                FollowUser newFollowUser = new FollowUser(doc.getId(), doc.get("name").toString(), photo);
+                                String followingPic = doc.getString("profilePic");
+                                FollowUser newFollowUser = new FollowUser(doc.getId(), doc.get("name").toString(), followingPic);
                                 following.add(newFollowUser);
                             }
                         }
@@ -213,6 +211,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                     }
                 });
     }
+
     /**
      * This method updates the FeedFragment whenever the remote database is updated
      */
