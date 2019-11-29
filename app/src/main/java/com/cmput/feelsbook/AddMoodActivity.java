@@ -18,6 +18,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.cmput.feelsbook.R;
+import com.cmput.feelsbook.User;
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.Post;
@@ -51,6 +53,8 @@ public class AddMoodActivity extends AppCompatActivity{
     private DocumentReference UserDocument;
     private Spinner spinner;
     private Spinner socialSpinner;
+    private boolean edit = false;
+    private Mood edited;
     private Mood mood = new Mood();
 
 
@@ -80,6 +84,7 @@ public class AddMoodActivity extends AppCompatActivity{
             currentUser = (User) bundle.get("User");
             if ((boolean) bundle.get("editMood")) {
                 mood = (Mood) bundle.get("Mood");
+                input.setText(mood.getReason());
                 spinner.setSelection(moodTypeAdapter.getPosition(mood.getMoodType()));
                 socialSpinner.setSelection(socialAdapter.getPosition(mood.getSituation()));
                 deleteButton.setVisibility(View.VISIBLE);
@@ -122,7 +127,11 @@ public class AddMoodActivity extends AppCompatActivity{
             mood.setReason(input.getText().toString());
             mood.setSituation(socialAdapter.getItem(socialSpinner.getSelectedItemPosition()));
             mood.setProfilePic(Mood.profilePicString(bitmapProfilePicture));
+            mood.setUser(currentUser.getUserName());
             onSubmit(mood);
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("Mood", mood);
+            setResult(Activity.RESULT_OK, returnIntent);
             finish();
         });
     }
@@ -194,35 +203,6 @@ public class AddMoodActivity extends AppCompatActivity{
                 });
     }
 
-    private Mood getValues(){
-        String moodText = input.getText().toString();
-        MoodType selected_type = (MoodType) spinner.getSelectedItem();
-        SocialSituation selectedSocial = null;
-
-        if (socialSpinner.getVisibility() == View.VISIBLE)
-            selectedSocial = (SocialSituation) socialSpinner.getSelectedItem();
-
-
-        if (picture == null) {
-            if(edit){
-                return new Mood(edited.getDateTime(), selected_type, null)
-                        .withReason(moodText).withSituation(selectedSocial)
-                        .withUser(currentUser.getUserName());
-            }
-            return new Mood(selected_type, null).withReason(moodText)
-                    .withSituation(selectedSocial).withUser(currentUser.getUserName());
-        }
-        else{
-            if(edit){
-                return new Mood(edited.getDateTime(), selected_type, null)
-                        .withPhoto(picture).withReason(moodText).withSituation(selectedSocial)
-                        .withUser(currentUser.getUserName());
-            }
-            return new Mood(selected_type, null).withPhoto(picture).withReason(moodText)
-                    .withSituation(selectedSocial).withUser(currentUser.getUserName());
-        }
-
-    }
-
+//
 
 }

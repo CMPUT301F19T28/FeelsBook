@@ -344,26 +344,6 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
 
     }
 
-    /**
-     * Takes in a base64 string and converts it into a bitmap
-     * @param photo
-     *          photo to be converted in base64 String format format
-     * @return
-     *      returns bitmap of decoded photo returns null if base64 string was not passed in
-     */
-    @SuppressLint("NewApi")
-    private Bitmap getPhoto(String photo){
-        try {
-            byte[] decoded = Base64.getDecoder()
-                    .decode(photo);
-            return BitmapFactory.decodeByteArray(decoded
-                    , 0, decoded.length);
-        }catch(Exception e){
-            Log.d("-----CONVERT PHOTO-----",
-                    "****NO PHOTO CONVERTED: " + e);
-            return null;
-        }
-    }
 
     /**
      * Handles when a filter button is pressed.

@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
         filteredMoods = new ArrayList<>();
         feedCopy = new ArrayList<>();
         viewPagerAdapter.AddFragment(feedFragment, "Feed");
-        viewPagerAdapter.AddFragment(mapFragment,"Map");
+        viewPagerAdapter.AddFragment(mapFragment, "Map");
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                 Intent intent = new Intent(getApplicationContext(), ViewMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
-                userBundle.putBoolean("editMood", true);
+//                userBundle.putBoolean("editMood", true);
                 userBundle.putSerializable("Mood", post);
                 intent.putExtras(userBundle);
                 startActivityForResult(intent, 1);
@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
      */
     private Bitmap getPhoto(String photo){
         try {
-            @SuppressLint({"NewApi", "LocalSuppress"}) byte[] decoded = Base64.getDecoder()
+            @SuppressLint("NewApi") byte[] decoded = Base64.getDecoder()
                     .decode(photo);
             return BitmapFactory.decodeByteArray(decoded
                     , 0, decoded.length);
