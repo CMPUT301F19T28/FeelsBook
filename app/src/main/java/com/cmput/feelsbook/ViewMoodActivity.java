@@ -70,7 +70,7 @@ public class ViewMoodActivity extends AppCompatActivity{
         }
 
         // sets users profile picture
-        Bitmap bitmapProfilePicture = currentUser.getProfilePic();
+        Bitmap bitmapProfilePicture = currentUser.profilePicBitmap();
         profilePicture.setImageBitmap(bitmapProfilePicture);
 
         Button backButton = findViewById(R.id.back_button);

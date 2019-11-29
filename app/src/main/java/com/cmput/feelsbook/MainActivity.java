@@ -217,6 +217,20 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                         }
                     });
         }
+
+        UserDocument.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    DocumentSnapshot document = task.getResult();
+                    if(document.exists()){
+                        currentUser.setProfilePic(document.get("profilePic").toString());
+                        profileButton.setImageBitmap(currentUser.profilePicBitmap());
+                    }
+                }
+            }
+        });
+
     }
 
 

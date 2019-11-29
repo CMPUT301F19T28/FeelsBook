@@ -1,8 +1,10 @@
 package com.cmput.feelsbook;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -47,14 +49,13 @@ public class AddMoodActivity extends AppCompatActivity{
     private EditText input;
     private Bitmap picture;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int MY_CAMERA_REQUEST_CODE = 100;
     private User currentUser;
     private FirebaseFirestore db;
     private CollectionReference MoodCollection;
     private DocumentReference UserDocument;
     private Spinner spinner;
     private Spinner socialSpinner;
-    private boolean edit = false;
-    private Mood edited;
     private Mood mood = new Mood();
 
 
@@ -106,15 +107,19 @@ public class AddMoodActivity extends AppCompatActivity{
         MoodCollection = UserDocument.collection("Moods");
 
         // sets users profile picture
-        Bitmap bitmapProfilePicture = currentUser.getProfilePic();
+        Bitmap bitmapProfilePicture = currentUser.profilePicBitmap();
         ImageView profilePicture = findViewById(R.id.profile_picture);
         profilePicture.setImageBitmap(bitmapProfilePicture);
 
         Button cameraButtonAdd = findViewById(R.id.add_picture_button);
         cameraButtonAdd.setOnClickListener(v -> {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (intent.resolveActivity(AddMoodActivity.this.getPackageManager()) != null)
-                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_REQUEST_CODE);
+            }else{
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (intent.resolveActivity(AddMoodActivity.this.getPackageManager()) != null)
+                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+            }
         });
 
         Button backButton = findViewById(R.id.back_button);
@@ -203,6 +208,17 @@ public class AddMoodActivity extends AppCompatActivity{
                 });
     }
 
-//
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_CAMERA_REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (intent.resolveActivity(AddMoodActivity.this.getPackageManager()) != null)
+                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+            }
+        }
+    }
 
 }

@@ -1,8 +1,10 @@
 package com.cmput.feelsbook;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -17,6 +19,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -78,7 +82,9 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
     private FilterFragment filter;
     private boolean filterClicked = false;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int MY_CAMERA_REQUEST_CODE = 100;
     private Bitmap profilePicBitmap;
+    private DocumentReference UserDocument;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +94,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         Bundle bundle = getIntent().getExtras();
         tabLayout = findViewById(R.id.profile_tab);
         viewPager = findViewById(R.id.history_pager);
-        //profilePicture = findViewById(R.drawable.);
+        profilePicture = findViewById(R.id.profile_picture);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         db = FirebaseFirestore.getInstance();
         postCount = 0;
@@ -96,6 +102,9 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
 
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
+
+            if( currentUser.getProfilePic() != null)
+                profilePicture.setImageBitmap(currentUser.profilePicBitmap());
         }
 
         listener = new Feed.OnItemClickListener() {
@@ -110,24 +119,22 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                 Intent intent = new Intent(getApplicationContext(), ViewMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
-//                userBundle.putBoolean("editMood", true);
                 userBundle.putSerializable("Mood", post);
                 intent.putExtras(userBundle);
                 startActivityForResult(intent, 1);
             }
         };
 
-//        if (bundle != null) {
-//            currentUser = (User) bundle.get("User");
-//        }
 
         if(currentUser == null){
             throw new AssertionError("User is null from MainActivity.");
         }
 
         //Sets the document to that of the current user
-        MoodCollection = db.collection("users").document(currentUser.getUserName())
-                .collection("Moods");
+        UserDocument = db.collection("users").document(currentUser.getUserName());
+
+        //Sets the collection to that of the current user's moods
+        MoodCollection = UserDocument.collection("Moods");
 
         historyFragment = new FeedFragment();
         historyFragment.getRecyclerAdapter().setOnItemClickListener(listener);
@@ -151,11 +158,10 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         fullName.setText(currentUser.getName());
         userName.setText("@" + currentUser.getUserName());
 
-        // document reference used to fetch total number of posts field inside of the database
-        CollectionReference cr = db.collection("users")
-                .document(currentUser.getUserName()).collection("Moods");
 
-        cr.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+
+        MoodCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
@@ -211,24 +217,17 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
             LogoutFragment frag = new LogoutFragment();
             frag.show(getSupportFragmentManager(), "logout");
         });
-//        backButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-//                Bundle userBundle = new Bundle();
-//                userBundle.putSerializable("User", currentUser);
-//                intent.putExtras(userBundle);
-//                startActivity(intent);
-//            }
-//        });
+
         editProfilePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (intent.resolveActivity(ProfileActivity.this.getPackageManager()) != null)
-                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-                currentUser.setProfilePic(profilePicBitmap);
-                profilePicture.setImageBitmap(profilePicBitmap);
+                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_REQUEST_CODE);
+                }else{
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    if (intent.resolveActivity(ProfileActivity.this.getPackageManager()) != null)
+                        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                }
             }
         });
 
@@ -246,9 +245,11 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_IMAGE_CAPTURE) {
-                profilePicBitmap = (Bitmap) data.getExtras().get("data");
-//                currentUser.setProfilePic(profilePicBitmap);
-//                profilePicture.setImageBitmap(currentUser.getProfilePic());
+                currentUser.setProfilePic(Mood.profilePicString((Bitmap)data.getExtras().get("data")));
+                profilePicture.setImageBitmap(currentUser.profilePicBitmap());
+
+                UserDocument.update("profilePic",currentUser.getProfilePic());
+
             }
         }
     }
@@ -273,7 +274,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                 followersText.setText(followersCount + " followers");
             }
         });
-        db.collection("users").document(currentUser.getUserName()).collection("Moods")
+        MoodCollection
                 .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -326,7 +327,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
             // update total number of posts
             HashMap<String,Object> userUpdate = new HashMap<>();
             userUpdate.put("total_posts",String.valueOf(postListCount));
-            db.collection("users").document(currentUser.getUserName())
+            UserDocument
                     .update(userUpdate)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
@@ -406,5 +407,18 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
         intent.putExtras(userBundle);
         startActivity(intent);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_CAMERA_REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (intent.resolveActivity(ProfileActivity.this.getPackageManager()) != null)
+                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+            }
+        }
     }
 }
