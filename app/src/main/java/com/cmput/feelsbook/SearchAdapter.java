@@ -1,5 +1,7 @@
 package com.cmput.feelsbook;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {

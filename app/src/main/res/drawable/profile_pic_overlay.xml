@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <item
+        android:drawable="@drawable/ic_default_profile"
+        android:width="156dp"
+        android:height="156dp"
+        android:gravity="center"/>
+    <item android:drawable="@drawable/profile_pic_circle"/>
+
+</layer-list>

@@ -13,8 +13,12 @@ public class FollowUser implements Serializable {
     private String name;
     private String profilePic;
 
-    public FollowUser() {
+    public FollowUser() {}
 
+    public FollowUser(String userName, String name) {
+        this.userName = userName;
+        this.name = name;
+        this.profilePic = null;
     }
 
     public FollowUser(String userName, String name, Bitmap profilePic) {

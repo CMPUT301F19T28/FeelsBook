@@ -119,6 +119,7 @@ public class User implements Serializable {
                                                 task.getResult().getReference()
                                                         .collection("followRequests")
                                                         .document(getUserName())
+
                                                         .set(new FollowUser(getUserName(), getName(), getProfilePic()))
                                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                             @Override
