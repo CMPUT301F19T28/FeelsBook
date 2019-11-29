@@ -161,10 +161,9 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void successfulLogin(DocumentSnapshot document){
         Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
-        byte[] decodedPicArr = Base64.getDecoder().decode(document.getString("profilePic"));
-        String decodedPicString = new String(decodedPicArr, StandardCharsets.UTF_8);
+        String encodedPic = document.getString("profilePic");
         User user = new User(document.getId(), document.getString("name"), new Feed());
-        user.setProfilePic(decodedPicString);
+        user.setProfilePic(encodedPic);
         Log.d("Login","(LOGIN)Successful login with User: " + document.getId());
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         Bundle bundle = new Bundle();

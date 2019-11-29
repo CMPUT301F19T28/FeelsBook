@@ -177,12 +177,13 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
         //setLoading()
         getFollowing();
 
+        // decode profile picture string
         String photo = currentUser.getProfilePic();
         byte[] decodePhoto = Base64.getDecoder().decode(photo);
         bitmapProfilePicture = BitmapFactory.decodeByteArray(decodePhoto, 0, decodePhoto.length);
 
         if(bitmapProfilePicture != null){
-            profileButton.setImageBitmap(bitmapProfilePicture);
+            profileButton.setImageBitmap(Bitmap.createScaledBitmap(bitmapProfilePicture, 80,80,false));
         }
     }
 

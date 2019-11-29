@@ -75,6 +75,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
     private List<Post> historyCopy;
     private FilterFragment filter;
     private boolean filterClicked = false;
+    private Bitmap bitmapProfilePicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +85,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         Bundle bundle = getIntent().getExtras();
         tabLayout = findViewById(R.id.profile_tab);
         viewPager = findViewById(R.id.history_pager);
-        //profilePicture = findViewById(R.drawable.);
+        profilePicture = findViewById(R.id.profile_picture);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         db = FirebaseFirestore.getInstance();
         postCount = 0;
@@ -143,6 +144,13 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         ImageView profilePicture = findViewById(R.id.profile_picture);
         fullName.setText(currentUser.getName());
         userName.setText("@" + currentUser.getUserName());
+        String photo = currentUser.getProfilePic();
+        byte[] decodePhoto = Base64.getDecoder().decode(photo);
+        bitmapProfilePicture = BitmapFactory.decodeByteArray(decodePhoto, 0, decodePhoto.length);
+
+        if(bitmapProfilePicture != null){
+            profilePicture.setImageBitmap(bitmapProfilePicture);
+        }
 
         // document reference used to fetch total number of posts field inside of the database
         CollectionReference cr = db.collection("users")

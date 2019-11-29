@@ -93,6 +93,7 @@ public class ProfilePicFragment extends DialogFragment {
         profileBtn1.setOnClickListener(v -> {
             picSelected = profilePic1;
             listener.onPictureSelect(picSelected);
+            dismiss();
         });
 
         ImageButton profileBtn2  = view.findViewById(R.id.profile_pic_2);
@@ -115,6 +116,7 @@ public class ProfilePicFragment extends DialogFragment {
         profileBtn2.setOnClickListener(v -> {
             picSelected = profilePic2;
             listener.onPictureSelect(picSelected);
+            dismiss();
         });
 
         ImageButton profileBtn3  = view.findViewById(R.id.profile_pic_3);
@@ -160,6 +162,7 @@ public class ProfilePicFragment extends DialogFragment {
         profileBtn4.setOnClickListener(v -> {
             picSelected = profilePic4;
             listener.onPictureSelect(picSelected);
+            dismiss();
         });
 
         ImageButton profileBtn5  = view.findViewById(R.id.profile_pic_5);
@@ -181,6 +184,7 @@ public class ProfilePicFragment extends DialogFragment {
         profileBtn5.setOnClickListener(v -> {
             picSelected = profilePic5;
             listener.onPictureSelect(picSelected);
+            dismiss();
         });
 
         ImageButton profileBtn6  = view.findViewById(R.id.profile_pic_6);
@@ -203,6 +207,7 @@ public class ProfilePicFragment extends DialogFragment {
         profileBtn6.setOnClickListener(v -> {
             picSelected = profilePic6;
             listener.onPictureSelect(picSelected);
+            dismiss();
         });
 
         // create dialog using FilterDialog theme

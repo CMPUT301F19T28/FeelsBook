@@ -3,7 +3,6 @@ package com.cmput.feelsbook;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -34,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.Base64;
 
 /**
  * Creates a signup activity where a new user can be created.
@@ -187,11 +187,11 @@ public class SignUpActivity extends AppCompatActivity implements ProfilePicFragm
             data.put("name", name);
             data.put("total_posts","0");
             try {
-                //puts profilePic into hashmap
+                // encodes the profile picture taken from the user document
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                chosenPic.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                chosenPic.compress(Bitmap.CompressFormat.PNG, 100, baos);
                 byte[] picData = baos.toByteArray();
-                data.put("profilePic", Base64.encodeToString(picData, Base64.NO_WRAP));
+                data.put("profilePic", Base64.getEncoder().encodeToString(picData));
 
             } catch (Exception e) {
                 Log.d("-----UPLOAD PHOTO-----",
