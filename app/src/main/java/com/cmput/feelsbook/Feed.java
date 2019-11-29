@@ -79,6 +79,10 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
         getFilter().filter(null);
     }
 
+    public List<MoodType> getMoods() {
+        return moods;
+    }
+
     public List<Post> getFeedFiltered() {
         return feedListFiltered;
     }

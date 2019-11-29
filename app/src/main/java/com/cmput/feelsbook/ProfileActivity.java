@@ -162,8 +162,10 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         });
 
         backButton.setOnClickListener(view -> {
-            filter.reset();
-            historyFragment.getRecyclerAdapter().clearMoods();
+            if(filter.prefs != null) {
+                filter.reset();
+                historyFragment.getRecyclerAdapter().clearMoods();
+            }
             finish();
         });
 
@@ -199,8 +201,10 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         Bundle bundle = new Bundle();
         bundle.putSerializable("user",currentUser);
         intent.putExtras(bundle);
-        filter.reset();
-        historyFragment.getRecyclerAdapter().clearMoods();
+        if(filter.prefs != null) {
+            filter.reset();
+            historyFragment.getRecyclerAdapter().clearMoods();
+        }
         startActivity(intent);
     }
 
@@ -221,8 +225,10 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
     public void onLogout(){
         Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        filter.reset();
-        historyFragment.getRecyclerAdapter().clearMoods();
+        if(filter.prefs != null) {
+            filter.reset();
+            historyFragment.getRecyclerAdapter().clearMoods();
+        }
         startActivity(intent);
     }
 }

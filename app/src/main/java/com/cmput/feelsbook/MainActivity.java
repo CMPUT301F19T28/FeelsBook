@@ -105,8 +105,10 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
             Bundle userBundle = new Bundle();
             userBundle.putSerializable("User", currentUser);
             intent.putExtras(userBundle);
-            filter.reset();
-            feedFragment.getRecyclerAdapter().clearMoods();
+            if(filter.prefs != null) {
+                filter.reset();
+                feedFragment.getRecyclerAdapter().clearMoods();
+            }
             startActivity(intent);
         });
 
