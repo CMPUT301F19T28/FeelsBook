@@ -110,6 +110,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         TextView fullName = findViewById(R.id.full_name);
         TextView userName = findViewById(R.id.username);
         TextView followText = findViewById(R.id.follower_count);
+        TextView followersText = findViewById(R.id.follower_count);
         TextView followingText = findViewById(R.id.following_count);
         TextView postsText = findViewById(R.id.total_posts);
         ImageView profilePicture = findViewById(R.id.profile_picture);
@@ -151,9 +152,6 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                 }
             }
         });
-
-        TextView followersText = findViewById(R.id.follower_count);
-        TextView followingText = findViewById(R.id.following_count);
 
         db.collection("users")
                 .document(currentUser.getUserName())
