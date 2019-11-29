@@ -19,6 +19,7 @@ import com.google.firebase.firestore.SetOptions;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +45,7 @@ public class User implements Serializable {
         this.userName = userName;
         this.name = name;
         this.posts = posts;
-        //this.following = following;
+        this.following = new ArrayList<>();
     }
 
 
@@ -175,6 +176,14 @@ public class User implements Serializable {
                 .collection("following")
                 .document(getUserName())
                 .delete();
+    }
+
+    public void addUserToFollowing(FollowUser followUser) {
+        following.add(followUser);
+    }
+
+    public void removeUserFromFollowing(int position) {
+        following.remove(position);
     }
 
     public User(String name){

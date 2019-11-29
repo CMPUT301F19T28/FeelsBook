@@ -9,8 +9,6 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.cmput.feelsbook.Feed;
-import com.cmput.feelsbook.ProxyBitmap;
 import com.cmput.feelsbook.R;
 
 import java.io.ByteArrayOutputStream;
@@ -20,8 +18,6 @@ import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Locale;
-
-import static java.util.Base64.getDecoder;
 
 /**
  * Object that contains information about a mood.
@@ -42,7 +38,6 @@ public class Mood extends Post implements Serializable {
     private SocialSituation situation;
     private String photo;
     private Location location;
-    private String user;
 
 
     public Mood() {

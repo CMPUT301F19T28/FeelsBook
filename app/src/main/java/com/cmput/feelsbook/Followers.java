@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -21,6 +22,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Followers extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -35,16 +37,23 @@ public class Followers extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 .collection("users")
                 .document(user.getUserName())
                 .collection("followers")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            return;
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    if (e == null) {
+                        for (DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
+                            switch (doc.getType()) {
+                                case ADDED:
+                                    list.add(doc.getDocument().toObject(FollowUser.class));
+                                    notifyItemInserted(doc.getNewIndex());
+                                    break;
+                                case REMOVED:
+                                    if(list.size() > 0 && list.get(doc.getOldIndex()).getUserName().equals(doc.getDocument().getId())) {
+                                        list.remove(doc.getOldIndex());
+                                        notifyItemRemoved(doc.getOldIndex());
+                                        notifyItemRangeChanged(doc.getOldIndex(), getItemCount());
+                                    }
+                                    break;
+                            }
                         }
-                        for(QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                            list.add(doc.toObject(FollowUser.class));
-                        }
-                        notifyDataSetChanged();
                     }
                 });
     }
@@ -73,6 +82,7 @@ public class Followers extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 user.removeFollowing(list.get(position).getUserName());
                 list.remove(position);
                 notifyItemRemoved(position);
+                notifyItemRangeChanged(position, list.size());
             }
         });
 
