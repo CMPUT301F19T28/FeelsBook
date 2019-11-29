@@ -62,7 +62,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Filtera
     private ArrayList<ClusterMarker> clusterMarkers = new ArrayList<>();
     private User currentUser;
     private Boolean firstRun = false;
-    private Boolean profile = false;
+    private Boolean inMainActivity = false;
     private List<Post> feedListFiltered;
     private List<Post> feedList;
     private List<MoodType> moods;
@@ -73,6 +73,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Filtera
         if (getArguments() != null) {
             currentUser = (User) getArguments().getSerializable("user");
             locationPermissionGranted = getArguments().getBoolean("locationPermission");
+            inMainActivity = getArguments().getBoolean("inMainActivity");
         }
         this.feedList = new ArrayList<>();
         this.feedListFiltered = new ArrayList<>();
@@ -180,13 +181,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Filtera
             clusterManager.setOnClusterItemInfoWindowClickListener(
                     new ClusterManager.OnClusterItemInfoWindowClickListener<ClusterMarker>() {
                         @Override public void onClusterItemInfoWindowClick(ClusterMarker clusterMarker) {
-                            Intent intent = new Intent(getActivity().getApplicationContext(), AddMoodActivity.class);
+                            Intent intent = new Intent(getActivity().getApplicationContext(), ViewMoodActivity.class);
                             Bundle userBundle = new Bundle();
                             userBundle.putSerializable("User", currentUser);
-                            userBundle.putBoolean("editMood", true);
                             userBundle.putSerializable("Mood", clusterMarker.getMood());
                             intent.putExtras(userBundle);
                             startActivityForResult(intent, 1);
+
                         }
                     });
             googleMap.setOnInfoWindowClickListener(clusterManager);
