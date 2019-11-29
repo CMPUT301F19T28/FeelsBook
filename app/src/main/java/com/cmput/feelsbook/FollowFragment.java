@@ -11,6 +11,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import javax.annotation.Nullable;
 
+/**
+ * creates a small window used to select the option to track another users posts
+ */
+
 public class FollowFragment extends Fragment {
 
     private RecyclerView recyclerView;

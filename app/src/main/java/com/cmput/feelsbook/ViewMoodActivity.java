@@ -30,6 +30,13 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 
+/**
+ * Activity in which a user can view a mood
+ * if feed view is clicked in main feed then view activity is non interactive
+ * if feed view is clicked in profile activity then edit mood button
+ * and delete button are avalible
+ */
+
 public class ViewMoodActivity extends AppCompatActivity{
 
     private User currentUser;

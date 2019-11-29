@@ -31,6 +31,10 @@ import java.util.Base64;
 
 import javax.annotation.Nullable;
 
+/**
+ * Activity in which user looks up another user in order to follow or unfollow
+ */
+
 public class SearchActivity extends AppCompatActivity {
 
     private User user;

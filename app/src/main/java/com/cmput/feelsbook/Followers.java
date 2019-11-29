@@ -16,6 +16,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Allows an individual user to track the users that
+ * track their posts (mood events)
+ */
+
 public class Followers extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<FollowUser> list;

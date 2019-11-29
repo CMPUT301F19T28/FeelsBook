@@ -45,6 +45,11 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.Arrays;
 import java.util.Base64;
 
+/**
+ * Activity in which a user makes a Mood and post object and attaches to feed
+ * or edits/deletes a post object from the feed
+ *
+ */
 public class AddMoodActivity extends AppCompatActivity{
 
     private EditText input;

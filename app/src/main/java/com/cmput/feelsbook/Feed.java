@@ -16,6 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Extends recycler view adapter in which a collection of post objects are displayed
+ */
+
 public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Serializable, Filterable {
 
     private final String TAG = "Feed";

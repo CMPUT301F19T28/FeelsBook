@@ -12,6 +12,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
+/**
+ * Creates a small dialog fragment that confirms that a user wishes to sign out or cancel
+ * Brings user to login page upon ok requested and back to original activity upon cancel
+ */
+
 public class LogoutFragment extends DialogFragment {
     private OnLogoutListener listener;
 

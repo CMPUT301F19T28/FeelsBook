@@ -20,6 +20,10 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import static android.content.ContentValues.TAG;
 
+/**
+ * activity that confirms permission access for Location used in conjunction with posts
+ */
+
 public class PermissionsActivity extends AppCompatActivity {
     //Location permission vars
 

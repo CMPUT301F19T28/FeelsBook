@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Adapter used in the dropdown mood spinner selector when adding or editing a mood event
+ */
+
 public class MoodTypeAdapter extends ArrayAdapter<MoodType> {
 
     private List<MoodType> list;

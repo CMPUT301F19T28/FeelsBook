@@ -7,6 +7,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.util.Base64;
 
+/**
+ * User object that has requested to follow another user
+ */
+
 public class FollowUser implements Serializable {
 
     private String userName;
