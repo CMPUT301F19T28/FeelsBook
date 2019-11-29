@@ -1,10 +1,12 @@
 package com.cmput.feelsbook;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -37,7 +39,7 @@ import java.util.HashMap;
  * username entered by the user respectively.
  * FirebaseFirestore db - created instance of the database used for storing the created user
  */
-public class SignUpActivity extends AppCompatActivity {
+public class SignUpActivity extends AppCompatActivity implements ProfilePicFragment.OnPictureSelectedListener{
 
     private static final String TAG = "SignUpActivity";
 
@@ -46,9 +48,11 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText nameField;
     private EditText passwordField;
     private EditText usernameField;
+    private ImageView profilePic;
     private FirebaseFirestore db;
     private Client client;
     private Index index;
+    private ProfilePicFragment chooseProfile;
 
     private final String SIGNUP_TAG = "Invalid field";
     public static final String USER = "com.cmput.feelsbook.SignUpActivity.User";
@@ -66,6 +70,7 @@ public class SignUpActivity extends AppCompatActivity {
         nameField     = findViewById(R.id.s_name_text);
         passwordField = findViewById(R.id.s_password_text);
         usernameField = findViewById(R.id.s_user_text);
+        profilePic    = findViewById(R.id.set_profile_pic);
 
         nameField.getText().clear();
         passwordField.getText().clear();
@@ -117,6 +122,13 @@ public class SignUpActivity extends AppCompatActivity {
             public void onClick(View v) {
                 finish();
             }
+        });
+
+        profilePic.setOnClickListener(view -> {
+            // add profile pic fragment
+            chooseProfile = new ProfilePicFragment();
+            chooseProfile.show(getSupportFragmentManager(), "PICTURE_CHOOSE");
+
         });
 
     }
@@ -201,5 +213,9 @@ public class SignUpActivity extends AppCompatActivity {
             }
         }
         return hexString.toString();
+    }
+
+    public void onPictureSelect(Bitmap picture){
+
     }
 }
