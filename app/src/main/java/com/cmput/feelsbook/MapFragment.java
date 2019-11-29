@@ -162,6 +162,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Filtera
                         clusterManager
                 );
                 clusterManager.setRenderer(clusterManagerRenderer);
+                clusterManagerRenderer.setMinClusterSize(2);
                 firstRun = true;
 
             }
