@@ -203,8 +203,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Filtera
                 LatLng position = new LatLng(mood.getLatitude(), mood.getLongitude());
                 String title = mood.getUser();
                 String snippet = getString(mood.getMoodType().getEmoticon()) + "@ " + mood.getDateTime().toString();
-                //Bitmap avatar = getPhoto(mood.getProfilePic());
-                Bitmap avatar = getPhoto(mood.getPhoto());
+                Bitmap avatar = getPhoto(mood.getProfilePic());
                 ClusterMarker clusterMarker = new ClusterMarker(position, title, snippet, avatar, mood);
                 clusterManager.addItem(clusterMarker);
                 clusterMarkers.add(clusterMarker);
