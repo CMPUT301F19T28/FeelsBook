@@ -244,5 +244,8 @@ public class SignUpActivity extends AppCompatActivity implements ProfilePicFragm
      */
     public void onPictureSelect(Bitmap picture){
         chosenPic = picture;
+        if(chosenPic != null){
+            profilePicView.setImageBitmap(chosenPic);
+        }
     }
 }
