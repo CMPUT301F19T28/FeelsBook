@@ -1,10 +1,13 @@
 package com.cmput.feelsbook;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,15 +23,19 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.Base64;
 
 /**
  * Creates a signup activity where a new user can be created.
@@ -37,18 +44,22 @@ import java.util.HashMap;
  * username entered by the user respectively.
  * FirebaseFirestore db - created instance of the database used for storing the created user
  */
-public class SignUpActivity extends AppCompatActivity {
+public class SignUpActivity extends AppCompatActivity implements ProfilePicFragment.OnPictureSelectedListener{
 
     private static final String TAG = "SignUpActivity";
 
+    private final long ONE_MEGABYTE = 1024 * 1024;
     private Button signupButton;
     private Button cancelButton;
     private EditText nameField;
     private EditText passwordField;
     private EditText usernameField;
+    private ImageView profilePicView;
     private FirebaseFirestore db;
     private Client client;
     private Index index;
+    private ProfilePicFragment chooseProfile;
+    private Bitmap chosenPic;
 
     private final String SIGNUP_TAG = "Invalid field";
     public static final String USER = "com.cmput.feelsbook.SignUpActivity.User";
@@ -61,11 +72,16 @@ public class SignUpActivity extends AppCompatActivity {
 
         client = new Client("CZHQW4KJVA","394205d7e7f173719c08f3e187b2a77b");
         index = client.getIndex("users");
-        signupButton  = findViewById(R.id.confirm_signup);
-        cancelButton  = findViewById(R.id.cancel_signup);
-        nameField     = findViewById(R.id.s_name_text);
-        passwordField = findViewById(R.id.s_password_text);
-        usernameField = findViewById(R.id.s_user_text);
+        signupButton    = findViewById(R.id.confirm_signup);
+        cancelButton    = findViewById(R.id.cancel_signup);
+        nameField       = findViewById(R.id.s_name_text);
+        passwordField   = findViewById(R.id.s_password_text);
+        usernameField   = findViewById(R.id.s_user_text);
+        profilePicView  = findViewById(R.id.set_profile_pic);
+
+        nameField.getText().clear();
+        passwordField.getText().clear();
+        usernameField.getText().clear();
 
         db = FirebaseFirestore.getInstance();  // Create an instance to access Cloud Firestore
         final CollectionReference collectionReference = db.collection("users");
@@ -88,7 +104,8 @@ public class SignUpActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             DocumentSnapshot doc = task.getResult();
                             if (!doc.exists()) {
-                                createUser(username);
+                                getProfilePic(username);
+                                finish();
                                 try {
                                     index.addObjectAsync(new JSONObject().put("username",username), username, null);
                                 }catch (Exception e) {
@@ -107,7 +124,6 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
 
-
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -115,9 +131,25 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
 
+        profilePicView.setOnClickListener(view -> {
+            // add profile pic fragment
+            chooseProfile = new ProfilePicFragment();
+            chooseProfile.show(getSupportFragmentManager(), "PICTURE_CHOOSE");
+        });
+
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        if(chosenPic != null){
+            profilePicView.setImageBitmap(chosenPic);
+        }
     }
 
     /**
+     *
      * Checks the requirements of the field:
      *  All the fields are not empty
      *  The length of the password is at least a length of 8
@@ -139,13 +171,30 @@ public class SignUpActivity extends AppCompatActivity {
         return  true;
     }
 
+    private void getProfilePic(String username){
+        if (chosenPic == null){
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReference();
+            StorageReference defaultPic1 = storageRef.child("default_profile_pictures/app_default_profile_pic.png");
+            defaultPic1.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                @Override
+                public void onSuccess(byte[] bytes) {
+                    // Data retrieval success, convert to a BitMap and set as user's profile pic
+                    Bitmap profilePic = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    createUser(username, profilePic);
+                }
+            });
+        } else{
+            createUser(username, chosenPic);
+        }
+    }
     /**
      * Create a new document with the entered username as doc ID
      * Fill in name and password entries into the document
      * @param username
      *  The username the user has entered
      */
-    private void createUser(String username){
+    private void createUser(String username, Bitmap profilePic){
         final String password = passwordField.getText().toString();
         final String name = nameField.getText().toString();
 
@@ -156,7 +205,18 @@ public class SignUpActivity extends AppCompatActivity {
             HashMap<String, String> data = new HashMap<>();
             data.put("password", hashedPassword);
             data.put("name", name);
-            data.put("username",username);
+            data.put("total_posts","0");
+            try {
+                // encodes the profile picture taken from the user document
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                profilePic.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                byte[] picData = baos.toByteArray();
+                data.put("profilePic", Base64.getEncoder().encodeToString(picData));
+
+            } catch (Exception e) {
+                Log.d("-----UPLOAD PHOTO-----",
+                        "**NO profilepic UPLOADED: " + e);
+            }
 
             db.collection("users")
                     .document(username)
@@ -174,7 +234,6 @@ public class SignUpActivity extends AppCompatActivity {
                         }
                     });
 
-            finish();
         }
         catch (NoSuchAlgorithmException e){
             Log.d(TAG, "Exception thrown for incorrect algorithm " + e);
@@ -197,5 +256,13 @@ public class SignUpActivity extends AppCompatActivity {
             }
         }
         return hexString.toString();
+    }
+
+    /**
+     * Receives the profile picture chosen by the user during sign-up
+     * @param picture
+     */
+    public void onPictureSelect(Bitmap picture){
+        chosenPic = picture;
     }
 }

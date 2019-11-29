@@ -1,6 +1,7 @@
 package com.cmput.feelsbook;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +26,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Base64;
 
 import javax.annotation.Nullable;
 
@@ -75,8 +78,9 @@ public class SearchActivity extends AppCompatActivity {
                                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                     if (task.isSuccessful() && task.getResult() != null) {
                                                         DocumentSnapshot doc = task.getResult();
+
                                                         if(doc.exists())
-                                                            adapter.addUser(new FollowUser(task.getResult().getId(), (String) doc.getData().get("name"), (Bitmap) doc.getData().get("profilePic")));
+                                                            adapter.addUser(new FollowUser(doc.getId(), (String) doc.getData().get("name"), (String) doc.getData().get("profilePic")));
                                                     }
                                                 }
                                             });

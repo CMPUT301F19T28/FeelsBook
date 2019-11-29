@@ -2,6 +2,7 @@ package com.cmput.feelsbook;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,18 +20,17 @@ import com.google.firebase.firestore.SetOptions;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Used to represent the individual using the application. Contains personal information and
  * allows for creation of new posts.
  * String userName, name - contains the username and name of the user, respectively
  * Feed posts - contains the user's personal posts
- * FollowList followList - contains the user's following list
  * Bitmap profilePicture - contains the user's profile pictur
  */
 public class User implements Serializable {
@@ -40,13 +40,13 @@ public class User implements Serializable {
     private String name;
     private Feed posts;
     private List<FollowUser> following;
-    private Bitmap profilePicture;
+    private String profilePicture;
 
     public User(String userName, String name, Feed posts){
         this.userName = userName;
         this.name = name;
         this.posts = posts;
-        //this.following = following;
+        this.following = new ArrayList<>();
     }
 
 
@@ -66,7 +66,7 @@ public class User implements Serializable {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         if(documentSnapshot.exists()) {
-                            toFollowing.document(getUserName()).set(new FollowUser(documentSnapshot.getId(),(String) documentSnapshot.getData().get("name"), null));
+                            toFollowing.document(getUserName()).set(new FollowUser(documentSnapshot.getId(),(String) documentSnapshot.getData().get("name"), (String) documentSnapshot.getData().get("profilePic")));
                         }
                     }
                 });
@@ -119,6 +119,7 @@ public class User implements Serializable {
                                                 task.getResult().getReference()
                                                         .collection("followRequests")
                                                         .document(getUserName())
+
                                                         .set(new FollowUser(getUserName(), getName(), getProfilePic()))
                                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                             @Override
@@ -179,6 +180,14 @@ public class User implements Serializable {
                 .delete();
     }
 
+    public void addUserToFollowing(FollowUser followUser) {
+        following.add(followUser);
+    }
+
+    public void removeUserFromFollowing(int position) {
+        following.remove(position);
+    }
+
     public User(String name){
         this.name = name;
     }
@@ -205,9 +214,11 @@ public class User implements Serializable {
         following = followsList;
     }
 
-    public Bitmap getProfilePic(){
+    public String getProfilePic(){
         return this.profilePicture;
     }
+
+    public void setProfilePic(String picture) {this.profilePicture = picture;}
 
     public String getUserName() {
         return userName;

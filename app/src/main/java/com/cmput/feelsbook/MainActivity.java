@@ -1,38 +1,27 @@
 package com.cmput.feelsbook;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ImageButton;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
-import com.cmput.feelsbook.post.SocialSituation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.cmput.feelsbook.post.Post;
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -40,18 +29,23 @@ import java.util.List;
  * Homepage where a feed of moods/posts will be seen.
  * Comprised of a scrollable RecyclerView
  */
-public class MainActivity extends AppCompatActivity {
-    RecyclerView feedView;
+public class MainActivity extends AppCompatActivity implements FilterFragment.OnMoodSelectListener{
+    private ImageButton profileButton;
     private User currentUser;
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private ViewPagerAdapter viewPagerAdapter;
-    FeedFragment feedFragment;
-    private MapFragment mapFragment;
+    protected FeedFragment feedFragment;
+    protected MapFragment mapFragment;
     private Feed.OnItemClickListener listener;
     private FirebaseFirestore db;
+    private FilterFragment filter;
+    private boolean filterClicked = false;
     private CollectionReference MoodCollection;
     private DocumentReference UserDocument;
+    private Boolean locationPermissionGranted;
+    private Bitmap bitmapProfilePicture;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,49 +55,57 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = findViewById(R.id.tab_layout);
         viewPager = findViewById(R.id.view_pager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        ImageButton profileButton = findViewById(R.id.profileButton);
+        profileButton = findViewById(R.id.profile_button);
         db = FirebaseFirestore.getInstance();
+        filter = new FilterFragment();
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
+            locationPermissionGranted = bundle.getBoolean("locationPermission");
         }
 
-        //Sets the document to that of the current user
-        UserDocument = db.collection("users").document(currentUser.getUserName());
-
-        //Sets the collectionReference to that of the current users moods
-        MoodCollection = UserDocument.collection("Moods");
+        if(currentUser == null){
+            throw new AssertionError("User is not set from login.");
+        }
 
         feedFragment = new FeedFragment();
-        mapFragment = new MapFragment();
         viewPagerAdapter.AddFragment(feedFragment, "Feed");
-        viewPagerAdapter.AddFragment(mapFragment, "Map");
+
+        if (locationPermissionGranted) {
+            mapFragment = new MapFragment();
+            Bundle args = new Bundle();
+            args.putSerializable("user", currentUser);
+            args.putBoolean("locationPermission", locationPermissionGranted);
+            mapFragment.setArguments(args);
+            viewPagerAdapter.AddFragment(mapFragment,"Map");
+        }
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
 
-        listener = new Feed.OnItemClickListener() {
+        listener = new Feed.OnItemClickListener(){
             /**
              * Sets onItemClick to open a fragment in which the mood will be edited
-             * @param post
-             *          Post to be edited
+             *
+             * @param post Post to be edited
              */
             @Override
             public void onItemClick(Post post){
-                Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
+                Intent intent = new Intent(getApplicationContext(), ViewMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
-                userBundle.putBoolean("editMood", true);
-                userBundle.putSerializable("Mood", ((Mood) post).Serialize(true));
+//                userBundle.putBoolean("editMood", true);
+                userBundle.putSerializable("Mood", post);
                 intent.putExtras(userBundle);
                 startActivityForResult(intent, 1);
-            }
-        };
+                }
+            };
+
         feedFragment.getRecyclerAdapter().setOnItemClickListener(listener);
 
-        FloatingActionButton addPostBttn = findViewById(R.id.addPostButton);
+        final FloatingActionButton addPostBttn = findViewById(R.id.addPostButton);
         addPostBttn.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
             Bundle userBundle = new Bundle();
@@ -113,154 +115,95 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(intent, 1);
         });
 
+        profileButton = findViewById(R.id.profile_button);
+
         profileButton.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             Bundle userBundle = new Bundle();
             userBundle.putSerializable("User", currentUser);
+            userBundle.putBoolean("locationPermission", locationPermissionGranted);
             intent.putExtras(userBundle);
+            if(filter.prefs != null) {
+                filter.reset();
+                feedFragment.getRecyclerAdapter().clearMoods();
+                mapFragment.clearMoods();
+            }
             startActivity(intent);
         });
 
-        //setLoading()
-        getFollowing();
-    }
+        final ImageButton filterButton = findViewById(R.id.filter_button);
+        filterButton.setOnClickListener(view -> {
+                feedFragment.getRecyclerAdapter().getFilter().filter(null);
+                filter.show(getSupportFragmentManager(), "MAIN_FILTER");
+            });
 
-    private void getFollowing() {
-        List<FollowUser> following = new ArrayList<FollowUser>();
-        FirebaseFirestore.getInstance()
-                .collection("users")
+        // decode profile picture string
+        String photo = currentUser.getProfilePic();
+        byte[] decodePhoto = Base64.getDecoder().decode(photo);
+        bitmapProfilePicture = BitmapFactory.decodeByteArray(decodePhoto, 0, decodePhoto.length);
+
+        if(bitmapProfilePicture != null){
+            profileButton.setImageBitmap(Bitmap.createScaledBitmap(bitmapProfilePicture, 80,80,false));
+        }
+
+
+        db.collection("users")
                 .document(currentUser.getUserName())
                 .collection("following")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        List<DocumentSnapshot> list = task.getResult().getDocuments();
-                        if (list.size() != 0) {
-                            for (int i = 0; i < list.size(); i++) {
-                                DocumentSnapshot doc = list.get(i);
-                                Bitmap photo;
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    if(e == null) {
+                        for(DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
+                            switch (doc.getType()) {
+                                case ADDED:
+                                    currentUser.addUserToFollowing(doc.getDocument().toObject(FollowUser.class));
+                                    db.collection("mostRecent")
+                                            .document(doc.getDocument().getId())
+                                            .addSnapshotListener((documentSnapshot, e2) -> {
+                                                if(documentSnapshot != null && documentSnapshot.exists()) {
+                                                    Mood mood = documentSnapshot.toObject(Mood.class);
+                                                    if(currentUser.getFollowingList().stream().anyMatch(followUser -> followUser.getUserName().equals(mood.getUser()))) {
+                                                        feedFragment.getRecyclerAdapter()
+                                                                .getFeed()
+                                                                .stream()
+                                                                .filter(post -> post.getUser().equals(mood.getUser()))
+                                                                .findFirst()
+                                                                .ifPresent(post -> feedFragment.getRecyclerAdapter().removePost(post));
+                                                        feedFragment.getRecyclerAdapter().addPost(documentSnapshot.toObject(Mood.class));
+                                                        feedFragment.getRecyclerAdapter().notifyItemInserted(feedFragment.getRecyclerAdapter().getItemCount() - 1);
+                                                        mapFragment.addPost(documentSnapshot.toObject(Mood.class));
+                                                        mapFragment.updateMap();
+                                                    }
+                                                }
+                                            });
+                                    break;
+                                case REMOVED:
+                                    currentUser.removeUserFromFollowing(doc.getOldIndex());
+                                    feedFragment.getRecyclerAdapter()
+                                            .getFeed()
+                                            .stream()
+                                            .filter(post -> post.getUser().equals(doc.getDocument().getId()))
+                                            .findFirst()
+                                            .ifPresent(post -> feedFragment.getRecyclerAdapter().removePost(post));
+                                    mapFragment.getFeed().stream().filter(post -> post.getUser().equals(doc.getDocument().getId())).findFirst().ifPresent(post -> mapFragment.removePost(post));
+                                    mapFragment.updateMap();
 
-                                /*
-                                converts the photo is present converts from a base64 string to a byte[]
-                                and then into a bitmap if no photo is present sets photo to null
-                                 */
-                                try {
-                                    byte[] decoded = Base64.getDecoder()
-                                            .decode((String) doc.get("photo"));
-                                    photo = BitmapFactory.decodeByteArray(decoded
-                                            , 0, decoded.length);
-                                } catch (Exception e) {
-                                    Log.d("-----UPLOAD PHOTO-----",
-                                            "****NO PHOTO DOWNLOADED: " + e);
-                                    photo = null;
-                                }
-                                FollowUser newFollowUser = new FollowUser(doc.getId(), doc.get("name").toString(), photo);
-                                following.add(newFollowUser);
+                                    break;
                             }
                         }
-                        currentUser.setFollowingList(following);
-                        updateFeed();
                     }
                 });
     }
 
     /**
-     * This method updates the FeedFragment whenever the remote database is updated
+     * Handles when a filter button is pressed.
+     * Note that when a filter button is pressed, this means that all moods EXCEPT the currently
+     * pressed mood/s will be shown in the feed.
+     * @param moodType - the MoodType to be filtered
      */
-    private void updateFeed() {
-        List<FollowUser> followingList = currentUser.getFollowingList();
-        for (int i = 0; i < followingList.size(); i++) {
-            db.collection("mostRecent")
-                    .document(followingList.get(i).getUserName())
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.getResult().exists()) {
-                                DocumentSnapshot doc = task.getResult();
-
-                                MoodType moodType = null;
-                                String reason = null;
-                                SocialSituation situation = null;
-                                Bitmap photo = null;
-                                Location location = null;
-                                Bitmap profilePic = null;
-                                Date dateTime = null;
-                                String user = "null";
-
-                                try {
-                                    if (doc.contains("datetime"))
-                                        dateTime = ((Timestamp) doc.get("datetime")).toDate();
-
-                                    if (doc.contains("location"))
-                                        location = (Location) doc.get("location");
-
-                                    if (doc.contains("photo")) {
-                                        photo = getPhoto((String) doc.get("photo"));
-                                    }
-
-                                    if (doc.contains("profilePic")) {
-                                        profilePic = getPhoto((String) doc.get("profilePic"));
-                                    }
-
-                                    if (doc.contains("reason"))
-                                        reason = (String) doc.get("reason");
-
-                                    if (doc.contains("situation") & (doc.get("situation") != null)) {
-                                        situation = SocialSituation.getSocialSituation((String) doc.get("situation"));
-                                    }
-
-                                    if (doc.contains("moodType") & (doc.get("moodType") != null)) {
-                                        moodType = MoodType.getMoodType((String) doc.get("moodType"));
-                                    }
-
-                                    if (doc.contains("User")) {
-                                        user = (String) doc.get("User");
-                                    }
-
-                                    Mood mood = new Mood(dateTime, moodType, profilePic).withUser(user);
-
-                                    if (reason != null)
-                                        mood = mood.withReason(reason);
-                                    if (situation != null)
-                                        mood = mood.withSituation(situation);
-                                    if (photo != null)
-                                        mood = mood.withPhoto(photo);
-                                    if (location != null)
-                                        mood.withLocation(location);
-
-                                    feedFragment.getRecyclerAdapter().addPost(mood);
-                                } catch (Exception error) {
-                                    Log.d("-----UPLOAD SAMPLE-----",
-                                            "****MOOD DOWNLOAD FAILED: " + error);
-                                }
-                            }
-                            feedFragment.getRecyclerAdapter().notifyDataSetChanged();
-                        }
-
-                    });
-        }
-    }
-
-
-    /**
-     * Takes in a base64 string and converts it into a bitmap
-     * @param photo
-     *          photo to be converted in base64 String format format
-     * @return
-     *      returns bitmap of decoded photo returns null if base64 string was not passed in
-     */
-    private Bitmap getPhoto(String photo){
-        try {
-            @SuppressLint("NewApi") byte[] decoded = Base64.getDecoder()
-                    .decode(photo);
-            return BitmapFactory.decodeByteArray(decoded
-                    , 0, decoded.length);
-        }catch(Exception e){
-            Log.d("-----CONVERT PHOTO-----",
-                    "****NO PHOTO CONVERTED: " + e);
-            return null;
-        }
+    public void onSelect(MoodType moodType){
+        feedFragment.getRecyclerAdapter().toggleMoodFilter(moodType);
+        feedFragment.getRecyclerAdapter().getFilter().filter(null);
+        mapFragment.toggleMoodFilter(moodType);
+        mapFragment.getFilter().filter(null);
     }
 }

@@ -6,10 +6,11 @@
     android:layout_height="match_parent">
 
 
-    <LinearLayout
+    <TableRow
         android:id="@+id/LinearLayout3"
-        android:layout_width="407dp"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="62dp"
+        android:background="@color/menu_bar_color"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -21,34 +22,43 @@
             android:layout_height="match_parent">
 
             <Button
-                android:id="@+id/post_button"
+                android:id="@+id/edit_button"
                 android:layout_width="70dp"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginRight="10dp"
-                android:background="@drawable/default_button"
+                android:layout_marginBottom="5dp"
+                android:background="@drawable/logout_button"
                 android:text="post"
+                android:textColor="@color/defaultWhite"
+                android:textSize="15sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Button
                 android:id="@+id/back_button"
-                android:layout_width="70dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="5dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="4dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:background="@drawable/circle"
+                android:contentDescription="arrow"
                 android:drawableStart="@drawable/ic_arrow_back_black_24dp"
-                android:shadowColor="#00948E8E"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </LinearLayout>
+    </TableRow>
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/mood_text"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginTop="148dp"
@@ -62,7 +72,7 @@
         android:layout_width="76dp"
         android:layout_height="73dp"
         android:contentDescription="profile_picture"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
+        app:layout_constraintBottom_toTopOf="@+id/mood_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/LinearLayout3"
@@ -87,19 +97,21 @@
 
     <Spinner
         android:id="@+id/mood_spinner"
-        android:layout_width="380dp"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginTop="28dp"
+        android:layout_marginBottom="28dp"
         android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@id/social_spinner"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.483"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/mood_text" />
 
     <Spinner
         android:id="@+id/social_spinner"
         android:layout_width="380dp"
-        android:layout_height="36dp"
+        android:layout_height="40dp"
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.516"
@@ -133,29 +145,33 @@
             android:layout_weight="1"
             android:text="Location" />
 
-        <Button
-            android:id="@+id/social_situation_button"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="SocialSit" />
     </LinearLayout>
 
     <Button
         android:id="@+id/delete_button"
         android:layout_width="270dp"
         android:layout_height="49dp"
-        android:background="#E91E63"
+        android:background="@color/defaultGray"
         android:text="@string/delete_button"
-        android:textColor="#FFFFFF"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
         app:layout_constraintVertical_bias="0.897" />
-    <![CDATA[
+
+    <TextView
+        android:id="@+id/location_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText" /><![CDATA[
+
+
 
 
 

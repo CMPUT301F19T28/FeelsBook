@@ -1,32 +1,40 @@
 package com.cmput.feelsbook.post;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput.feelsbook.Feed;
 
+import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
+import java.util.Base64;
 import java.util.Date;
 
 /**
- * Interface used to implement a Mood object. Provides additional methods when creating a Mood
- * object.
+ * Base for displaying a post on the user's feed.
  * Bitmap profilePic - profile picture of the user who created the Post object
  * Date dateTime - date and time used to display the Post
  */
 public abstract class Post implements Serializable{
 
-    protected Bitmap profilePic;
+    protected String profilePic;
     protected Date dateTime;
+    protected String user;
+
+    public Post() {
+
+    }
 
     public abstract void displayPost(RecyclerView.ViewHolder viewHolder);
 
-    public Bitmap getProfilePic() {
+    public String getProfilePic() {
         return profilePic;
     }
 
-    public void setProfilePic(Bitmap profilePic) {
+    public void setProfilePic(String profilePic) {
         this.profilePic = profilePic;
     }
 
@@ -38,8 +46,33 @@ public abstract class Post implements Serializable{
         this.dateTime = dateTime;
     }
 
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public Bitmap profilePicBitmap() {
+        if(profilePic != null) {
+            byte[] photo = Base64.getDecoder().decode(profilePic);
+            return BitmapFactory.decodeByteArray(photo, 0, photo.length);
+        }
+        return null;
+    }
+
     @Override
     public String toString(){
         return getClass().getName()+"@"+Integer.toHexString(dateTime.hashCode());
+    }
+
+    public static String profilePicString(Bitmap bitmap) {
+        if(bitmap != null) {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            return Base64.getEncoder().encodeToString(stream.toByteArray());
+        }
+        return null;
     }
 }

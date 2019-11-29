@@ -1,19 +1,18 @@
 package com.cmput.feelsbook.post;
 
 import android.graphics.Bitmap;
-import android.location.Location;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.cmput.feelsbook.Feed;
-import com.cmput.feelsbook.ProxyBitmap;
 import com.cmput.feelsbook.R;
-
+import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Locale;
 
@@ -34,11 +33,15 @@ public class Mood extends Post implements Serializable {
     private MoodType moodType;
     private String reason;
     private SocialSituation situation;
-    private ProxyBitmap serilizable_photo;
-    private Bitmap photo;
-    private Location location;
+    private String photo;
+    private double latitude;
+    private double longitude;
     private String user;
 
+
+    public Mood() {
+        this.dateTime = new Date();
+    }
 
     /**
      * Create a Mood object with the current Date
@@ -50,7 +53,7 @@ public class Mood extends Post implements Serializable {
     public Mood(MoodType moodType, Bitmap profilePic) {
         this.dateTime = new Date();
         this.moodType = moodType;
-        this.profilePic = profilePic;
+        this.profilePic = profilePicString(profilePic);
     }
 
     /**
@@ -65,7 +68,7 @@ public class Mood extends Post implements Serializable {
     public Mood(Date dateTime, MoodType moodType, Bitmap profilePic) {
         this.dateTime = dateTime;
         this.moodType = moodType;
-        this.profilePic = profilePic;
+        this.profilePic = profilePicString(profilePic);
     }
 
     /**
@@ -100,20 +103,21 @@ public class Mood extends Post implements Serializable {
      * The mood with a Photo added
      */
     public Mood withPhoto(Bitmap photo) {
-        this.photo = photo;
-        this.serilizable_photo = new ProxyBitmap(photo);
+        this.photo = photoString(photo);
         return this;
     }
 
     /**
      * Builder style to add a location to the Mood
-     * @param location
+     * @param latitude
+     * @param longitude
      * A location where the user is posting their Mood
      * @return
      * The mood with a Location added
      */
-    public Mood withLocation(Location location) {
-        this.location = location;
+    public Mood withLocation(double latitude, double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
         return this;
     }
 
@@ -125,15 +129,16 @@ public class Mood extends Post implements Serializable {
     public Mood Serialize(boolean change){
         if(change) {
             this.photo = null;
-        }else if(serilizable_photo != null){
-            this.photo = serilizable_photo.getBitmap();
         }
         return this;
     }
 
-    public Mood withUser(String username){
+    public void setUser(String username){
         this.user = username;
-        return this;
+    }
+
+    public String getUser(){
+        return user;
     }
 
     /**
@@ -146,27 +151,28 @@ public class Mood extends Post implements Serializable {
         TextView moodText = viewHolder.itemView.findViewById(R.id.moodText);
         ImageView profile_pic_feed = viewHolder.itemView.findViewById(R.id.profileImage);
         TextView username = viewHolder.itemView.findViewById(R.id.user_name);
+        ImageView locationImage = viewHolder.itemView.findViewById(R.id.location_image);
+        ImageView photoImage = viewHolder.itemView.findViewById(R.id.photo_image);
 
-
+        viewHolder.itemView.setBackgroundColor(Color.parseColor(moodType.getColor()));
         dateTimeText.setText(dateFormatter.format(dateTime));
         moodText.setText(moodType.getEmoticon());
-        profile_pic_feed.setImageBitmap(profilePic);
+        profile_pic_feed.setImageBitmap(profilePicBitmap());
         username.setText(user);
 
         if(reason != null) {
             TextView reasonText = viewHolder.itemView.findViewById(R.id.reasonText);
             reasonText.setText(reason);
         }
-/*        if(situation != null) {
-            TextView situationText = viewHolder.itemView.findViewById(R.id.situation_feed);
-            situationText.setText(situation.toString());
-        }
-        if(photo != null) {
-            ImageView photoFeed = viewHolder.itemView.findViewById(R.id.photo_feed);
-            photoFeed.setImageBitmap(photo);
-        }
+        if(hasLocation())
+            locationImage.setVisibility(View.VISIBLE);
+        else
+            locationImage.setVisibility(View.INVISIBLE);
+        if(hasPhoto())
+            photoImage.setVisibility(View.VISIBLE);
+        else
+            photoImage.setVisibility(View.INVISIBLE);
 
- */
     }
 
     public MoodType getMoodType() {
@@ -198,23 +204,51 @@ public class Mood extends Post implements Serializable {
         return photo != null;
     }
 
+    public boolean hasLocation() {return (latitude != 0 && longitude != 0);}
+
     public void setSituation(SocialSituation situation) {
         this.situation = situation;
     }
 
-    public Bitmap getPhoto() {
+    public Bitmap photoBitmap() {
+        if(photo != null) {
+            byte[] photo = Base64.getDecoder().decode(this.photo);
+            return BitmapFactory.decodeByteArray(photo, 0, photo.length);
+        }
+        return null;
+    }
+
+    public String getPhoto() {
         return photo;
     }
 
-    public void setPhoto(Bitmap photo) {
+    public void setPhoto(String photo) {
         this.photo = photo;
     }
 
-    public Location getLocation() {
-        return location;
+    public double getLatitude() {
+        return latitude;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+
+    public static String photoString(Bitmap bitmap) {
+        if(bitmap != null) {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            return Base64.getEncoder().encodeToString(stream.toByteArray());
+        }
+        return null;
     }
 }
