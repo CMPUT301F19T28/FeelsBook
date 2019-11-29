@@ -1,9 +1,12 @@
 package com.cmput.feelsbook;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -13,16 +16,30 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import com.cmput.feelsbook.R;
+import com.cmput.feelsbook.User;
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.Post;
 import com.cmput.feelsbook.post.SocialSituation;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.Arrays;
@@ -39,6 +56,11 @@ public class AddMoodActivity extends AppCompatActivity{
     private DocumentReference UserDocument;
     private Spinner spinner;
     private Spinner socialSpinner;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private GeoPoint currentLocation;
+    private TextView locationText;
+    private MapView mapView;
+
     private boolean edit = false;
     private Mood edited;
     private Mood mood = new Mood();
@@ -52,6 +74,7 @@ public class AddMoodActivity extends AppCompatActivity{
         input = findViewById(R.id.editText);
         spinner = findViewById(R.id.mood_spinner);
         socialSpinner = findViewById(R.id.social_spinner);
+        mapView = findViewById(R.id.map_view);
 
         MoodTypeAdapter moodTypeAdapter = new MoodTypeAdapter(this, Arrays.asList(MoodType.values()));
         spinner.setAdapter(moodTypeAdapter);
@@ -66,6 +89,12 @@ public class AddMoodActivity extends AppCompatActivity{
 
         Button deleteButton = findViewById(R.id.delete_button);
 
+        //gets current location and sets location view
+        locationText = findViewById(R.id.location_text);
+        getLastKnownLocation();
+        locationText.setText("Current location will be included.");
+        locationText.setVisibility(View.GONE); //sets the location view to be gone because it is optional
+
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
             if ((boolean) bundle.get("editMood")) {
@@ -73,6 +102,8 @@ public class AddMoodActivity extends AppCompatActivity{
                 input.setText(mood.getReason());
                 spinner.setSelection(moodTypeAdapter.getPosition(mood.getMoodType()));
                 socialSpinner.setSelection(socialAdapter.getPosition(mood.getSituation()));
+                if (mood.hasLocation())
+                    locationText.setVisibility(View.VISIBLE);
                 deleteButton.setVisibility(View.VISIBLE);
                 deleteButton.setOnClickListener(view -> {
                     delete(mood);
@@ -102,6 +133,16 @@ public class AddMoodActivity extends AppCompatActivity{
         Bitmap bitmapProfilePicture = BitmapFactory.decodeByteArray(photo, 0, photo.length);
         profilePicture.setImageBitmap(bitmapProfilePicture);
 
+        //if the location button is pressed then shows the drop down
+        Button locationBttn = findViewById(R.id.add_location_button);
+        locationBttn.setOnClickListener(v -> {
+            if (locationText.getVisibility() == View.VISIBLE) {
+                locationText.setVisibility(View.INVISIBLE);
+            } else {
+                locationText.setVisibility(View.VISIBLE);
+            }
+        });
+
         Button cameraButtonAdd = findViewById(R.id.add_picture_button);
         cameraButtonAdd.setOnClickListener(v -> {
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -121,6 +162,12 @@ public class AddMoodActivity extends AppCompatActivity{
                 mood.setPhoto(mood.getPhoto());
             mood.setReason(input.getText().toString());
             mood.setSituation(socialAdapter.getItem(socialSpinner.getSelectedItemPosition()));
+            if (locationText.getVisibility() == View.VISIBLE) {
+                mood.setLatitude(currentLocation.getLatitude());
+                mood.setLongitude(currentLocation.getLongitude());
+
+            }
+            mood.setUser(currentUser.getUserName());
             mood.setProfilePic(Mood.profilePicString(bitmapProfilePicture));
             mood.setUser(currentUser.getUserName());
             onSubmit(mood);
@@ -198,6 +245,20 @@ public class AddMoodActivity extends AppCompatActivity{
                 });
     }
 
-//
+    public void getLastKnownLocation() {
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(@NonNull Task<Location> task) {
+                Location location = (Location) task.getResult();
+                currentLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
+            }
+        });
+    }
 
 }

@@ -1,15 +1,11 @@
 package com.cmput.feelsbook;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ImageButton;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 import com.cmput.feelsbook.post.Mood;
@@ -47,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
     private boolean filterClicked = false;
     private CollectionReference MoodCollection;
     private DocumentReference UserDocument;
+    private Boolean locationPermissionGranted;
     private Bitmap bitmapProfilePicture;
 
 
@@ -65,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
+            locationPermissionGranted = bundle.getBoolean("locationPermission");
         }
 
         if(currentUser == null){
@@ -72,9 +70,16 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
         }
 
         feedFragment = new FeedFragment();
-        mapFragment = new MapFragment();
         viewPagerAdapter.AddFragment(feedFragment, "Feed");
-        viewPagerAdapter.AddFragment(mapFragment, "Map");
+
+        if (locationPermissionGranted) {
+            mapFragment = new MapFragment();
+            Bundle args = new Bundle();
+            args.putSerializable("user", currentUser);
+            args.putBoolean("locationPermission", locationPermissionGranted);
+            mapFragment.setArguments(args);
+            viewPagerAdapter.AddFragment(mapFragment,"Map");
+        }
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -116,10 +121,12 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             Bundle userBundle = new Bundle();
             userBundle.putSerializable("User", currentUser);
+            userBundle.putBoolean("locationPermission", locationPermissionGranted);
             intent.putExtras(userBundle);
             if(filter.prefs != null) {
                 filter.reset();
                 feedFragment.getRecyclerAdapter().clearMoods();
+                mapFragment.clearMoods();
             }
             startActivity(intent);
         });
@@ -163,6 +170,8 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                                                                 .ifPresent(post -> feedFragment.getRecyclerAdapter().removePost(post));
                                                         feedFragment.getRecyclerAdapter().addPost(documentSnapshot.toObject(Mood.class));
                                                         feedFragment.getRecyclerAdapter().notifyItemInserted(feedFragment.getRecyclerAdapter().getItemCount() - 1);
+                                                        mapFragment.addPost(documentSnapshot.toObject(Mood.class));
+                                                        mapFragment.updateMap();
                                                     }
                                                 }
                                             });
@@ -175,6 +184,9 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                                             .filter(post -> post.getUser().equals(doc.getDocument().getId()))
                                             .findFirst()
                                             .ifPresent(post -> feedFragment.getRecyclerAdapter().removePost(post));
+                                    mapFragment.getFeed().stream().filter(post -> post.getUser().equals(doc.getDocument().getId())).findFirst().ifPresent(post -> mapFragment.removePost(post));
+                                    mapFragment.updateMap();
+
                                     break;
                             }
                         }
@@ -191,5 +203,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
     public void onSelect(MoodType moodType){
         feedFragment.getRecyclerAdapter().toggleMoodFilter(moodType);
         feedFragment.getRecyclerAdapter().getFilter().filter(null);
+        mapFragment.toggleMoodFilter(moodType);
+        mapFragment.getFilter().filter(null);
     }
 }

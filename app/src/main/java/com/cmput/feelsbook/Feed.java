@@ -6,10 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.Post;
@@ -152,6 +150,7 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
                 feedListFiltered = (ArrayList<Post>) filterResults.values;
                 notifyDataSetChanged();
+
             }
         };
     }

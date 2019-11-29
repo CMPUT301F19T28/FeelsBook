@@ -1,6 +1,7 @@
 package com.cmput.feelsbook;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -19,6 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -157,7 +160,7 @@ public class LoginActivity extends AppCompatActivity {
     /**
      * Passes a valid user if login was successful
      * @param document
-     * Document context used to create a User object to pass to MainActivity
+     * Document context used to create a User object to pass to PermissionsActivity
      */
     private void successfulLogin(DocumentSnapshot document){
         Toast.makeText(LoginActivity.this, "Successful Login", Toast.LENGTH_SHORT).show();
@@ -165,12 +168,10 @@ public class LoginActivity extends AppCompatActivity {
         User user = new User(document.getId(), document.getString("name"), new Feed());
         user.setProfilePic(encodedPic);
         Log.d("Login","(LOGIN)Successful login with User: " + document.getId());
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        Intent intent = new Intent(LoginActivity.this, PermissionsActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("User",user);
         intent.putExtras(bundle);
         startActivity(intent);
     }
-
-
 }
