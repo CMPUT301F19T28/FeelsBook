@@ -1,8 +1,6 @@
 package com.cmput.feelsbook;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -10,11 +8,9 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -25,14 +21,8 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.GeoPoint;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -148,11 +138,15 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                                 case ADDED:
                                     historyFragment.getRecyclerAdapter().addPost(doc.getDocument().toObject(Mood.class));
                                     historyFragment.getRecyclerAdapter().notifyItemInserted(doc.getNewIndex());
+                                    mapFragment.addPost(doc.getDocument().toObject(Mood.class));
+                                    mapFragment.updateMap();
                                     break;
                                 case REMOVED:
                                     historyFragment.getRecyclerAdapter().removePost(doc.getOldIndex());
                                     historyFragment.getRecyclerAdapter().notifyItemRemoved(doc.getOldIndex());
                                     historyFragment.getRecyclerAdapter().notifyItemRangeChanged(doc.getOldIndex(), historyFragment.getRecyclerAdapter().getItemCount());
+                                    mapFragment.getFeed().stream().filter(post -> post.getUser().equals(doc.getDocument().getId())).findFirst().ifPresent(post -> mapFragment.removePost(post));
+                                    mapFragment.updateMap();
                                     break;
                             }
                         }

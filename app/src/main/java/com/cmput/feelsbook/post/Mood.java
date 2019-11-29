@@ -3,16 +3,11 @@ package com.cmput.feelsbook.post;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.media.Image;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.cmput.feelsbook.R;
-import com.google.firebase.firestore.GeoPoint;
-
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.text.DateFormat;
