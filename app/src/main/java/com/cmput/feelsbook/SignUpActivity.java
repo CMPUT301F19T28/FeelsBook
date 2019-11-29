@@ -175,7 +175,8 @@ public class SignUpActivity extends AppCompatActivity implements ProfilePicFragm
         if (chosenPic == null){
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference();
-            StorageReference defaultPic1 = storageRef.child("default_profile_pictures/app_default_profile_pic.png");
+            StorageReference defaultPic1 = storageRef
+                    .child("default_profile_pictures/app_default_profile_pic.png");
             defaultPic1.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                 @Override
                 public void onSuccess(byte[] bytes) {

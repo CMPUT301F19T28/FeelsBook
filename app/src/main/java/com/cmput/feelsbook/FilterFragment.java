@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,7 +43,7 @@ public class FilterFragment extends DialogFragment {
     private int posY = 135;
 
     private OnMoodSelectListener listener;
-    public SharedPreferences prefs;
+    protected SharedPreferences prefs;
 
     private boolean happyPressed = false;
     private boolean sadPressed = false;

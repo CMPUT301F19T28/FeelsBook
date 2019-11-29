@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
     private CollectionReference MoodCollection;
     private DocumentReference UserDocument;
     private Bitmap bitmapProfilePicture;
+    private Boolean locationPermissionGranted;
 
 
     @Override
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
+            locationPermissionGranted = bundle.getBoolean("locationPermission");
         }
 
         if(currentUser == null){
@@ -75,9 +77,16 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
         }
 
         feedFragment = new FeedFragment();
-        mapFragment = new MapFragment();
         viewPagerAdapter.AddFragment(feedFragment, "Feed");
-        viewPagerAdapter.AddFragment(mapFragment, "Map");
+
+        if (locationPermissionGranted) {
+            mapFragment = new MapFragment();
+            Bundle args = new Bundle();
+            args.putSerializable("user", currentUser);
+            args.putBoolean("locationPermission", locationPermissionGranted);
+            mapFragment.setArguments(args);
+            viewPagerAdapter.AddFragment(mapFragment,"Map");
+        }
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -119,10 +128,12 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             Bundle userBundle = new Bundle();
             userBundle.putSerializable("User", currentUser);
+            userBundle.putBoolean("locationPermission", locationPermissionGranted);
             intent.putExtras(userBundle);
             if(filter.prefs != null) {
                 filter.reset();
                 feedFragment.getRecyclerAdapter().clearMoods();
+                mapFragment.clearMoods();
             }
             startActivity(intent);
         });
@@ -132,16 +143,6 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                 feedFragment.getRecyclerAdapter().getFilter().filter(null);
                 filter.show(getSupportFragmentManager(), "MAIN_FILTER");
             });
-
-        // decode profile picture string
-        String photo = currentUser.getProfilePic();
-        byte[] decodePhoto = Base64.getDecoder().decode(photo);
-        bitmapProfilePicture = BitmapFactory.decodeByteArray(decodePhoto, 0, decodePhoto.length);
-
-        if(bitmapProfilePicture != null){
-            profileButton.setImageBitmap(Bitmap.createScaledBitmap(bitmapProfilePicture, 80,80,false));
-        }
-
 
         db.collection("users")
                 .document(currentUser.getUserName())
@@ -167,6 +168,8 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                                                         feedFragment.getRecyclerAdapter().addPost(documentSnapshot.toObject(Mood.class));
                                                         feedFragment.getRecyclerAdapter().notifyItemInserted(feedFragment.getRecyclerAdapter().getItemCount() - 1);
                                                     }
+                                                    mapFragment.addPost(documentSnapshot.toObject(Mood.class));
+                                                    mapFragment.updateMap();
                                                 }
                                             });
                                     break;
@@ -178,6 +181,9 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                                             .filter(post -> post.getUser().equals(doc.getDocument().getId()))
                                             .findFirst()
                                             .ifPresent(post -> feedFragment.getRecyclerAdapter().removePost(post));
+                                    mapFragment.getFeed().stream().filter(post -> post.getUser().equals(doc.getDocument().getId())).findFirst().ifPresent(post -> mapFragment.removePost(post));
+                                    mapFragment.updateMap();
+
                                     break;
                             }
                         }
@@ -210,5 +216,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
     public void onSelect(MoodType moodType){
         feedFragment.getRecyclerAdapter().toggleMoodFilter(moodType);
         feedFragment.getRecyclerAdapter().getFilter().filter(null);
+        mapFragment.toggleMoodFilter(moodType);
+        mapFragment.getFilter().filter(null);
     }
 }

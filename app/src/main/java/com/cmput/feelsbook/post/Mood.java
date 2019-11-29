@@ -3,14 +3,11 @@ package com.cmput.feelsbook.post;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.location.Location;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.cmput.feelsbook.R;
-
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -37,7 +34,9 @@ public class Mood extends Post implements Serializable {
     private String reason;
     private SocialSituation situation;
     private String photo;
-    private Location location;
+    private double latitude;
+    private double longitude;
+    private String user;
 
 
     public Mood() {
@@ -110,13 +109,15 @@ public class Mood extends Post implements Serializable {
 
     /**
      * Builder style to add a location to the Mood
-     * @param location
+     * @param latitude
+     * @param longitude
      * A location where the user is posting their Mood
      * @return
      * The mood with a Location added
      */
-    public Mood withLocation(Location location) {
-        this.location = location;
+    public Mood withLocation(double latitude, double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
         return this;
     }
 
@@ -150,6 +151,8 @@ public class Mood extends Post implements Serializable {
         TextView moodText = viewHolder.itemView.findViewById(R.id.moodText);
         ImageView profile_pic_feed = viewHolder.itemView.findViewById(R.id.profileImage);
         TextView username = viewHolder.itemView.findViewById(R.id.user_name);
+//        ImageView photoImage = viewHolder.itemView.findViewById(R.id.photo_image);
+//        ImageView locationImage = viewHolder.itemView.findViewById(R.id.location_image);
 
         viewHolder.itemView.setBackgroundColor(Color.parseColor(moodType.getColor()));
         dateTimeText.setText(dateFormatter.format(dateTime));
@@ -161,6 +164,12 @@ public class Mood extends Post implements Serializable {
             TextView reasonText = viewHolder.itemView.findViewById(R.id.reasonText);
             reasonText.setText(reason);
         }
+
+//        if(photo == null)
+//            photoImage.setVisibility(View.INVISIBLE);
+//        if(!(hasLocation()))
+//            locationImage.setVisibility(View.INVISIBLE);
+
     }
 
     public MoodType getMoodType() {
@@ -192,6 +201,8 @@ public class Mood extends Post implements Serializable {
         return photo != null;
     }
 
+    public boolean hasLocation() {return (latitude != 0 && longitude != 0);}
+
     public void setSituation(SocialSituation situation) {
         this.situation = situation;
     }
@@ -212,13 +223,23 @@ public class Mood extends Post implements Serializable {
         this.photo = photo;
     }
 
-    public Location getLocation() {
-        return location;
+    public double getLatitude() {
+        return latitude;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
     }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+
 
 
     public static String photoString(Bitmap bitmap) {

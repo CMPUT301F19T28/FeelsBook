@@ -16,12 +16,13 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
@@ -31,6 +32,9 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -60,6 +64,10 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
     private FirebaseFirestore db;
     private MapFragment mapFragment;
     private Feed.OnItemClickListener listener;
+    private Boolean locationPermissionGranted;
+    private List<MoodType> filteredMoods;
+    private List<Post> historyCopy;
+    private boolean filterPressed = false;
     private FilterFragment filter;
     private boolean filterClicked = false;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -85,6 +93,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
 
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
+            locationPermissionGranted = bundle.getBoolean("locationPermission");
 
             if( currentUser.getProfilePic() != null)
                 profilePicture.setImageBitmap(currentUser.profilePicBitmap());
@@ -110,10 +119,18 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
 
         historyFragment = new FeedFragment();
         historyFragment.getRecyclerAdapter().setOnItemClickListener(listener);
-        mapFragment = new MapFragment();
         viewPagerAdapter.AddFragment(historyFragment, "History");
-        viewPagerAdapter.AddFragment(mapFragment, "Map");
+        filteredMoods = new ArrayList<>();
+        historyCopy = new ArrayList<>();
 
+        if (locationPermissionGranted) {
+            mapFragment = new MapFragment();
+            Bundle args = new Bundle();
+            args.putSerializable("user", currentUser);
+            args.putBoolean("locationPermission", locationPermissionGranted);
+            mapFragment.setArguments(args);
+            viewPagerAdapter.AddFragment(mapFragment,"Map");
+        }
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
@@ -137,11 +154,15 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                                 case ADDED:
                                     historyFragment.getRecyclerAdapter().addPost(doc.getDocument().toObject(Mood.class));
                                     historyFragment.getRecyclerAdapter().notifyItemInserted(doc.getNewIndex());
+                                    mapFragment.addPost(doc.getDocument().toObject(Mood.class));
+                                    mapFragment.updateMap();
                                     break;
                                 case REMOVED:
                                     historyFragment.getRecyclerAdapter().removePost(doc.getOldIndex());
                                     historyFragment.getRecyclerAdapter().notifyItemRemoved(doc.getOldIndex());
                                     historyFragment.getRecyclerAdapter().notifyItemRangeChanged(doc.getOldIndex(), historyFragment.getRecyclerAdapter().getItemCount());
+                                    mapFragment.getFeed().stream().filter(post -> post.getUser().equals(doc.getDocument().getId())).findFirst().ifPresent(post -> mapFragment.removePost(post));
+                                    mapFragment.updateMap();
                                     break;
                             }
                         }
@@ -191,9 +212,10 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                 });
 
         backButton.setOnClickListener(view -> {
-            if(filter.prefs != null) {
+            if(filterPressed) {
                 filter.reset();
                 historyFragment.getRecyclerAdapter().clearMoods();
+                mapFragment.clearMoods();
             }
             finish();
         });
@@ -211,6 +233,8 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
 
         final ImageButton filterButton = findViewById(R.id.profile_filter_button);
         filterButton.setOnClickListener(view -> {
+            filterPressed = true;
+            filter = new FilterFragment();
             filter.show(getSupportFragmentManager(), "MAIN_FILTER");
         });
 
@@ -271,9 +295,10 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         Bundle bundle = new Bundle();
         bundle.putSerializable("user",currentUser);
         intent.putExtras(bundle);
-        if(filter.prefs != null) {
+        if(filterPressed) {
             filter.reset();
             historyFragment.getRecyclerAdapter().clearMoods();
+            mapFragment.clearMoods();
         }
         startActivity(intent);
     }
@@ -287,6 +312,8 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
     public void onSelect(MoodType moodType){
         historyFragment.getRecyclerAdapter().toggleMoodFilter(moodType);
         historyFragment.getRecyclerAdapter().getFilter().filter(null);
+        mapFragment.toggleMoodFilter(moodType);
+        mapFragment.getFilter().filter(null);
     }
 
     /**
@@ -298,6 +325,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         if(filter.prefs != null) {
             filter.reset();
             historyFragment.getRecyclerAdapter().clearMoods();
+            mapFragment.clearMoods();
         }
         startActivity(intent);
     }
