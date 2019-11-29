@@ -164,12 +164,14 @@ public class Mood extends Post implements Serializable {
             TextView reasonText = viewHolder.itemView.findViewById(R.id.reasonText);
             reasonText.setText(reason);
         }
-        if(!hasLocation()) {
+        if(hasLocation())
+            locationImage.setVisibility(View.VISIBLE);
+        else
             locationImage.setVisibility(View.INVISIBLE);
-        }
-        if(!hasPhoto()) {
+        if(hasPhoto())
+            photoImage.setVisibility(View.VISIBLE);
+        else
             photoImage.setVisibility(View.INVISIBLE);
-        }
 
     }
 

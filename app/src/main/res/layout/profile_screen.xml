@@ -8,7 +8,7 @@
 
     <TableRow
         android:id="@+id/tableRow2"
-        android:layout_width="0dp"
+        android:layout_width="411dp"
         android:layout_height="62dp"
         android:background="@color/menu_bar_color"
         app:layout_constraintEnd_toEndOf="parent"
@@ -26,7 +26,6 @@
                 android:layout_margin="4dp"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
                 android:background="@drawable/circle"
                 android:contentDescription="arrow"
                 android:drawableStart="@drawable/ic_arrow_back_black_24dp"
@@ -40,13 +39,11 @@
             <ImageButton
                 android:id="@+id/profile_filter_button"
                 android:layout_width="40dp"
-                android:layout_height="0dp"
+                android:layout_height="40dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
                 android:background="#00000000"
                 android:contentDescription="filter"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@android:drawable/ic_menu_sort_by_size" />
@@ -54,13 +51,11 @@
             <ImageButton
                 android:id="@+id/logout_button"
                 android:layout_width="40dp"
-                android:layout_height="0dp"
+                android:layout_height="40dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
                 android:background="@drawable/logout_button"
                 android:contentDescription="logout"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/profile_filter_button"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/logout_arrow_black" />
@@ -70,7 +65,7 @@
 
     <TableRow
         android:id="@+id/tableRow3"
-        android:layout_width="0dp"
+        android:layout_width="410dp"
         android:layout_height="148dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -162,7 +157,6 @@
         android:id="@+id/tableRow4"
         android:layout_width="match_parent"
         android:layout_height="522dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tableRow3">
@@ -175,7 +169,6 @@
                 android:id="@+id/history_pager"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
