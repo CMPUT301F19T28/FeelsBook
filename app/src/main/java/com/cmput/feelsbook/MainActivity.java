@@ -172,5 +172,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
     public void onSelect(MoodType moodType){
         feedFragment.getRecyclerAdapter().toggleMoodFilter(moodType);
         feedFragment.getRecyclerAdapter().getFilter().filter(null);
+        mapFragment.toggleMoodFilter(moodType);
+        mapFragment.getFilter().filter(null);
     }
 }

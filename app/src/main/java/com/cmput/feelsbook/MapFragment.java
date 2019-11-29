@@ -13,12 +13,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import com.cmput.feelsbook.post.Mood;
+import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.Post;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -35,6 +38,7 @@ import com.google.maps.android.clustering.ClusterManager;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -45,7 +49,7 @@ import static android.content.ContentValues.TAG;
  * MapView mapView - window used to display the map
  * String MAPVIEW_BUNDLE_KEY - used to uniquely identify a map Bundle object
  */
-public class MapFragment extends Fragment implements OnMapReadyCallback {
+public class MapFragment extends Fragment implements OnMapReadyCallback, Filterable {
 
     private MapView mapView;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
@@ -59,7 +63,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private User currentUser;
     private Boolean firstRun = false;
     private Boolean profile = false;
-    private List<Post> feed;
+    private List<Post> feedListFiltered;
+    private List<Post> feedList;
+    private List<MoodType> moods;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,7 +74,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             currentUser = (User) getArguments().getSerializable("user");
             locationPermissionGranted = getArguments().getBoolean("locationPermission");
         }
-        this.feed = new ArrayList<>();
+        this.feedList = new ArrayList<>();
+        this.feedListFiltered = new ArrayList<>();
+        this.moods = new ArrayList<>();
     }
 
     @Nullable
@@ -189,12 +197,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      * Scans firebase for moods with a location and adds map markers based on Moods.
      */
     public void updateMapMarkers(){
-        for (int i = 0; i < feed.size(); i++) {
-            Mood mood = (Mood) feed.get(i);
+        for (int i = 0; i < feedListFiltered.size(); i++) {
+            Mood mood = (Mood) feedListFiltered.get(i);
             if(mood.hasLocation()) {
                 LatLng position = new LatLng(mood.getLatitude(), mood.getLongitude());
                 String title = mood.getUser();
                 String snippet = getString(mood.getMoodType().getEmoticon()) + "@ " + mood.getDateTime().toString();
+                //Bitmap avatar = getPhoto(mood.getProfilePic());
                 Bitmap avatar = getPhoto(mood.getPhoto());
                 ClusterMarker clusterMarker = new ClusterMarker(position, title, snippet, avatar, mood);
                 clusterManager.addItem(clusterMarker);
@@ -294,19 +303,60 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public List<Post> getFeed() {
-        return feed;
+        return feedList;
     }
 
     public void setFeed(List<Post> feed) {
-        this.feed = feed;
+        this.feedList = feed;
     }
 
     public void addPost(Post post) {
-        feed.add((int) feed.stream().filter(post1 -> post.getDateTime().compareTo(post1.getDateTime()) > 0).count(), post);
+        feedList.add((int) feedList.stream().filter(post1 -> post.getDateTime().compareTo(post1.getDateTime()) > 0).count(), post);
+        getFilter().filter(null);
+
     }
 
     public void removePost(Post post) {
-        feed.remove(post);
+        feedList.remove(post);
+        getFilter().filter(null);
+    }
+
+    public void toggleMoodFilter(MoodType moodType) {
+        Optional<MoodType> mood = moods.stream().filter(moodType1 -> moodType1.equals(moodType)).findFirst();
+        if(mood.isPresent())
+            moods.remove(mood.get());
+        else
+            moods.add(moodType);
+
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                if(moods.isEmpty())
+                    feedListFiltered = feedList;
+                else {
+                    List<Post> filtered = new ArrayList<>();
+                    for(Post post : feedList) {
+                        if(moods.contains(((Mood) post).getMoodType()))
+                            filtered.add(post);
+                    }
+                    feedListFiltered = filtered;
+                }
+                FilterResults results = new FilterResults();
+                results.values = feedListFiltered;
+                return results;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                feedListFiltered = (ArrayList<Post>) filterResults.values;
+                updateMap();
+
+            }
+        };
     }
 
     public void updateMap() {

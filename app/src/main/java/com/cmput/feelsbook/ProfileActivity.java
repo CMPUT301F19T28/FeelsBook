@@ -237,6 +237,8 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
     public void onSelect(MoodType moodType){
         historyFragment.getRecyclerAdapter().toggleMoodFilter(moodType);
         historyFragment.getRecyclerAdapter().getFilter().filter(null);
+        mapFragment.toggleMoodFilter(moodType);
+        mapFragment.getFilter().filter(null);
     }
 
     /**
