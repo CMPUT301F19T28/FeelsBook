@@ -178,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                                                 if(documentSnapshot != null && documentSnapshot.exists()) {
                                                     feedFragment.getRecyclerAdapter().addPost(documentSnapshot.toObject(Mood.class));
                                                     feedFragment.getRecyclerAdapter().notifyItemInserted(feedFragment.getRecyclerAdapter().getItemCount() - 1);
+                                                    mapFragment.addPost(documentSnapshot.toObject(Mood.class));
                                                 }
                                             });
                                     break;
@@ -189,6 +190,8 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                                             .filter(post -> post.getUser().equals(doc.getDocument().getId()))
                                             .findFirst()
                                             .ifPresent(post -> feedFragment.getRecyclerAdapter().removePost(post));
+
+                                    mapFragment.getFeed().stream().filter(post -> post.getUser().equals(doc.getDocument().getId())).findFirst().ifPresent(post -> mapFragment.removePost(post));
                                     break;
                             }
                         }
