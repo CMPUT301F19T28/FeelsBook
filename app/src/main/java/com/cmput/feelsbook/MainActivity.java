@@ -99,8 +99,6 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
         }
 
         feedFragment = new FeedFragment();
-        filteredMoods = new ArrayList<>();
-        feedCopy = new ArrayList<>();
         viewPagerAdapter.AddFragment(feedFragment, "Feed");
 
         if (locationPermissionGranted) {
