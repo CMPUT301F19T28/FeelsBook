@@ -2,7 +2,6 @@ package com.cmput.feelsbook;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -79,11 +78,11 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
              */
 
             @Override
-            public void onItemClick(Post post) {
-                Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
+            public void onItemClick(Post post){
+                Intent intent = new Intent(getApplicationContext(), ViewMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
-                userBundle.putBoolean("editMood", true);
+//                userBundle.putBoolean("editMood", true);
                 userBundle.putSerializable("Mood", post);
                 intent.putExtras(userBundle);
                 startActivityForResult(intent, 1);
@@ -123,8 +122,9 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         Button backButton = findViewById(R.id.exit_profile);
         TextView fullName = findViewById(R.id.full_name);
         TextView userName = findViewById(R.id.username);
+        TextView followersText = findViewById(R.id.follower_count);
+        TextView followingText = findViewById(R.id.following_count);
         TextView postsText = findViewById(R.id.total_posts);
-        ImageView profilePicture = findViewById(R.id.profile_picture);
         fullName.setText(currentUser.getName());
         userName.setText("@" + currentUser.getUserName());
 
@@ -148,6 +148,11 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                                     mapFragment.getFeed().stream().filter(post -> post.getUser().equals(doc.getDocument().getId())).findFirst().ifPresent(post -> mapFragment.removePost(post));
                                     mapFragment.updateMap();
                                     break;
+                                case MODIFIED:
+                                    historyFragment.getRecyclerAdapter().removePost(doc.getOldIndex());
+                                    historyFragment.getRecyclerAdapter().addPost(doc.getDocument().toObject(Mood.class));
+                                    historyFragment.getRecyclerAdapter().notifyItemChanged(doc.getOldIndex());
+
                             }
                         }
                     }
@@ -157,27 +162,39 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         CollectionReference cr = db.collection("users")
                 .document(currentUser.getUserName()).collection("Moods");
 
-        cr.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    QuerySnapshot doc = task.getResult();
-                    if (doc != null) {
-                        postCount = doc.size();
-                        if (postCount > 1 || postCount == 0) {
-                            postsText.setText(postCount + " total posts");
-                        } else if (postCount == 1) {
-                            postsText.setText(postCount + " total post");
-                        }
-                        Log.d("Profile", "Total posts retrieved: " + postCount);
-                    } else {
-                        Log.d("Profile", "No document found");
-                    }
-                } else {
-                    Log.d("Profile", "Document retrieval failed: " + task.getException());
+        cr.addSnapshotListener((queryDocumentSnapshots, e) -> {
+            if(queryDocumentSnapshots != null) {
+                postCount = queryDocumentSnapshots.getDocuments().size();
+                if (postCount > 1 || postCount == 0) {
+                    postsText.setText(postCount + " total posts");
+                } else if (postCount == 1) {
+                    postsText.setText(postCount + " total post");
                 }
             }
         });
+
+        db.collection("users")
+                .document(currentUser.getUserName())
+                .collection("followers")
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    if(queryDocumentSnapshots != null) {
+                        followersCount = queryDocumentSnapshots.getDocuments().size();
+                        if(followersCount > 1 || followersCount == 0)
+                            followersText.setText(followersCount + " followers");
+                        else if(followersCount == 1)
+                            followersText.setText(followersCount + " follower");
+
+                    }
+                });
+        db.collection("users")
+                .document(currentUser.getUserName())
+                .collection("following")
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    if(queryDocumentSnapshots != null) {
+                        followCount = queryDocumentSnapshots.getDocuments().size();
+                        followingText.setText(followCount + " following");
+                    }
+                });
 
         backButton.setOnClickListener(view -> {
             if(filterPressed) {
