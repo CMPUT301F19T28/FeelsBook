@@ -1,6 +1,5 @@
 package com.cmput.feelsbook;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,14 +21,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.Post;
-import com.cmput.feelsbook.post.SocialSituation;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.GeoPoint;
@@ -38,9 +32,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -69,15 +60,13 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
     private ViewPager viewPager;
     private ViewPagerAdapter viewPagerAdapter;
     private FeedFragment historyFragment;
-    private MapFragment mapFragment;
     private FirebaseFirestore db;
-    private CollectionReference MoodCollection;
+    private MapFragment mapFragment;
     private Feed.OnItemClickListener listener;
     private Boolean locationPermissionGranted;
     private List<MoodType> filteredMoods;
     private List<Post> historyCopy;
     private FilterFragment filter;
-    private boolean filterClicked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,10 +112,6 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
             throw new AssertionError("User is null from MainActivity.");
         }
 
-        //Sets the document to that of the current user
-        MoodCollection = db.collection("users").document(currentUser.getUserName())
-                .collection("Moods");
-
         historyFragment = new FeedFragment();
         historyFragment.getRecyclerAdapter().setOnItemClickListener(listener);
         viewPagerAdapter.AddFragment(historyFragment, "History");
@@ -151,6 +136,27 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         ImageView profilePicture = findViewById(R.id.profile_picture);
         fullName.setText(currentUser.getName());
         userName.setText("@" + currentUser.getUserName());
+
+        db.collection("users")
+                .document(currentUser.getUserName())
+                .collection("Moods")
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    if(e == null) {
+                        for(DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
+                            switch (doc.getType()) {
+                                case ADDED:
+                                    historyFragment.getRecyclerAdapter().addPost(doc.getDocument().toObject(Mood.class));
+                                    historyFragment.getRecyclerAdapter().notifyItemInserted(doc.getNewIndex());
+                                    break;
+                                case REMOVED:
+                                    historyFragment.getRecyclerAdapter().removePost(doc.getOldIndex());
+                                    historyFragment.getRecyclerAdapter().notifyItemRemoved(doc.getOldIndex());
+                                    historyFragment.getRecyclerAdapter().notifyItemRangeChanged(doc.getOldIndex(), historyFragment.getRecyclerAdapter().getItemCount());
+                                    break;
+                            }
+                        }
+                    }
+                });
 
         // document reference used to fetch total number of posts field inside of the database
         CollectionReference cr = db.collection("users")
@@ -179,11 +185,9 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         });
 
         backButton.setOnClickListener(view -> {
-            if (filterClicked) {
-                // reset filtered feed if filter was clicked at least once
-                filter.resetFilterButtons();
-                filteredMoods.clear();
-                updateFeed();
+            if(filter.prefs != null) {
+                filter.reset();
+                historyFragment.getRecyclerAdapter().clearMoods();
             }
             finish();
         });
@@ -201,10 +205,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
 
         final ImageButton filterButton = findViewById(R.id.profile_filter_button);
         filterButton.setOnClickListener(view -> {
-            // creates filter window
-            filter = new FilterFragment();
             filter.show(getSupportFragmentManager(), "MAIN_FILTER");
-            filterClicked = true;
         });
 
         final ImageButton logoutButton = findViewById(R.id.logout_button);
@@ -212,44 +213,6 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                 LogoutFragment frag = new LogoutFragment();
                 frag.show(getSupportFragmentManager(), "logout");
         });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        TextView followersText = findViewById(R.id.follower_count);
-        TextView followingText = findViewById(R.id.following_count);
-        TextView postsText = findViewById(R.id.total_posts);
-        db.collection("users").document(currentUser.getUserName()).collection("following").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                followCount = queryDocumentSnapshots.size();
-                followingText.setText(followCount + " following");
-            }
-        });
-        db.collection("users").document(currentUser.getUserName()).collection("followers").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                followersCount = queryDocumentSnapshots.size();
-                followersText.setText(followersCount + " followers");
-            }
-        });
-        db.collection("users").document(currentUser.getUserName()).collection("Moods")
-                .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        postCount = queryDocumentSnapshots.size();
-                        if (postCount > 1 || postCount == 0) {
-                            postsText.setText(postCount + " total posts");
-                        } else if (postCount == 1) {
-                            postsText.setText(postCount + " total post");
-                        }
-                        Log.d("Profile", "Counter update successful");
-                    }
-                });
-
-
-        updateFeed();
     }
 
     /**
@@ -261,69 +224,11 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         Bundle bundle = new Bundle();
         bundle.putSerializable("user",currentUser);
         intent.putExtras(bundle);
-        startActivity(intent);
-    }
-
-    /**
-     * This method updates the FeedFragment whenever the remote database is updated
-     */
-    private void updateFeed(){
-        MoodCollection.addSnapshotListener((queryDocumentSnapshots, e) -> {
-
-            //clears list
-            while( historyFragment.getRecyclerAdapter().getItemCount() > 0) {
-                historyFragment.getRecyclerAdapter().removePost(0);
-                historyFragment.getRecyclerAdapter().notifyItemRemoved(0);
-            }
-            for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
-                if(doc.exists())
-                    historyFragment.getRecyclerAdapter().addPost(doc.toObject(Mood.class));
-            }
-            mapFragment.setFeed(historyFragment.getRecyclerAdapter().getFeed());
-            historyFragment.getRecyclerAdapter().notifyDataSetChanged();
-            mapFragment.updateMap();
-            historyCopy = new ArrayList<>(historyFragment.getRecyclerAdapter().getFeed());
-            int postListCount = historyFragment.getRecyclerAdapter().getItemCount();
-
-            // update total number of posts
-            HashMap<String,Object> userUpdate = new HashMap<>();
-            userUpdate.put("total_posts",String.valueOf(postListCount));
-            db.collection("users").document(currentUser.getUserName())
-                    .update(userUpdate)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d("Profile", "Counter update successful");
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w("Profile", "Counter update failed: " + e);
-                        }
-                    });
-        });
-
-    }
-
-    /**
-     * Takes in a base64 string and converts it into a bitmap
-     * @param photo
-     *          photo to be converted in base64 String format format
-     * @return
-     *      returns bitmap of decoded photo returns null if base64 string was not passed in
-     */
-    private Bitmap getPhoto(String photo){
-        try {
-            @SuppressLint("NewApi") byte[] decoded = Base64.getDecoder()
-                    .decode(photo);
-            return BitmapFactory.decodeByteArray(decoded
-                    , 0, decoded.length);
-        }catch(Exception e){
-            Log.d("-----CONVERT PHOTO-----",
-                    "****NO PHOTO CONVERTED: " + e);
-            return null;
+        if(filter.prefs != null) {
+            filter.reset();
+            historyFragment.getRecyclerAdapter().clearMoods();
         }
+        startActivity(intent);
     }
 
     /**
@@ -333,63 +238,20 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
      * @param moodType - the MoodType to be filtered
      */
     public void onSelect(MoodType moodType){
-        if (historyCopy.size() > 0){
-            filteredMoods.add(moodType);
-            // log used for debugging
-            Log.d("Filter","(SELECT-Profile)Current filtered mood size: "+filteredMoods.size());
-            Iterator<Post> it = historyCopy.iterator();
-            List<Post> result = new ArrayList<>();
-            while (it.hasNext()){
-                Mood m = (Mood)it.next();
-                if (filteredMoods.contains(m.getMoodType())){
-                    result.add(m);
-                }
-            }
-            historyFragment.getRecyclerAdapter().setFeed(result);
-            mapFragment.setFeed(result);
-            historyFragment.getRecyclerAdapter().notifyDataSetChanged();
-            mapFragment.updateMap();
-        }
-    }
-
-    /**
-     * Handles when a filter button is unpressed.
-     * When a filter button is unpressed, all moods that are currently unpressed will be hidden
-     * in the feed. If there is one mood left to be unpressed, when that same mood is unpressed,
-     * the feed will be restored to show all moods.
-     * @param moodType - the MoodType to be unfiltered.
-     */
-    public void onDeselect(MoodType moodType){
-        filteredMoods.remove(moodType);
-        // log used for debugging
-        Log.d("Filter","(DESELECT-Profile)Current filtered mood size: "+filteredMoods.size());
-        if (filteredMoods.size() > 0){
-            Iterator<Post> it = historyCopy.iterator();
-            List<Post> result = new ArrayList<>();
-            while (it.hasNext()){
-                Mood m = (Mood)it.next();
-                if (filteredMoods.contains(m.getMoodType())){
-                    result.add(m);
-                }
-            }
-            historyFragment.getRecyclerAdapter().setFeed(result);
-            mapFragment.setFeed(result);
-            historyFragment.getRecyclerAdapter().notifyDataSetChanged();
-            mapFragment.updateMap();
-        }
-        else {
-            updateFeed();
-        }
+        historyFragment.getRecyclerAdapter().toggleMoodFilter(moodType);
+        historyFragment.getRecyclerAdapter().getFilter().filter(null);
     }
 
     /**
      * Logs out the current logged in user from the application.
      */
     public void onLogout(){
-        Bundle userBundle = getIntent().getExtras();
-        userBundle.remove("User");
         Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
-        intent.putExtras(userBundle);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        if(filter.prefs != null) {
+            filter.reset();
+            historyFragment.getRecyclerAdapter().clearMoods();
+        }
         startActivity(intent);
     }
 }

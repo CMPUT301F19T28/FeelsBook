@@ -58,6 +58,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 user.sendFollowRequest(view.getContext(), list.get(position).getUserName());
                 list.remove(position);
                 notifyItemRemoved(position);
+                notifyItemRangeChanged(position, list.size());
             }
         });
 
