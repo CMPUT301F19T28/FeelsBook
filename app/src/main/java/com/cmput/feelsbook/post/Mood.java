@@ -230,6 +230,14 @@ public class Mood extends Post implements Serializable {
         this.longitude = longitude;
     }
 
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
     public static String photoString(Bitmap bitmap) {
         if(bitmap != null) {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();

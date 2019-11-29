@@ -6,16 +6,16 @@
     android:layout_height="match_parent">
 
 
-    <LinearLayout
+    <TableRow
         android:id="@+id/LinearLayout3"
-        android:layout_width="407dp"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="62dp"
+        android:background="@color/menu_bar_color"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/menu_bar_color">
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -24,9 +24,10 @@
             <Button
                 android:id="@+id/post_button"
                 android:layout_width="70dp"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginRight="10dp"
+                android:layout_marginBottom="5dp"
                 android:background="@drawable/logout_button"
                 android:text="post"
                 android:textColor="@color/defaultWhite"
@@ -42,19 +43,19 @@
                 android:layout_margin="4dp"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
                 android:background="@drawable/circle"
                 android:contentDescription="arrow"
                 android:drawableStart="@drawable/ic_arrow_back_black_24dp"
-                android:paddingStart="8dp"
+                android:paddingStart="15dp"
                 android:paddingEnd="15dp"
-                app:layout_constraintDimensionRatio="1:1"
-                android:shadowColor="#00948E8E"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </LinearLayout>
+    </TableRow>
 
     <TextView
         android:id="@+id/textView"
@@ -142,12 +143,6 @@
             android:layout_weight="1"
             android:text="Location" />
 
-        <Button
-            android:id="@+id/social_situation_button"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="SocialSit" />
     </LinearLayout>
 
     <Button
@@ -173,8 +168,9 @@
         app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText" />
-    <![CDATA[
+        app:layout_constraintTop_toBottomOf="@+id/editText" /><![CDATA[
+
+
 
 
 

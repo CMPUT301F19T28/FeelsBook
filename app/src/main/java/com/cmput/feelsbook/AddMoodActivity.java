@@ -31,6 +31,7 @@ import com.cmput.feelsbook.post.Post;
 import com.cmput.feelsbook.post.SocialSituation;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -64,6 +65,7 @@ public class AddMoodActivity extends AppCompatActivity{
     private FusedLocationProviderClient fusedLocationProviderClient;
     private GeoPoint currentLocation;
     private TextView locationText;
+    private MapView mapView;
 
     private Mood mood = new Mood();
 
@@ -76,6 +78,7 @@ public class AddMoodActivity extends AppCompatActivity{
         input = findViewById(R.id.editText);
         spinner = findViewById(R.id.mood_spinner);
         socialSpinner = findViewById(R.id.social_spinner);
+        mapView = findViewById(R.id.map_view);
 
         MoodTypeAdapter moodTypeAdapter = new MoodTypeAdapter(this, Arrays.asList(MoodType.values()));
         spinner.setAdapter(moodTypeAdapter);
@@ -90,12 +93,21 @@ public class AddMoodActivity extends AppCompatActivity{
 
         Button deleteButton = findViewById(R.id.delete_button);
 
+        //gets current location and sets location view
+        locationText = findViewById(R.id.location_text);
+        getLastKnownLocation();
+        locationText.setText("Current location will be included.");
+        locationText.setVisibility(View.GONE); //sets the location view to be gone because it is optional
+
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
             if ((boolean) bundle.get("editMood")) {
                 mood = (Mood) bundle.get("Mood");
+                input.setText(mood.getReason());
                 spinner.setSelection(moodTypeAdapter.getPosition(mood.getMoodType()));
                 socialSpinner.setSelection(socialAdapter.getPosition(mood.getSituation()));
+                if (mood.hasLocation())
+                    locationText.setVisibility(View.VISIBLE);
                 deleteButton.setVisibility(View.VISIBLE);
                 deleteButton.setOnClickListener(view -> {
                     delete(mood);
@@ -118,22 +130,6 @@ public class AddMoodActivity extends AppCompatActivity{
         Bitmap bitmapProfilePicture = currentUser.getProfilePic();
         ImageView profilePicture = findViewById(R.id.profile_picture);
         profilePicture.setImageBitmap(bitmapProfilePicture);
-
-        //if the social situatiion button is pressed then shows the drop down
-        Button socialBttn = findViewById(R.id.social_situation_button);
-        socialBttn.setOnClickListener(v -> {
-            if (socialSpinner.getVisibility() == View.VISIBLE) {
-                socialSpinner.setVisibility(View.INVISIBLE);
-            } else {
-                socialSpinner.setVisibility(View.VISIBLE);
-            }
-        });
-
-        //gets current location and sets location view
-        locationText = findViewById(R.id.location_text);
-        getLastKnownLocation();
-        locationText.setText("Current location will be included.");
-        locationText.setVisibility(View.GONE); //sets the location view to be gone because it is optional
 
         //if the location button is pressed then shows the drop down
         Button locationBttn = findViewById(R.id.add_location_button);
@@ -166,6 +162,7 @@ public class AddMoodActivity extends AppCompatActivity{
                 mood.setLongitude(currentLocation.getLongitude());
 
             }
+            mood.setUser(currentUser.getUserName());
             mood.setProfilePic(Mood.profilePicString(bitmapProfilePicture));
             onSubmit(mood);
             finish();

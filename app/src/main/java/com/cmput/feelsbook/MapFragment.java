@@ -43,6 +43,7 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -86,6 +87,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private ArrayList<ClusterMarker> clusterMarkers = new ArrayList<>();
     private User currentUser;
     private Boolean firstRun = false;
+    private Boolean profile = false;
     private List<Post> feed;
 
     @Override
@@ -223,7 +225,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             Mood mood = (Mood) feed.get(i);
             if(mood.hasLocation()) {
                 LatLng position = new LatLng(mood.getLatitude(), mood.getLongitude());
-                String title = "TODO: Put username here";
+                String title = mood.getUser();
                 String snippet = getString(mood.getMoodType().getEmoticon()) + "@ " + mood.getDateTime().toString();
                 Bitmap avatar = getPhoto(mood.getPhoto());
                 ClusterMarker clusterMarker = new ClusterMarker(position, title, snippet, avatar, mood);
@@ -263,6 +265,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
 
         initClusterManager();
+        googleMap.setInfoWindowAdapter(clusterManager.getMarkerManager());
         updateMapMarkers();
 
         new Handler().postDelayed(new Runnable() {
