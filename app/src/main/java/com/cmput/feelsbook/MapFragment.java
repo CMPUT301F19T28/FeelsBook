@@ -204,7 +204,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Filtera
                 LatLng position = new LatLng(mood.getLatitude(), mood.getLongitude());
                 String title = mood.getUser();
                 String snippet = getString(mood.getMoodType().getEmoticon()) + "@ " + mood.getDateTime().toString();
-                Bitmap avatar = getPhoto(mood.getProfilePic());
+                Bitmap avatar = Bitmap.createScaledBitmap(mood.profilePicBitmap(), 80, 80, false);
                 ClusterMarker clusterMarker = new ClusterMarker(position, title, snippet, avatar, mood);
                 clusterManager.addItem(clusterMarker);
                 clusterMarkers.add(clusterMarker);
@@ -214,7 +214,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Filtera
 
     @Override
     public void onMapReady(GoogleMap map) {
-        Toast.makeText(getActivity(), "Map is Ready", Toast.LENGTH_SHORT).show();
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
