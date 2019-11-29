@@ -220,6 +220,7 @@ public class Mood extends Post implements Serializable {
         this.location = location;
     }
 
+
     public static String photoString(Bitmap bitmap) {
         if(bitmap != null) {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();

@@ -156,8 +156,17 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                                             .document(doc.getDocument().getId())
                                             .addSnapshotListener((documentSnapshot, e2) -> {
                                                 if(documentSnapshot != null && documentSnapshot.exists()) {
-                                                    feedFragment.getRecyclerAdapter().addPost(documentSnapshot.toObject(Mood.class));
-                                                    feedFragment.getRecyclerAdapter().notifyItemInserted(feedFragment.getRecyclerAdapter().getItemCount() - 1);
+                                                    Mood mood = documentSnapshot.toObject(Mood.class);
+                                                    if(currentUser.getFollowingList().stream().anyMatch(followUser -> followUser.getUserName().equals(mood.getUser()))) {
+                                                        feedFragment.getRecyclerAdapter()
+                                                                .getFeed()
+                                                                .stream()
+                                                                .filter(post -> post.getUser().equals(mood.getUser()))
+                                                                .findFirst()
+                                                                .ifPresent(post -> feedFragment.getRecyclerAdapter().removePost(post));
+                                                        feedFragment.getRecyclerAdapter().addPost(documentSnapshot.toObject(Mood.class));
+                                                        feedFragment.getRecyclerAdapter().notifyItemInserted(feedFragment.getRecyclerAdapter().getItemCount() - 1);
+                                                    }
                                                 }
                                             });
                                     break;
