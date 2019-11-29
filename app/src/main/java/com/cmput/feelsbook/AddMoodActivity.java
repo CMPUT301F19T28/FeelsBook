@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -15,33 +14,18 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.cmput.feelsbook.R;
-import com.cmput.feelsbook.User;
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.Post;
 import com.cmput.feelsbook.post.SocialSituation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
 
 public class AddMoodActivity extends AppCompatActivity{
 
@@ -54,6 +38,8 @@ public class AddMoodActivity extends AppCompatActivity{
     private DocumentReference UserDocument;
     private Spinner spinner;
     private Spinner socialSpinner;
+    private boolean edit = false;
+    private Mood edited;
     private Mood mood = new Mood();
 
 
@@ -83,12 +69,16 @@ public class AddMoodActivity extends AppCompatActivity{
             currentUser = (User) bundle.get("User");
             if ((boolean) bundle.get("editMood")) {
                 mood = (Mood) bundle.get("Mood");
+                input.setText(mood.getReason());
                 spinner.setSelection(moodTypeAdapter.getPosition(mood.getMoodType()));
                 socialSpinner.setSelection(socialAdapter.getPosition(mood.getSituation()));
                 deleteButton.setVisibility(View.VISIBLE);
                 deleteButton.setOnClickListener(view -> {
                     delete(mood);
-                    finish();
+                    Intent intent = new Intent(this, ProfileActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+
                 });
             }
         }
@@ -121,14 +111,18 @@ public class AddMoodActivity extends AppCompatActivity{
         Button backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> finish());
 
-        Button postButton = findViewById(R.id.post_button);
+        Button postButton = findViewById(R.id.edit_button);
         postButton.setOnClickListener(v -> {
             mood.setMoodType(moodTypeAdapter.getItem(spinner.getSelectedItemPosition()));
             mood.setPhoto(Mood.photoString(picture));
             mood.setReason(input.getText().toString());
             mood.setSituation(socialAdapter.getItem(socialSpinner.getSelectedItemPosition()));
             mood.setProfilePic(Mood.profilePicString(bitmapProfilePicture));
+            mood.setUser(currentUser.getUserName());
             onSubmit(mood);
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("Mood", mood);
+            setResult(Activity.RESULT_OK, returnIntent);
             finish();
         });
     }
@@ -199,5 +193,7 @@ public class AddMoodActivity extends AppCompatActivity{
                     }
                 });
     }
+
+//
 
 }

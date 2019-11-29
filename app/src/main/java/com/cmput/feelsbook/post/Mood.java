@@ -132,9 +132,12 @@ public class Mood extends Post implements Serializable {
         return this;
     }
 
-    public Mood withUser(String username){
+    public void setUser(String username){
         this.user = username;
-        return this;
+    }
+
+    public String getUser(){
+        return user;
     }
 
     /**
@@ -216,6 +219,7 @@ public class Mood extends Post implements Serializable {
     public void setLocation(Location location) {
         this.location = location;
     }
+
 
     public static String photoString(Bitmap bitmap) {
         if(bitmap != null) {
