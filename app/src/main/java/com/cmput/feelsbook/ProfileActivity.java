@@ -120,6 +120,11 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
                                     historyFragment.getRecyclerAdapter().notifyItemRemoved(doc.getOldIndex());
                                     historyFragment.getRecyclerAdapter().notifyItemRangeChanged(doc.getOldIndex(), historyFragment.getRecyclerAdapter().getItemCount());
                                     break;
+                                case MODIFIED:
+                                    historyFragment.getRecyclerAdapter().removePost(doc.getOldIndex());
+                                    historyFragment.getRecyclerAdapter().addPost(doc.getDocument().toObject(Mood.class));
+                                    historyFragment.getRecyclerAdapter().notifyItemChanged(doc.getOldIndex());
+
                             }
                         }
                     }
