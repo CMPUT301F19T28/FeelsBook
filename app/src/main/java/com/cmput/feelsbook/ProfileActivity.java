@@ -66,6 +66,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
     private Boolean locationPermissionGranted;
     private List<MoodType> filteredMoods;
     private List<Post> historyCopy;
+    private boolean filterPressed = false;
     private FilterFragment filter;
 
     @Override
@@ -185,7 +186,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         });
 
         backButton.setOnClickListener(view -> {
-            if(filter.prefs != null) {
+            if(filterPressed) {
                 filter.reset();
                 historyFragment.getRecyclerAdapter().clearMoods();
             }
@@ -205,6 +206,8 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
 
         final ImageButton filterButton = findViewById(R.id.profile_filter_button);
         filterButton.setOnClickListener(view -> {
+            filterPressed = true;
+            filter = new FilterFragment();
             filter.show(getSupportFragmentManager(), "MAIN_FILTER");
         });
 
@@ -224,7 +227,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         Bundle bundle = new Bundle();
         bundle.putSerializable("user",currentUser);
         intent.putExtras(bundle);
-        if(filter.prefs != null) {
+        if(filterPressed) {
             filter.reset();
             historyFragment.getRecyclerAdapter().clearMoods();
         }

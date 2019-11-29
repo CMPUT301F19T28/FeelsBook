@@ -44,7 +44,7 @@ public class FilterFragment extends DialogFragment {
     private int posY = 135;
 
     private OnMoodSelectListener listener;
-    public SharedPreferences prefs;
+    protected SharedPreferences prefs;
 
     private boolean happyPressed = false;
     private boolean sadPressed = false;
