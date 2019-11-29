@@ -321,6 +321,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Filtera
         getFilter().filter(null);
     }
 
+    public void clearMoods() {
+        moods.clear();
+        getFilter().filter(null);
+    }
+
     public void toggleMoodFilter(MoodType moodType) {
         Optional<MoodType> mood = moods.stream().filter(moodType1 -> moodType1.equals(moodType)).findFirst();
         if(mood.isPresent())

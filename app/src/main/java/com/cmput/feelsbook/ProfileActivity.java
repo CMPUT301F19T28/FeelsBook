@@ -183,6 +183,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
             if(filterPressed) {
                 filter.reset();
                 historyFragment.getRecyclerAdapter().clearMoods();
+                mapFragment.clearMoods();
             }
             finish();
         });
@@ -224,6 +225,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         if(filterPressed) {
             filter.reset();
             historyFragment.getRecyclerAdapter().clearMoods();
+            mapFragment.clearMoods();
         }
         startActivity(intent);
     }
@@ -250,6 +252,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         if(filter.prefs != null) {
             filter.reset();
             historyFragment.getRecyclerAdapter().clearMoods();
+            mapFragment.clearMoods();
         }
         startActivity(intent);
     }

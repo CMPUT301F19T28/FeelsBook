@@ -115,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
             if(filter.prefs != null) {
                 filter.reset();
                 feedFragment.getRecyclerAdapter().clearMoods();
+                mapFragment.clearMoods();
             }
             startActivity(intent);
         });
