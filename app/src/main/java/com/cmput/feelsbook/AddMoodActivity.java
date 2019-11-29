@@ -90,7 +90,10 @@ public class AddMoodActivity extends AppCompatActivity{
                 deleteButton.setVisibility(View.VISIBLE);
                 deleteButton.setOnClickListener(view -> {
                     delete(mood);
-                    finish();
+                    Intent intent = new Intent(this, ProfileActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+
                 });
             }
         }
