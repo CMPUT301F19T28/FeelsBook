@@ -70,6 +70,7 @@ public class FilterFragment extends DialogFragment {
             throw new RuntimeException(context.toString()
                     + "must implement OnMoodSelectListener");
         }
+        prefs = getActivity().getSharedPreferences("filterkey", Context.MODE_PRIVATE);
     }
 
     /**
@@ -81,8 +82,6 @@ public class FilterFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.filter_fragment, null);
         TextView filterTitle = view.findViewById(R.id.mood_title);
-
-        prefs = getActivity().getSharedPreferences("filterkey", Context.MODE_PRIVATE);
 
         filterHappy = view.findViewById(R.id.happy_mood);
         filterHappy.setOnCheckedChangeListener((compoundButton, b) -> {

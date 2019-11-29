@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
 
         final ImageButton filterButton = findViewById(R.id.filter_button);
         filterButton.setOnClickListener(view -> {
+                feedFragment.getRecyclerAdapter().getFilter().filter(null);
                 filter.show(getSupportFragmentManager(), "MAIN_FILTER");
             });
 

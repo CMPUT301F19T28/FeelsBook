@@ -16,6 +16,7 @@ import com.cmput.feelsbook.post.Post;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Serializable, Filterable {
 
@@ -46,17 +47,18 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
     }
 
     public void addPost(Post post) {
-        feedList.add(post);
-        feedListFiltered.add(post);
+        feedList.add((int) feedList.stream().filter(post1 -> post.getDateTime().compareTo(post1.getDateTime()) > 0).count(), post);
+        getFilter().filter(null);
     }
 
     public void removePost(Post post) {
         feedList.remove(post);
-        feedListFiltered.remove(post);
+        getFilter().filter(null);
     }
 
     public void removePost(int pos) {
-        feedListFiltered.remove(feedList.remove(pos));
+        feedList.remove(pos);
+        getFilter().filter(null);
     }
 
     public Post getPost(int pos) {
@@ -64,8 +66,12 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
     }
 
     public void toggleMoodFilter(MoodType moodType) {
-        if(!moods.remove(moodType))
+        Optional<MoodType> mood = moods.stream().filter(moodType1 -> moodType1.equals(moodType)).findFirst();
+        if(mood.isPresent())
+            moods.remove(mood.get());
+        else
             moods.add(moodType);
+
     }
 
     public void clearMoods() {
