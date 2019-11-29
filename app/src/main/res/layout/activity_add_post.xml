@@ -145,13 +145,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="Location" />
-
-        <Button
-            android:id="@+id/social_situation_button"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="SocialSit" />
+        
     </LinearLayout>
 
     <Button
