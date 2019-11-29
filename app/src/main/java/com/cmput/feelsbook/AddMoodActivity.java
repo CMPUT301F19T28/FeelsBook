@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -104,9 +105,13 @@ public class AddMoodActivity extends AppCompatActivity{
         MoodCollection = UserDocument.collection("Moods");
 
         // sets users profile picture
-        Bitmap bitmapProfilePicture = currentUser.getProfilePic();
+        String stringProfilePicture = currentUser.getProfilePic();
         ImageView profilePicture = findViewById(R.id.profile_picture);
+
+        byte[] photo = Base64.getDecoder().decode(stringProfilePicture);
+        Bitmap bitmapProfilePicture = BitmapFactory.decodeByteArray(photo, 0, photo.length);
         profilePicture.setImageBitmap(bitmapProfilePicture);
+
 
         //if the social situatiion button is pressed then shows the drop down
         Button socialBttn = findViewById(R.id.social_situation_button);

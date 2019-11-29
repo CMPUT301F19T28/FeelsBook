@@ -1,5 +1,7 @@
 package com.cmput.feelsbook;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -48,7 +51,10 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         username.setText(list.get(position).getUserName());
         fullname.setText(list.get(position).getName());
-        profilePic.setImageBitmap(list.get(position).getProfilePic());
+
+        byte[] photo = Base64.getDecoder().decode(list.get(position).getProfilePic());
+        Bitmap bitmapProfilePicture = BitmapFactory.decodeByteArray(photo, 0, photo.length);
+        profilePic.setImageBitmap(bitmapProfilePicture);
 
         Button send = holder.itemView.findViewById(R.id.follow_remove_button);
         send.setText("Send");

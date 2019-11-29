@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
     private boolean filterClicked = false;
     private CollectionReference MoodCollection;
     private DocumentReference UserDocument;
+    private Bitmap bitmapProfilePicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
         });
 
         profileButton = findViewById(R.id.profile_button);
+
         profileButton.setOnClickListener(view -> {
             if (filterClicked){
                 // reset filtered feed if filter was clicked at least once
@@ -174,6 +176,14 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
 
         //setLoading()
         getFollowing();
+
+        String photo = currentUser.getProfilePic();
+        byte[] decodePhoto = Base64.getDecoder().decode(photo);
+        bitmapProfilePicture = BitmapFactory.decodeByteArray(decodePhoto, 0, decodePhoto.length);
+
+        if(bitmapProfilePicture != null){
+            profileButton.setImageBitmap(bitmapProfilePicture);
+        }
     }
 
     private void getFollowing() {
@@ -190,7 +200,9 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                         if (list.size() != 0) {
                             for (int i = 0; i < list.size(); i++) {
                                 DocumentSnapshot doc = list.get(i);
-                                String photo = doc.get("profilePic");
+                                String photo = doc.getString("profilePic");
+                                byte[] decodePhoto = Base64.getDecoder().decode(photo);
+                                bitmapProfilePicture = BitmapFactory.decodeByteArray(decodePhoto, 0, decodePhoto.length);
                                 FollowUser newFollowUser = new FollowUser(doc.getId(), doc.get("name").toString(), photo);
                                 following.add(newFollowUser);
                             }

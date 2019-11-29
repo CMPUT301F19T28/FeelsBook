@@ -1,5 +1,7 @@
 package com.cmput.feelsbook;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +19,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 public class Following extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -64,7 +67,9 @@ public class Following extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         username.setText(list.get(position).getUserName());
         fullname.setText(list.get(position).getName());
-        profilePic.setImageBitmap(list.get(position).getProfilePic());
+        byte[] photo = Base64.getDecoder().decode(list.get(position).getProfilePic());
+        Bitmap bitmapProfilePicture = BitmapFactory.decodeByteArray(photo, 0, photo.length);
+        profilePic.setImageBitmap(bitmapProfilePicture);
 
         Button remove = holder.itemView.findViewById(R.id.follow_remove_button);
         remove.setOnClickListener(new View.OnClickListener() {

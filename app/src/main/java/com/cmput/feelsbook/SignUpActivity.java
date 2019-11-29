@@ -189,7 +189,7 @@ public class SignUpActivity extends AppCompatActivity implements ProfilePicFragm
             try {
                 //puts profilePic into hashmap
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                chosenPic.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+                chosenPic.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 byte[] picData = baos.toByteArray();
                 data.put("profilePic", Base64.encodeToString(picData, Base64.NO_WRAP));
 

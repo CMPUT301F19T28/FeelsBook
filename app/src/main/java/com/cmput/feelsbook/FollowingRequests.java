@@ -84,7 +84,10 @@ public class FollowingRequests extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         userName.setText(list.get(position).getUserName());
         fullName.setText(list.get(position).getName());
-        profilePic.setImageBitmap(list.get(position).getProfilePic());
+
+        byte[] photo = Base64.getDecoder().decode(list.get(position).getProfilePic());
+        Bitmap bitmapProfilePicture = BitmapFactory.decodeByteArray(photo, 0, photo.length);
+        profilePic.setImageBitmap(bitmapProfilePicture);
 
         Button accept = holder.itemView.findViewById(R.id.AcceptButton);
         accept.setOnClickListener(new View.OnClickListener() {
