@@ -1,6 +1,8 @@
 package com.cmput.feelsbook;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -17,6 +19,12 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -47,6 +55,8 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
     private MapFragment mapFragment;
     private Feed.OnItemClickListener listener;
     private FilterFragment filter;
+    private boolean filterClicked = false;
+    private Bitmap bitmapProfilePicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +66,7 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         Bundle bundle = getIntent().getExtras();
         tabLayout = findViewById(R.id.profile_tab);
         viewPager = findViewById(R.id.history_pager);
-        //profilePicture = findViewById(R.drawable.);
+        profilePicture = findViewById(R.id.profile_picture);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         db = FirebaseFirestore.getInstance();
         postCount = 0;
@@ -103,6 +113,14 @@ public class ProfileActivity extends AppCompatActivity implements FilterFragment
         TextView postsText = findViewById(R.id.total_posts);
         fullName.setText(currentUser.getName());
         userName.setText("@" + currentUser.getUserName());
+        String photo = currentUser.getProfilePic();
+        byte[] decodePhoto = Base64.getDecoder().decode(photo);
+        bitmapProfilePicture = BitmapFactory.decodeByteArray(decodePhoto, 0, decodePhoto.length);
+
+
+        if(bitmapProfilePicture != null){
+            profilePicture.setImageBitmap(bitmapProfilePicture);
+        }
 
         db.collection("users")
                 .document(currentUser.getUserName())

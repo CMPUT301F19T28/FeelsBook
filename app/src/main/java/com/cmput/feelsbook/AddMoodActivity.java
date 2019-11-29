@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
@@ -25,6 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.Arrays;
+import java.util.Base64;
 
 public class AddMoodActivity extends AppCompatActivity{
 
@@ -93,8 +95,11 @@ public class AddMoodActivity extends AppCompatActivity{
         MoodCollection = UserDocument.collection("Moods");
 
         // sets users profile picture
-        Bitmap bitmapProfilePicture = currentUser.getProfilePic();
+        String stringProfilePicture = currentUser.getProfilePic();
         ImageView profilePicture = findViewById(R.id.profile_picture);
+
+        byte[] photo = Base64.getDecoder().decode(stringProfilePicture);
+        Bitmap bitmapProfilePicture = BitmapFactory.decodeByteArray(photo, 0, photo.length);
         profilePicture.setImageBitmap(bitmapProfilePicture);
 
         Button cameraButtonAdd = findViewById(R.id.add_picture_button);
@@ -110,7 +115,10 @@ public class AddMoodActivity extends AppCompatActivity{
         Button postButton = findViewById(R.id.edit_button);
         postButton.setOnClickListener(v -> {
             mood.setMoodType(moodTypeAdapter.getItem(spinner.getSelectedItemPosition()));
-            mood.setPhoto(Mood.photoString(picture));
+            if(picture != null)
+                mood.setPhoto(Mood.photoString(picture));
+            else
+                mood.setPhoto(mood.getPhoto());
             mood.setReason(input.getText().toString());
             mood.setSituation(socialAdapter.getItem(socialSpinner.getSelectedItemPosition()));
             mood.setProfilePic(Mood.profilePicString(bitmapProfilePicture));

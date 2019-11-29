@@ -2,6 +2,7 @@ package com.cmput.feelsbook;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -39,7 +40,7 @@ public class User implements Serializable {
     private String name;
     private Feed posts;
     private List<FollowUser> following;
-    private Bitmap profilePicture;
+    private String profilePicture;
 
     public User(String userName, String name, Feed posts){
         this.userName = userName;
@@ -118,6 +119,7 @@ public class User implements Serializable {
                                                 task.getResult().getReference()
                                                         .collection("followRequests")
                                                         .document(getUserName())
+
                                                         .set(new FollowUser(getUserName(), getName(), getProfilePic()))
                                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                             @Override
@@ -212,11 +214,11 @@ public class User implements Serializable {
         following = followsList;
     }
 
-    public Bitmap getProfilePic(){
+    public String getProfilePic(){
         return this.profilePicture;
     }
 
-    public void setProfilePic(Bitmap picture) {this.profilePicture = picture;}
+    public void setProfilePic(String picture) {this.profilePicture = picture;}
 
     public String getUserName() {
         return userName;

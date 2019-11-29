@@ -3,6 +3,8 @@ package com.cmput.feelsbook;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageButton;
@@ -19,7 +21,10 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
 
@@ -39,6 +44,11 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
     private Feed.OnItemClickListener listener;
     private FirebaseFirestore db;
     private FilterFragment filter;
+    private boolean filterClicked = false;
+    private CollectionReference MoodCollection;
+    private DocumentReference UserDocument;
+    private Bitmap bitmapProfilePicture;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
         });
 
         profileButton = findViewById(R.id.profile_button);
+
         profileButton.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             Bundle userBundle = new Bundle();
@@ -118,6 +129,16 @@ public class MainActivity extends AppCompatActivity implements FilterFragment.On
                 feedFragment.getRecyclerAdapter().getFilter().filter(null);
                 filter.show(getSupportFragmentManager(), "MAIN_FILTER");
             });
+
+        // decode profile picture string
+        String photo = currentUser.getProfilePic();
+        byte[] decodePhoto = Base64.getDecoder().decode(photo);
+        bitmapProfilePicture = BitmapFactory.decodeByteArray(decodePhoto, 0, decodePhoto.length);
+
+        if(bitmapProfilePicture != null){
+            profileButton.setImageBitmap(Bitmap.createScaledBitmap(bitmapProfilePicture, 80,80,false));
+        }
+
 
         db.collection("users")
                 .document(currentUser.getUserName())
