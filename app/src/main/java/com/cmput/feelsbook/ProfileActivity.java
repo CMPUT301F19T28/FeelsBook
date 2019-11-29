@@ -1,47 +1,34 @@
 package com.cmput.feelsbook;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.Post;
-import com.cmput.feelsbook.post.SocialSituation;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import io.opencensus.tags.Tag;
 
 /**
  * Handles the profile activities and displays the user profile information.
@@ -56,7 +43,8 @@ import io.opencensus.tags.Tag;
  * FeedFragment feedFragment - contains the feed activity to be displayed
  * FirebaseFirestore db - created instance of the database where data is being pulled from
  */
-public class ProfileActivity extends AppCompatActivity{
+
+public class ProfileActivity extends AppCompatActivity implements FilterFragment.OnMoodSelectListener, LogoutFragment.OnLogoutListener{
     private int followCount;
     private int followersCount;
     private int postCount;
@@ -69,6 +57,7 @@ public class ProfileActivity extends AppCompatActivity{
     private FirebaseFirestore db;
     private MapFragment mapFragment;
     private Feed.OnItemClickListener listener;
+    private FilterFragment filter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,25 +67,26 @@ public class ProfileActivity extends AppCompatActivity{
         Bundle bundle = getIntent().getExtras();
         tabLayout = findViewById(R.id.profile_tab);
         viewPager = findViewById(R.id.history_pager);
+        //profilePicture = findViewById(R.drawable.);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         db = FirebaseFirestore.getInstance();
-
         postCount = 0;
+        filter = new FilterFragment();
 
 
-        if (bundle != null){
-            currentUser = (User)bundle.get("User");
+        if (bundle != null) {
+            currentUser = (User) bundle.get("User");
         }
 
-        listener = new Feed.OnItemClickListener(){
+        listener = new Feed.OnItemClickListener() {
             /**
              * Sets onItemClick to open a fragment in which the mood will be edited
-             * @param post
-             *          Post to be edited
+             *
+             * @param post Post to be edited
              */
 
             @Override
-            public void onItemClick(Post post){
+            public void onItemClick(Post post) {
                 Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
@@ -111,7 +101,7 @@ public class ProfileActivity extends AppCompatActivity{
         historyFragment.getRecyclerAdapter().setOnItemClickListener(listener);
         mapFragment = new MapFragment();
         viewPagerAdapter.AddFragment(historyFragment, "History");
-        viewPagerAdapter.AddFragment(mapFragment,"Map");
+        viewPagerAdapter.AddFragment(mapFragment, "Map");
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -121,10 +111,8 @@ public class ProfileActivity extends AppCompatActivity{
         TextView userName = findViewById(R.id.username);
         TextView postsText = findViewById(R.id.total_posts);
         ImageView profilePicture = findViewById(R.id.profile_picture);
-
-        postCount = historyFragment.getRecyclerAdapter().getItemCount();
         fullName.setText(currentUser.getName());
-        userName.setText("@"+currentUser.getUserName());
+        userName.setText("@" + currentUser.getUserName());
 
         db.collection("users")
                 .document(currentUser.getUserName())
@@ -147,36 +135,61 @@ public class ProfileActivity extends AppCompatActivity{
                     }
                 });
 
-        postsText.setText(postCount + " total post");
+        // document reference used to fetch total number of posts field inside of the database
+        CollectionReference cr = db.collection("users")
+                .document(currentUser.getUserName()).collection("Moods");
 
-        backButton.setOnClickListener(new View.OnClickListener() {
+        cr.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onClick(View view) {
-                finish();
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    QuerySnapshot doc = task.getResult();
+                    if (doc != null) {
+                        postCount = doc.size();
+                        if (postCount > 1 || postCount == 0) {
+                            postsText.setText(postCount + " total posts");
+                        } else if (postCount == 1) {
+                            postsText.setText(postCount + " total post");
+                        }
+                        Log.d("Profile", "Total posts retrieved: " + postCount);
+                    } else {
+                        Log.d("Profile", "No document found");
+                    }
+                } else {
+                    Log.d("Profile", "Document retrieval failed: " + task.getException());
+                }
             }
+        });
+
+        backButton.setOnClickListener(view -> {
+            filter.reset();
+            historyFragment.getRecyclerAdapter().clearMoods();
+            finish();
+        });
+
+
+        final FloatingActionButton profileButton = findViewById(R.id.profile_float_button);
+        profileButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
+            Bundle userBundle = new Bundle();
+            userBundle.putSerializable("User", currentUser);
+            userBundle.putBoolean("editMood", false);
+            intent.putExtras(userBundle);
+            startActivityForResult(intent, 1);
+        });
+
+        final ImageButton filterButton = findViewById(R.id.profile_filter_button);
+        filterButton.setOnClickListener(view -> {
+            filter.show(getSupportFragmentManager(), "MAIN_FILTER");
+        });
+
+        final ImageButton logoutButton = findViewById(R.id.logout_button);
+        logoutButton.setOnClickListener(view -> {
+                LogoutFragment frag = new LogoutFragment();
+                frag.show(getSupportFragmentManager(), "logout");
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        TextView followersText = findViewById(R.id.follower_count);
-        TextView followingText = findViewById(R.id.following_count);
-        db.collection("users").document(currentUser.getUserName()).collection("following").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                followCount = queryDocumentSnapshots.size();
-                followingText.setText(followCount + " following");
-            }
-        });
-        db.collection("users").document(currentUser.getUserName()).collection("followers").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                followersCount = queryDocumentSnapshots.size();
-                followersText.setText(followersCount + " followers");
-            }
-        });
-    }
     /**
      * Launches follower list / following list activity
      * @param v
@@ -186,7 +199,30 @@ public class ProfileActivity extends AppCompatActivity{
         Bundle bundle = new Bundle();
         bundle.putSerializable("user",currentUser);
         intent.putExtras(bundle);
+        filter.reset();
+        historyFragment.getRecyclerAdapter().clearMoods();
+        startActivity(intent);
+    }
+
+    /**
+     * Handles when a filter button is pressed.
+     * Note that when a filter button is pressed, this means that all moods EXCEPT the currently
+     * pressed mood/s will be shown in the feed.
+     * @param moodType - the MoodType to be filtered
+     */
+    public void onSelect(MoodType moodType){
+        historyFragment.getRecyclerAdapter().toggleMoodFilter(moodType);
+        historyFragment.getRecyclerAdapter().getFilter().filter(null);
+    }
+
+    /**
+     * Logs out the current logged in user from the application.
+     */
+    public void onLogout(){
+        Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        filter.reset();
+        historyFragment.getRecyclerAdapter().clearMoods();
         startActivity(intent);
     }
 }
-

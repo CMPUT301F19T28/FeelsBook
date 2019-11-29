@@ -50,7 +50,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         fullname.setText(list.get(position).getName());
         profilePic.setImageBitmap(list.get(position).profilePicBitmap());
 
-        Button send = holder.itemView.findViewById(R.id.removeButton);
+        Button send = holder.itemView.findViewById(R.id.follow_remove_button);
         send.setText("Send");
         send.setOnClickListener(new View.OnClickListener() {
             @Override

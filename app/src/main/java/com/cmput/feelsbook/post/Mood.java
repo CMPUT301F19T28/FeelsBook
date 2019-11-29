@@ -2,6 +2,7 @@ package com.cmput.feelsbook.post;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Location;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -136,7 +137,7 @@ public class Mood extends Post implements Serializable {
         ImageView profile_pic_feed = viewHolder.itemView.findViewById(R.id.profileImage);
         TextView username = viewHolder.itemView.findViewById(R.id.user_name);
 
-
+        viewHolder.itemView.setBackgroundColor(Color.parseColor(moodType.getColor()));
         dateTimeText.setText(dateFormatter.format(dateTime));
         moodText.setText(moodType.getEmoticon());
         profile_pic_feed.setImageBitmap(profilePicBitmap());

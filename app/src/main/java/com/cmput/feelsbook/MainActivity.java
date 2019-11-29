@@ -1,39 +1,26 @@
 package com.cmput.feelsbook;
 
-import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.location.Location;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 import com.cmput.feelsbook.post.Mood;
 import com.cmput.feelsbook.post.MoodType;
-import com.cmput.feelsbook.post.SocialSituation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.cmput.feelsbook.post.Post;
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -41,18 +28,17 @@ import java.util.List;
  * Homepage where a feed of moods/posts will be seen.
  * Comprised of a scrollable RecyclerView
  */
-public class MainActivity extends AppCompatActivity {
-    RecyclerView feedView;
+public class MainActivity extends AppCompatActivity implements FilterFragment.OnMoodSelectListener{
+    private ImageButton profileButton;
     private User currentUser;
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private ViewPagerAdapter viewPagerAdapter;
-    FeedFragment feedFragment;
-    private MapFragment mapFragment;
+    protected FeedFragment feedFragment;
+    protected MapFragment mapFragment;
     private Feed.OnItemClickListener listener;
     private FirebaseFirestore db;
-    private CollectionReference MoodCollection;
-    private DocumentReference UserDocument;
+    private FilterFragment filter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,19 +48,18 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = findViewById(R.id.tab_layout);
         viewPager = findViewById(R.id.view_pager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        ImageButton profileButton = findViewById(R.id.profileButton);
+        profileButton = findViewById(R.id.profile_button);
         db = FirebaseFirestore.getInstance();
+        filter = new FilterFragment();
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             currentUser = (User) bundle.get("User");
         }
 
-        //Sets the document to that of the current user
-        UserDocument = db.collection("users").document(currentUser.getUserName());
-
-        //Sets the collectionReference to that of the current users moods
-        MoodCollection = UserDocument.collection("Moods");
+        if(currentUser == null){
+            throw new AssertionError("User is not set from login.");
+        }
 
         feedFragment = new FeedFragment();
         mapFragment = new MapFragment();
@@ -84,15 +69,14 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
-
         listener = new Feed.OnItemClickListener() {
             /**
              * Sets onItemClick to open a fragment in which the mood will be edited
-             * @param post
-             *          Post to be edited
+             *
+             * @param post Post to be edited
              */
             @Override
-            public void onItemClick(Post post){
+            public void onItemClick(Post post) {
                 Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
                 Bundle userBundle = new Bundle();
                 userBundle.putSerializable("User", currentUser);
@@ -100,11 +84,12 @@ public class MainActivity extends AppCompatActivity {
                 userBundle.putSerializable("Mood", post);
                 intent.putExtras(userBundle);
                 startActivityForResult(intent, 1);
-            }
-        };
+                }
+            };
+
         feedFragment.getRecyclerAdapter().setOnItemClickListener(listener);
 
-        FloatingActionButton addPostBttn = findViewById(R.id.addPostButton);
+        final FloatingActionButton addPostBttn = findViewById(R.id.addPostButton);
         addPostBttn.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), AddMoodActivity.class);
             Bundle userBundle = new Bundle();
@@ -114,13 +99,21 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(intent, 1);
         });
 
+        profileButton = findViewById(R.id.profile_button);
         profileButton.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             Bundle userBundle = new Bundle();
             userBundle.putSerializable("User", currentUser);
             intent.putExtras(userBundle);
+            filter.reset();
+            feedFragment.getRecyclerAdapter().clearMoods();
             startActivity(intent);
         });
+
+        final ImageButton filterButton = findViewById(R.id.filter_button);
+        filterButton.setOnClickListener(view -> {
+                filter.show(getSupportFragmentManager(), "MAIN_FILTER");
+            });
 
         db.collection("users")
                 .document(currentUser.getUserName())
@@ -153,5 +146,16 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    /**
+     * Handles when a filter button is pressed.
+     * Note that when a filter button is pressed, this means that all moods EXCEPT the currently
+     * pressed mood/s will be shown in the feed.
+     * @param moodType - the MoodType to be filtered
+     */
+    public void onSelect(MoodType moodType){
+        feedFragment.getRecyclerAdapter().toggleMoodFilter(moodType);
+        feedFragment.getRecyclerAdapter().getFilter().filter(null);
     }
 }

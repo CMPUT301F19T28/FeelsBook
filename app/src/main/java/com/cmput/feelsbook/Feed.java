@@ -4,21 +4,26 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput.feelsbook.post.Mood;
+import com.cmput.feelsbook.post.MoodType;
 import com.cmput.feelsbook.post.Post;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Serializable {
+public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Serializable, Filterable {
 
     private final String TAG = "Feed";
 
-    private List<Post> feed;
+    private List<Post> feedListFiltered;
+    private List<Post> feedList;
+    private List<MoodType> moods;
 
     private OnItemClickListener listener;
 
@@ -27,33 +32,54 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
     }
 
     public Feed() {
-        this.feed = new ArrayList<>();
+        this.feedList = new ArrayList<>();
+        this.feedListFiltered = new ArrayList<>();
+        this.moods = new ArrayList<>();
         setOnItemClickListener(null);
     }
 
     public Feed(List<Post> feed) {
-
-        this.feed = feed;
+        this.feedList = feed;
+        this.feedListFiltered = feed;
+        this.moods = new ArrayList<>();
         setOnItemClickListener(null);
     }
 
     public void addPost(Post post) {
-        feed.add(post);
+        feedList.add(post);
+        feedListFiltered.add(post);
     }
 
     public void removePost(Post post) {
-        feed.remove(post);
+        feedList.remove(post);
+        feedListFiltered.remove(post);
     }
 
     public void removePost(int pos) {
-        feed.remove(pos);
+        feedListFiltered.remove(feedList.remove(pos));
     }
 
     public Post getPost(int pos) {
-        return feed.get(pos);
+        return feedListFiltered.get(pos);
     }
 
-    public List<Post> getFeed(){ return this.feed; }
+    public void toggleMoodFilter(MoodType moodType) {
+        if(!moods.remove(moodType))
+            moods.add(moodType);
+    }
+
+    public void clearMoods() {
+        moods.clear();
+        getFilter().filter(null);
+    }
+
+    public List<Post> getFeedFiltered() {
+        return feedListFiltered;
+    }
+
+    public List<Post> getFeed(){ return this.feedList; }
+
+    public void setFeed(List<Post> feedList){ this.feedList = feedList;}
 
     public void setOnItemClickListener(OnItemClickListener listener){
         this.listener = listener;
@@ -83,17 +109,44 @@ public class Feed extends RecyclerView.Adapter<Feed.ViewHolder> implements Seria
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Log.d(TAG, "called onBindViewHolder");
-        feed.get(position).displayPost(holder);
-        holder.bind(feed.get(position), listener);
+        feedListFiltered.get(position).displayPost(holder);
+        holder.bind(feedListFiltered.get(position), listener);
     }
 
     @Override
     public int getItemCount() {
-        return feed.size();
+        return feedListFiltered.size();
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                if(moods.isEmpty())
+                    feedListFiltered = feedList;
+                else {
+                    List<Post> filtered = new ArrayList<>();
+                    for(Post post : feedList) {
+                        if(moods.contains(((Mood) post).getMoodType()))
+                            filtered.add(post);
+                    }
+                    feedListFiltered = filtered;
+                }
+                FilterResults results = new FilterResults();
+                results.values = feedListFiltered;
+                return results;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                feedListFiltered = (ArrayList<Post>) filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder  implements Serializable{
-
 
         public ViewHolder(final View view) {
             super(view);
