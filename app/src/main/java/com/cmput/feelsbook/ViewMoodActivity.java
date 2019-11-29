@@ -48,9 +48,9 @@ public class ViewMoodActivity extends AppCompatActivity{
         setContentView(R.layout.view_mood_activity);
 
 
-        moodText = findViewById(R.id.Mood_text);
+        moodText = findViewById(R.id.mood_text);
         reasonText = findViewById(R.id.reason_text);
-        socialSituationText = findViewById(R.id.social_situation_text);
+        socialSituationText = findViewById(R.id.social_text);
         photo = findViewById((R.id.post_picture));
         profilePicture = findViewById(R.id.profile_picture);
         Button editButton = findViewById(R.id.edit_button);
@@ -100,15 +100,17 @@ public class ViewMoodActivity extends AppCompatActivity{
 
     private void setValues(Mood editMood){
 
-        moodText.setText(editMood.getMoodType().toString());
-        reasonText.setText(editMood.getReason());
-
+        moodText.setText(getString(editMood.getMoodType().getEmoticon()));
+        if (editMood.getReason() != ""){
+            reasonText.setText("Reason: " + editMood.getReason());
+        } else {
+            reasonText.setVisibility(View.INVISIBLE);
+        }
         if(editMood.hasSituation()){
             socialSituationText.setText(editMood.getSituation().toString());
-        }else{
-            socialSituationText.setText("N/A");
+        } else{
+            socialSituationText.setVisibility(View.INVISIBLE);
         }
-
         if(editMood.hasPhoto()){
             photo.setImageBitmap(editMood.photoBitmap());
         }
