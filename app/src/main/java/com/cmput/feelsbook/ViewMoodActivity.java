@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -70,8 +71,8 @@ public class ViewMoodActivity extends AppCompatActivity{
         }
 
         // sets users profile picture
-        Bitmap bitmapProfilePicture = currentUser.getProfilePic();
-        profilePicture.setImageBitmap(bitmapProfilePicture);
+        byte[] bitmapProfilePicture = Base64.getDecoder().decode(currentUser.getProfilePic());
+        profilePicture.setImageBitmap(BitmapFactory.decodeByteArray(bitmapProfilePicture, 0, bitmapProfilePicture.length));
 
         Button backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(new View.OnClickListener() {

@@ -26,6 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.Arrays;
+import java.util.Base64;
 
 public class AddMoodActivity extends AppCompatActivity{
 
@@ -114,7 +115,10 @@ public class AddMoodActivity extends AppCompatActivity{
         Button postButton = findViewById(R.id.edit_button);
         postButton.setOnClickListener(v -> {
             mood.setMoodType(moodTypeAdapter.getItem(spinner.getSelectedItemPosition()));
-            mood.setPhoto(Mood.photoString(picture));
+            if(picture != null)
+                mood.setPhoto(Mood.photoString(picture));
+            else
+                mood.setPhoto(mood.getPhoto());
             mood.setReason(input.getText().toString());
             mood.setSituation(socialAdapter.getItem(socialSpinner.getSelectedItemPosition()));
             mood.setProfilePic(Mood.profilePicString(bitmapProfilePicture));
